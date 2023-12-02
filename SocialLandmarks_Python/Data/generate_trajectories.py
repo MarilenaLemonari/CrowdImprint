@@ -1,4 +1,5 @@
 #IMPORTS:
+from enum import unique
 from re import S
 from turtle import mode, shape
 import numpy as np
@@ -25,13 +26,12 @@ pathA=f"{path}agents/"
 pathO=f"{path}obstacles/"
 pathP=f"{path}policies/"
 #IF.XML
-def build_IFxml(desired_name,Ns):
+def build_IFxml(desired_name,Ns,dictionary):
   from xml.dom import minidom
   import os 
   root = minidom.Document()
   xml = root.createElement('InteractionFields') 
   root.appendChild(xml)
-  dictionary=['IF0_approach','IF3_hide','IF2_circlearound','IF4_avoid']
   for i in range(Ns):
     for j in range(len(dictionary)):
       sourceIF=f'source{i+1}'
@@ -97,13 +97,13 @@ def build_AGENTxml(desired_name,positions,s_positions,mode):
       f.write(xml_str)
   return Ns
 #SCENARIO.XML
-def build_SCENARIOxml(desired_name,desired_files, end_time):
+def build_SCENARIOxml(desired_name,desired_files):
   from xml.dom import minidom
   import os 
   root = minidom.Document()
   xml = root.createElement('Simulation')
   xml.setAttribute('delta_time','0.1')
-  xml.setAttribute('end_time',end_time) # Difference!
+  xml.setAttribute('end_time',"11,1") # Difference!
   root.appendChild(xml)
   world=root.createElement('World') 
   world.setAttribute('type', 'Infinite')
@@ -124,30 +124,18 @@ def build_SCENARIOxml(desired_name,desired_files, end_time):
   save_path_file = desired_name 
   with open(save_path_file, "w") as f:
       f.write(xml_str)
-def build_xml(mode,n,init_positions,end_time):
-  #init_positions=np.array([[0,0],[-5,0]])
-  if(mode=="s"):
-    build_IFxml(f"{pathIF}InteractionField_s.xml",1)
-    # Ns=build_AGENTxml(f"{pathA}Agent_gt{n}.xml",np.array([[0,0],[5,5],[-5,5],[5,-5],[-5,-5]]),[0])
-    Ns=build_AGENTxml(f"{pathA}Agent_s.xml",init_positions,[0],mode)
-    build_SCENARIOxml(f"{path}Scenario_s.xml","s",'11.1')
-  elif(mode=="t"):
-    build_IFxml(f"{pathIF}InteractionField_t.xml",1)
-    # Ns=build_AGENTxml(f"{pathA}Agent_t{n}.xml",np.array([[0,0],[5,5],[-5,5],[5,-5],[-5,-5]]),[0])
-    Ns=build_AGENTxml(f"{pathA}Agent_t.xml",init_positions,[0],mode)
-    build_SCENARIOxml(f"{path}Scenario_t.xml","t",'11.1')
-  else:
-    build_IFxml(f"{pathIF}InteractionField_no.xml",1)
-    Ns=build_AGENTxml(f"{pathA}Agent_no.xml",init_positions,[0],mode)
-    build_SCENARIOxml(f"{path}Scenario_no.xml","no",end_time)
+def build_xml(n,init_positions,dictionary):
+  build_IFxml(f"{pathIF}InteractionField_social.xml",1, dictionary)
+  Ns=build_AGENTxml(f"{pathA}Agent_social.xml",init_positions,[0],mode)
+  build_SCENARIOxml(f"{path}Scenario_social.xml","social")
 
-def update_gtIFxml(IFxml_file,W,actionTimes,inactiveTimes):
+def update_gtIFxml(IFxml_file,W,actionTimes,inactiveTimes,unique_size):
   Ns=W.shape[0]
   import xml.etree.ElementTree as ET
   tree = ET.parse(IFxml_file)
   root=tree.getroot()
   for source in range(Ns):
-    for basis_i in range(4):
+    for basis_i in range(unique_size):
       weight=W[source,basis_i]
       element = root[source+basis_i]
       element.set('weight', str(weight))
@@ -168,133 +156,223 @@ def load_trajectories(file_name, resume_time):
   return numpy_array
 def make_trajectory(n,n_agents,mode,category):
   if category == "Training":
-    if mode == "t":
-      folder = "TemporalLandmarks"
-    elif mode == "s":
-      folder="SpatialLandmarks"
-    else:
-      folder="NoLandmarksExt"
+    folder = mode
   else:
-      if mode == "t":
-        folder = "TemporalLandmarks/TestData"
-      elif mode == "s":
-        folder="SpatialLandmarks/TestData"
-      else:
-        folder="NoLandmarksExt/TestData"
+    folder=f"{mode}/TestData"
 
   for i in range(1,n_agents):
-    file=f"C:\PROJECTS\BehavioralLandmarks\BehavioralLandmarks_Python\Data\Trajectories\{folder}\{n}_a{i}.csv"
-    file2=f"C:\PROJECTS\BehavioralLandmarks\BehavioralLandmarks_Python\Data\Trajectories\{folder}\output_{mode}{i}.csv"
+    file=f"C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\Trajectories\{folder}\{n}_a{i}.csv"
+    file2=f"C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\Trajectories\{folder}\output_{mode}{i}.csv"
     if os.path.exists(file)==True:
       os.remove(file)
     if os.path.exists(file2)==True:
       os.remove(file2)
   os.getcwd()
-  os.system(f"C:\\PROJECTS\\DataDrivenInteractionFields\\InteractionFieldsUMANS\\build\\Release\\UMANS-ConsoleApplication-Windows.exe -i Scenario_{mode}.xml -o C:\PROJECTS\BehavioralLandmarks\BehavioralLandmarks_Python\Data\Trajectories\{folder}")
+  os.system(f"C:\\PROJECTS\\DataDrivenInteractionFields\\InteractionFieldsUMANS\\build\\Release\\UMANS-ConsoleApplication-Windows.exe -i Scenario_social.xml -o C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\Trajectories\{folder}")
+  exit()
   S_true=[]
   for i in range(1,n_agents):
-    os.rename(f"C:\PROJECTS\BehavioralLandmarks\BehavioralLandmarks_Python\Data\Trajectories\{folder}\output_{i}.csv",f"C:\PROJECTS\BehavioralLandmarks\BehavioralLandmarks_Python\Data\Trajectories\{folder}\{n}_a{i}.csv")
-    S_true.append(load_trajectories(f"C:/PROJECTS/BehavioralLandmarks/BehavioralLandmarks_Python/Data/Trajectories/{folder}/{n}_a{i}.csv", 0))
+    os.rename(f"C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\Trajectories\{folder}\output_{i}.csv",f"C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\Trajectories\{folder}\{n}_a{i}.csv")
+    S_true.append(load_trajectories(f"C:/PROJECTS/SocialLandmarks/SocialLandmarks_Python/Data/Trajectories/{folder}/{n}_a{i}.csv", 0))
   return S_true
 #---------------------------------------------------------------------------------------------------------------
 
-def generate_instance(n,init_positions,weight,actionTimes,inactiveTimes,mode,category,end_time):
-  build_xml(mode,n,init_positions,end_time)
+def generate_instance(n,init_positions,weight,actionTimes,inactiveTimes,category,dictionary,mode):
+  build_xml(n,init_positions,dictionary)
   n_agents=init_positions.shape[0]
-  update_gtIFxml(f"{pathIF}InteractionField_{mode}.xml",weight,actionTimes,inactiveTimes)
+  update_gtIFxml(f"{pathIF}InteractionField_social.xml",weight,actionTimes,inactiveTimes,len(dictionary))
   S_true=make_trajectory(n,n_agents,mode,category)
 
 if __name__ ==  '__main__':
-  category = "Training" # TODO
+
+  dictionary ={}
+  dictionary[0] = ["IF0_avoid","IF0_far"]
+  dictionary[1] = ["IF1_approach", "IF1_approach2"]
+  dictionary[2] = ["IF2_disperse", "IF2_disperse2"]
+  dictionary[3] = ["IF3_follow", "IF3_follow2"]
+  dictionary[4] = ["IF4_stop", "IF4_stop2"]
+  id_dictionary = {}
+  id_dictionary[0] = "Avoid"
+  id_dictionary[1] = "Approach"
+  id_dictionary[2] = "Disperse"
+  id_dictionary[3] = "Follow"
+  id_dictionary[4] = "Stop"
+
+  category = "Training" 
   if category == "Training":
-    repeat = 1000
+    repeat = 2
     prefix = '_IF_'
   elif category == "Testing":
     repeat = 100
     prefix = '_test_IF_'
-  mode = "no" 
-  counter = 730 #TODO: change mode
-  if mode == "t":
+
+  counter = 0
+  mode = "Single"
+
+  if mode == "Single":
     for r in tqdm(range(repeat)):
+      field_id=random.randint(0,4)
+      dictionary_single = dictionary[field_id]
+      weight=np.zeros((1,len(dictionary_single)))
+      unique1 = random.randint(0,len(dictionary_single)-1)
+      unique2 = random.randint(0,len(dictionary_single)-1)
+      weight[0,unique1] = 1
+      weight[0,unique2] = 1
+      actionTimes=np.ones((1,len(dictionary_single)))*(-1)
+      inactiveTimes=np.ones((1,len(dictionary_single)))*(-1)
+      T = random.randint(1,9)
+      actionTimes[0,unique2] = T
+      inactiveTimes[0,unique1] = T
+      actionTimes[0,unique1] = 0
+      inactiveTimes[0,unique2] = 10
+      
       x0 = 0
       y0 = 0
       radius = 9
       angle = random.uniform(0, 2 * math.pi)
       x = x0 + radius * math.cos(angle)
       y = y0 + radius * math.sin(angle)
-      # print(math.sqrt((x - x0)**2 + (y - y0)**2))
       init_positions=np.array([[x0,y0],[x,y]])
-      # CHANGE ACTIVE INTERACTION FIELDS:
-      weight=np.zeros((1,4))
-      IF1,IF2=random.sample(range(4), 2)
-      weight[0,IF1]=1
-      weight[0,IF2]=1
-      # CHANGE ACTIVE DURATION:
-      T=random.randint(1,9)
-      actionTimes=np.ones((1,4))*(-1)
-      inactiveTimes=np.ones((1,4))*(-1)
-      actionTimes[0,IF1]=0
-      actionTimes[0,IF2]=T
-      inactiveTimes[0,IF1]=T
-      inactiveTimes[0,IF2]=10
-      
-      n=str(counter)+prefix+str(IF1)+str(IF2)+'_T'+str(T)
-      counter += 1
 
-      generate_instance(n,init_positions,weight,actionTimes,inactiveTimes,mode,category,end_time='11.1')
-  elif mode == "s":
+      n=str(counter)+prefix+mode+id_dictionary[field_id]+'_T'+str(T)
+      counter += 1
+      generate_instance(n,init_positions,weight,actionTimes,inactiveTimes,category,dictionary_single,mode)
+
+  elif mode == "Join":
     for r in tqdm(range(repeat)):
+      dictionary_approach = dictionary[1]
+      dictionary_follow = dictionary[3]
+      dictionary_full = dictionary_approach + dictionary_follow
+      weight=np.zeros((1,len(dictionary_full)))
+
+      approach_id=random.randint(0,len(dictionary_approach)-1)
+      follow_id=random.randint(0,len(dictionary_follow)-1)
+      weight[0,approach_id] = 1
+      weight[0, len(dictionary_approach)+follow_id] = 1
+
+      actionTimes=np.ones((1,len(dictionary_full)))*(-1)
+      inactiveTimes=np.ones((1,len(dictionary_full)))*(-1)
+      T = random.randint(1,9)
+      unique1 = approach_id
+      unique2 = len(dictionary_approach) + follow_id
+      actionTimes[0,unique2] = T
+      inactiveTimes[0,unique1] = T
+      actionTimes[0,unique1] = 0
+      inactiveTimes[0,unique2] = 10
+      
       x0 = 0
       y0 = 0
       radius = 9
       angle = random.uniform(0, 2 * math.pi)
       x = x0 + radius * math.cos(angle)
       y = y0 + radius * math.sin(angle)
-      # print(math.sqrt((x - x0)**2 + (y - y0)**2))
       init_positions=np.array([[x0,y0],[x,y]])
-      # CHANGE ACTIVE INTERACTION FIELDS:
-      weight=np.zeros((1,4))
-      IF1,IF2=random.sample(range(4), 2)
-      # CHANGE BLENIDN VALUE: FIX BLENDING VALUE
-      b=random.randint(1,5)
-      # b = 1 
-      weight[0,IF1]=1
-      weight[0,IF2]=b
-      T=10
-      actionTimes=np.ones((1,4))*(-1)
-      inactiveTimes=np.ones((1,4))*(-1)
-      actionTimes[0,IF1]=0
-      actionTimes[0,IF2]=0
-      inactiveTimes[0,IF1]=T
-      inactiveTimes[0,IF2]=T
-      
-      n=str(counter)+prefix+str(IF1)+str(IF2)+'_b'+str(b)
+
+      n=str(counter)+prefix+mode+'_T'+str(T)
       counter += 1
+      generate_instance(n,init_positions,weight,actionTimes,inactiveTimes,category,dictionary_full,mode)
 
-      generate_instance(n,init_positions,weight,actionTimes,inactiveTimes,mode,category,end_time='11.1')
-  elif mode == "no":
+  elif mode == "Visit":
     for r in tqdm(range(repeat)):
+      dictionary_approach = dictionary[1]
+      dictionary_disperse = dictionary[2]
+      dictionary_full = dictionary_approach + dictionary_disperse
+      weight=np.zeros((1,len(dictionary_full)))
 
-      weight=np.zeros((1,4))
-      IF,=random.sample(range(4), 1)
-      weight[0,IF]=1
-      actionTimes=np.ones((1,4))*(-1)
-      inactiveTimes=np.ones((1,4))*(-1)
-      actionTimes[0,IF]=0
-      end_time, = random.sample(range(10,20),1)
-      inactiveTimes[0,IF]=end_time
+      approach_id=random.randint(0,len(dictionary_approach)-1)
+      disperse_id=random.randint(0,len(dictionary_disperse)-1)
+      weight[0,approach_id] = 1
+      weight[0, len(dictionary_approach)+disperse_id] = 1
 
+      actionTimes=np.ones((1,len(dictionary_full)))*(-1)
+      inactiveTimes=np.ones((1,len(dictionary_full)))*(-1)
+      T = random.randint(1,9)
+      unique1 = approach_id
+      unique2 = len(dictionary_approach) + disperse_id
+      actionTimes[0,unique2] = T
+      inactiveTimes[0,unique1] = T
+      actionTimes[0,unique1] = 0
+      inactiveTimes[0,unique2] = 10
+      
       x0 = 0
       y0 = 0
-      radius = 10
+      radius = 9
       angle = random.uniform(0, 2 * math.pi)
       x = x0 + radius * math.cos(angle)
       y = y0 + radius * math.sin(angle)
-      # print(math.sqrt((x - x0)**2 + (y - y0)**2))
       init_positions=np.array([[x0,y0],[x,y]])
+
+      n=str(counter)+prefix+mode+'_T'+str(T)
+      counter += 1
+      generate_instance(n,init_positions,weight,actionTimes,inactiveTimes,category,dictionary_full,mode)
+
+  elif mode == "Meet":
+    for r in tqdm(range(repeat)):
+      dictionary_avoid = dictionary[0]
+      dictionary_approach = dictionary[1]
+      dictionary_full = dictionary_avoid + dictionary_approach
+      weight=np.zeros((1,len(dictionary_full)))
+
+      avoid_id=random.randint(0,len(dictionary_avoid)-1)
+      approach_id=random.randint(0,len(dictionary_approach)-1)
+      weight[0,avoid_id] = 1
+      weight[0, len(dictionary_avoid)+approach_id] = 1
+
+      actionTimes=np.ones((1,len(dictionary_full)))*(-1)
+      inactiveTimes=np.ones((1,len(dictionary_full)))*(-1)
+      T = random.randint(1,9)
+      unique1 = avoid_id
+      unique2 = len(dictionary_avoid) + approach_id
+      actionTimes[0,unique2] = T
+      inactiveTimes[0,unique1] = T
+      actionTimes[0,unique1] = 0
+      inactiveTimes[0,unique2] = 10
       
-      n=str(counter)+prefix+str(IF)+"_dur"+str(end_time)
-      counter += 1 
-      generate_instance(n,init_positions,weight,actionTimes,inactiveTimes,mode,category,str(end_time))
+      x0 = 0
+      y0 = 0
+      radius = 9
+      angle = random.uniform(0, 2 * math.pi)
+      x = x0 + radius * math.cos(angle)
+      y = y0 + radius * math.sin(angle)
+      init_positions=np.array([[x0,y0],[x,y]])
+
+      n=str(counter)+prefix+mode+'_T'+str(T)
+      counter += 1
+      generate_instance(n,init_positions,weight,actionTimes,inactiveTimes,category,dictionary_full,mode)
+
+  elif mode == "Ignore":
+    for r in tqdm(range(repeat)):
+      dictionary_avoid = dictionary[0]
+      dictionary_stop = dictionary[4]
+      dictionary_full = dictionary_avoid + dictionary_stop
+      weight=np.zeros((1,len(dictionary_full)))
+
+      avoid_id=random.randint(0,len(dictionary_avoid)-1)
+      stop_id=random.randint(0,len(dictionary_stop)-1)
+      weight[0,avoid_id] = 1
+      weight[0, len(dictionary_avoid)+stop_id] = 1
+
+      actionTimes=np.ones((1,len(dictionary_full)))*(-1)
+      inactiveTimes=np.ones((1,len(dictionary_full)))*(-1)
+      T = random.randint(1,9)
+      unique1 = avoid_id
+      unique2 = len(dictionary_avoid) + stop_id
+      actionTimes[0,unique2] = T
+      inactiveTimes[0,unique1] = T
+      actionTimes[0,unique1] = 0
+      inactiveTimes[0,unique2] = 10
+      
+      x0 = 0
+      y0 = 0
+      radius = 9
+      angle = random.uniform(0, 2 * math.pi)
+      x = x0 + radius * math.cos(angle)
+      y = y0 + radius * math.sin(angle)
+      init_positions=np.array([[x0,y0],[x,y]])
+
+      n=str(counter)+prefix+mode+'_T'+str(T)
+      counter += 1
+      generate_instance(n,init_positions,weight,actionTimes,inactiveTimes,category,dictionary_full,mode)
+
   else:
-      print("ERROR! Wrong mode")
+    print("Error: Wrong Mode. Select a valid mode.")
