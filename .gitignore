@@ -5,48 +5,50 @@
 
 /.venv/
 /**/*.pv
-/BehavioralLandmarks_Python/Data/wandb/*/
-/BehavioralLandmarks_Python/Data/wandb/
-/BehavioralLandmarks_Python/Data/Full_Model/wandb/
-/BehavioralLandmarks_Python/Step1/Data/
-/BehavioralLandmarks_Python/Tool/Data/TemporalLandmarks/
-/BehavioralLandmarks_Python/Tool/Data/SpatialLandmarks/
-/BehavioralLandmarks_Python/Tool/Data/NoLandmarks/
-/BehavioralLandmarks_Python/Tool/Data/NoLandmarksExt/
-/BehavioralLandmarks_Python/Data/Images/TemporalLandmarks/
-/BehavioralLandmarks_Python/Data/Images/SpatialLandmarks/
-/BehavioralLandmarks_Python/Data/Images/NoLandmarks/
-/BehavioralLandmarks_Python/Data/Images/NoLandmarksExt/
-/BehavioralLandmarks_Python/Data/Images/TemporalLandmarks/TestData/
-/BehavioralLandmarks_Python/Data/Images/SpatialLandmarks/TestData/
-/BehavioralLandmarks_Python/Data/Images/NoLandmarks/TestData/
-/BehavioralLandmarks_Python/Data/Images/NoLandmarksExt/TestData/
-/BehavioralLandmarks_Python/Data/Trajectories/TemporalLandmarks/
-/BehavioralLandmarks_Python/Data/Trajectories/SpatialLandmarks/
-/BehavioralLandmarks_Python/Data/Trajectories/NoLandmarks/
-/BehavioralLandmarks_Python/Data/Trajectories/NoLandmarksExt/
-/BehavioralLandmarks_Python/Data/Trajectories/TemporalLandmarks/TestData/
-/BehavioralLandmarks_Python/Data/Trajectories/SpatialLandmarks/TestData/
-/BehavioralLandmarks_Python/Data/Trajectories/NoLandmarks/TestData/
-/BehavioralLandmarks_Python/Data/Trajectories/NoLandmarksExt/TestData/
-/BehavioralLandmarks_Python/Data/PythonFiles/
-/BehavioralLandmarks_Python/Data/PythonFiles/TestData/
-/BehavioralLandmarks_Python/Step1/Models/
-/BehavioralLandmarks_Python/Step1/wandb/
+/SocialLandmarks_Python/Data/wandb/*/
+/SocialLandmarks_Python/Data/wandb/
+/SocialLandmarks_Python/Data/Full_Model/wandb/
+/SocialLandmarks_Python/Step1/Data/
+/SocialLandmarks_Python/Tool/Data/Single/
+/SocialLandmarks_Python/Tool/Data/Join/
+/SocialLandmarks_Python/Tool/Data/Visit/
+
+/SocialLandmarks_Python/Data/Images/Single/
+/SocialLandmarks_Python/Data/Images/Join/
+/SocialLandmarks_Python/Data/Images/Visit/
+/SocialLandmarks_Python/Data/Images/Single/TestData/
+/SocialLandmarks_Python/Data/Images/Join/TestData/
+/SocialLandmarks_Python/Data/Images/Visit/TestData/
+
+/SocialLandmarks_Python/Data/Trajectories/Single/
+/SocialLandmarks_Python/Data/Trajectories/Join/
+/SocialLandmarks_Python/Data/Trajectories/Visit/
+/SocialLandmarks_Python/Data/Trajectories/Meet/
+/SocialLandmarks_Python/Data/Trajectories/Ignore/
+/SocialLandmarks_Python/Data/Trajectories/Single/TestData/
+/SocialLandmarks_Python/Data/Trajectories/Join/TestData/
+/SocialLandmarks_Python/Data/Trajectories/Visit/TestData/
+/SocialLandmarks_Python/Data/Trajectories/Meet/TestData
+/SocialLandmarks_Python/Data/Trajectories/Ignore/TestData
+
+/SocialLandmarks_Python/Data/PythonFiles/
+/SocialLandmarks_Python/Data/PythonFiles/TestData/
+/SocialLandmarks_Python/Step1/Models/
+/SocialLandmarks_Python/Step1/wandb/
 # /Framework/Models/**/*.pt
 # /Datasets/
-/BehavioralLandmarks_Unity/[Ll]ibrary/
-/BehavioralLandmarks_Unity/[Tt]emp/
-/BehavioralLandmarks_Unity/[Oo]bj/
-/BehavioralLandmarks_Unity/[Bb]uild/
-/BehavioralLandmarks_Unity/[Bb]uilds/
-/BehavioralLandmarks_Unity/[Ll]ogs/
-/BehavioralLandmarks_Unity/[Uu]ser[Ss]ettings/
-/BehavioralLandmarks_Unity/venv
+/SocialLandmarks_Unity/[Ll]ibrary/
+/SocialLandmarks_Unity/[Tt]emp/
+/SocialLandmarks_Unity/[Oo]bj/
+/SocialLandmarks_Unity/[Bb]uild/
+/SocialLandmarks_Unity/[Bb]uilds/
+/SocialLandmarks_Unity/[Ll]ogs/
+/SocialLandmarks_Unity/[Uu]ser[Ss]ettings/
+/SocialLandmarks_Unity/venv
 
 # MemoryCaptures can get excessive in size.
 # They also could contain extremely sensitive data
-/BehavioralLandmarks_Unity/[Mm]emoryCaptures/
+/SocialLandmarks_Unity/[Mm]emoryCaptures/
 
 # Recordings can get excessive in size
 # /Video-to-Crowds-Unity/[Rr]ecordings/

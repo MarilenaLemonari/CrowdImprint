@@ -52,7 +52,7 @@ def build_IFxml(desired_name,Ns,dictionary):
   with open(save_path_file, "w") as f:
       f.write(xml_str)
 #AGENT.XML
-def build_AGENTxml(desired_name,positions,s_positions,mode):
+def build_AGENTxml(desired_name,positions,s_positions,mode,dictionary):
   from xml.dom import minidom
   import os 
   if mode == "t":
@@ -87,7 +87,7 @@ def build_AGENTxml(desired_name,positions,s_positions,mode):
     sourcePolicy.setAttribute('id', '0')
     sourceIF.appendChild(sourcePolicy)
     if (i in s_positions)==True:
-      for j in range(4):
+      for j in range(len(dictionary)):
           sourcePolicy = root.createElement('InteractionField')
           sourcePolicy.setAttribute('id', f'{j}')
           sourceIF.appendChild(sourcePolicy)
@@ -126,7 +126,7 @@ def build_SCENARIOxml(desired_name,desired_files):
       f.write(xml_str)
 def build_xml(n,init_positions,dictionary):
   build_IFxml(f"{pathIF}InteractionField_social.xml",1, dictionary)
-  Ns=build_AGENTxml(f"{pathA}Agent_social.xml",init_positions,[0],mode)
+  Ns=build_AGENTxml(f"{pathA}Agent_social.xml",init_positions,[0],mode,dictionary)
   build_SCENARIOxml(f"{path}Scenario_social.xml","social")
 
 def update_gtIFxml(IFxml_file,W,actionTimes,inactiveTimes,unique_size):
@@ -169,7 +169,6 @@ def make_trajectory(n,n_agents,mode,category):
       os.remove(file2)
   os.getcwd()
   os.system(f"C:\\PROJECTS\\DataDrivenInteractionFields\\InteractionFieldsUMANS\\build\\Release\\UMANS-ConsoleApplication-Windows.exe -i Scenario_social.xml -o C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\Trajectories\{folder}")
-  exit()
   S_true=[]
   for i in range(1,n_agents):
     os.rename(f"C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\Trajectories\{folder}\output_{i}.csv",f"C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\Trajectories\{folder}\{n}_a{i}.csv")
@@ -186,11 +185,13 @@ def generate_instance(n,init_positions,weight,actionTimes,inactiveTimes,category
 if __name__ ==  '__main__':
 
   dictionary ={}
-  dictionary[0] = ["IF0_avoid","IF0_far"]
-  dictionary[1] = ["IF1_approach", "IF1_approach2"]
-  dictionary[2] = ["IF2_disperse", "IF2_disperse2"]
-  dictionary[3] = ["IF3_follow", "IF3_follow2"]
-  dictionary[4] = ["IF4_stop", "IF4_stop2"]
+  dictionary[0] = ["IF0_AvoidFar","IF0_AvoidNear", "IF0_OvertakeNear", "IF0_OvertakeFar"]
+  dictionary[1] = ["IF1_ApproachFront", "IF1_ApproachFrontSide","IF1_ApproachStraight"]
+  dictionary[2] = ["IF2_DisperseDown", "IF2_DisperseDownLeft","IF2_DisperseDownRight",
+                   "IF2_DisperseGeneral","IF2_DisperseLeft","IF2_DisperseRight","IF2_DisperseUp"
+                   ,"IF2_DisperseUpLeft","IF2_DisperseUpRight"]
+  dictionary[3] = ["IF3_FollowAjar", "IF3_FollowFar","IF3_FollowGeneral","IF3_FollowNear"]
+  dictionary[4] = ["IF4_Stop", "IF4_StopNear","IF4_Stop4pts"]
   id_dictionary = {}
   id_dictionary[0] = "Avoid"
   id_dictionary[1] = "Approach"
@@ -200,14 +201,14 @@ if __name__ ==  '__main__':
 
   category = "Training" 
   if category == "Training":
-    repeat = 2
+    repeat = 1000
     prefix = '_IF_'
   elif category == "Testing":
     repeat = 100
     prefix = '_test_IF_'
 
   counter = 0
-  mode = "Single"
+  mode = "Join"
 
   if mode == "Single":
     for r in tqdm(range(repeat)):
@@ -236,6 +237,7 @@ if __name__ ==  '__main__':
 
       n=str(counter)+prefix+mode+id_dictionary[field_id]+'_T'+str(T)
       counter += 1
+
       generate_instance(n,init_positions,weight,actionTimes,inactiveTimes,category,dictionary_single,mode)
 
   elif mode == "Join":
