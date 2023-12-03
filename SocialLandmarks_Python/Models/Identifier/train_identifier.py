@@ -22,8 +22,8 @@ from keras.layers import Dropout
 
 os.environ['WANDB_API_KEY']="29162836c3095b286c169bf889de71652ed3201b"
 
-#TODO: go to cd C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data
-# Execute python3 C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Models\Identifier\train_identifier.py
+#TODO: go to cd C:\PROJECTS\BehavioralLandmarks\BehavioralLandmarks_Python\Data
+# Execute python3 C:\PROJECTS\BehavioralLandmarks\BehavioralLandmarks_Python\Models\Identification\train_identifier.py
 
 # HELPER FUNCTIONS
 def visualize_image(array):
@@ -39,59 +39,61 @@ def scale_to_standard_normal(images):
     return scaled_images
 
 # LOAD DATA
-folder_path = 'PythonFiles\Identifier'  #TODO: change
+folder_path = 'PythonFiles'  
 file_list = os.listdir(folder_path)
 npz_files = [file for file in file_list if file.endswith('.npz')]
 loaded_images = []
 field_ID = []
-class_0 = 0 # Avoid
-class_1 = 0 # Approach
-class_2 = 0 # Disperse
-class_3 = 0 # Follow
-class_4 = 0 # Stop
+class_0 = 0 # Apporach
+class_1 = 0 # Wander
+class_2 = 0 # Circle Around
+class_3 = 0 # Avoid
 for npz_file in tqdm(npz_files):
+
     name_parts = npz_file.split('_')
     type_index = name_parts.index("type")
-    value_after_type = int(name_parts[type_index + 1])
-    
-    file_path = os.path.join(folder_path, npz_file)
-    loaded_data = np.load(file_path)
-    array_keys = loaded_data.files
-    array_key = array_keys[0]
-    array = loaded_data[array_key]
-    if (array.dtype != 'float32'):
-        print(file_path)
-        exit()
-    loaded_images.append(array)
+    value_after_type = name_parts[type_index + 1]
+    if(int(value_after_type) == 2):# NO LANDMARK IS FOUND
+        # Read image:
+        file_path = os.path.join(folder_path, npz_file)
+        loaded_data = np.load(file_path)
+        array_keys = loaded_data.files
+        array_key = array_keys[0]
+        array = loaded_data[array_key]
+        if (array.dtype != 'float32'):
+            print(file_path)
+            exit()
+        loaded_images.append(array)
 
-    field_ID.append(value_after_type)
-    if (value_after_type == 0):
-        class_0 += 1
-    elif (value_after_type == 1):
-        class_1 += 1
-    elif (value_after_type == 2):
-        class_2 += 1
-    elif (value_after_type == 3):
-        class_3 += 1
-    elif (value_after_type == 4):
-        class_4 += 1
-    # elif (value_after_IF == 5):
-    #     class_5 += 1
-    else:
-        print("ERROR: Invalid Field ID: ",value_after_type)
-        exit()
+        # Read field id:
+        type_index2 = name_parts.index("IF")
+        value_after_IF = int(name_parts[type_index2 + 1])
+        field_ID.append(value_after_IF)
+        if (value_after_IF == 0):
+            class_0 += 1
+        elif (value_after_IF == 1):
+            class_1 += 1
+        elif (value_after_IF == 2):
+            class_2 += 1
+        elif (value_after_IF == 3):
+            class_3 += 1
+            # elif (value_after_IF == 4):
+            #     class_4 += 1
+            # elif (value_after_IF == 5):
+            #     class_5 += 1
+        else:
+            print("ERROR: Invalid Field ID.")
+            exit()
 
-min_class =(np.min(np.array([class_0,class_1,class_2,class_3])))
-max_class =(np.max(np.array([class_0,class_1,class_2,class_3])))
-print(class_0,class_1,class_2,class_3,class_4) # 21402 22362 21730 20598 22122
+# min_class =(np.min(np.array([class_0,class_1,class_2,class_3])))
+# max_class =(np.max(np.array([class_0,class_1,class_2,class_3])))
+# print(class_0,class_1,class_2,class_3) #32448
 # exit()
 
 # NORMALIZE DATA
 gt = np.array(field_ID)
 #loaded_images = np.array(loaded_images)
 x = scale_to_standard_normal(loaded_images)
-# print(x.shape, gt.shape)
-# exit()
 
 # index =513
 # print(loaded_images[index].shape)
@@ -118,7 +120,7 @@ class CustomDataset(Dataset):
         return image, label
 
 dataset = CustomDataset(x,gt)
-batch_size = 64
+batch_size = 16 #TODO: change to 32
 dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
 
 x_train, x_val, y_train, y_val = train_test_split(x, gt, test_size=0.2, random_state=42)
@@ -145,7 +147,7 @@ model.add(Dense(128))
 model.add(Activation('relu'))
 model.add(Dropout(0.2))
 
-model.add(Dense(5))
+model.add(Dense(4))
 # model.add(Activation('sigmoid'))
 model.add(Activation('softmax')) # TODO
 
@@ -159,15 +161,15 @@ model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=
 # exit()
 
 # HYPERPARAMETERS
-wandb.init(project="SocialLandmarks")
+wandb.init(project="BehavioralLandmarks")
 config = wandb.config
-config.epochs = 50
+config.epochs = 100
 config.batch_size = batch_size
 
 model.fit(x_train, y_train, epochs=config.epochs, batch_size=config.batch_size,
           validation_data=(x_val, y_val),
           callbacks=[WandbCallback()])
-model.save("C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Models\Identifier\identifier_v1.h5")
+model.save("C:\PROJECTS\BehavioralLandmarks\BehavioralLandmarks_Python\Models\Identification\identifierv3.h5")
 print("MODEL IS SAVED!!")
 wandb.finish()
 
