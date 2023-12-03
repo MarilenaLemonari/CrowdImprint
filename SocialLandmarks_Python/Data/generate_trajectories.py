@@ -185,13 +185,13 @@ def generate_instance(n,init_positions,weight,actionTimes,inactiveTimes,category
 if __name__ ==  '__main__':
 
   dictionary ={}
-  dictionary[0] = ["IF0_AvoidFar","IF0_AvoidNear", "IF0_OvertakeNear", "IF0_OvertakeFar"]
-  dictionary[1] = ["IF1_ApproachFront", "IF1_ApproachFrontSide","IF1_ApproachStraight"]
+  dictionary[0] = ["IF0_AvoidFar","IF0_AvoidNear", "IF0_OvertakeNear", "IF0_OvertakeFar"] #TODO: If far enough? what then?
+  dictionary[1] = ["IF1_ApproachFront", "IF1_ApproachFrontSide","IF1_ApproachStraight"] #TODO: more than 1?
   dictionary[2] = ["IF2_DisperseDown", "IF2_DisperseDownLeft","IF2_DisperseDownRight",
                    "IF2_DisperseGeneral","IF2_DisperseLeft","IF2_DisperseRight","IF2_DisperseUp"
                    ,"IF2_DisperseUpLeft","IF2_DisperseUpRight"]
-  dictionary[3] = ["IF3_FollowAjar", "IF3_FollowFar","IF3_FollowGeneral","IF3_FollowNear"]
-  dictionary[4] = ["IF4_Stop", "IF4_StopNear","IF4_Stop4pts"]
+  dictionary[3] = ["IF3_FollowAjar", "IF3_FollowFar","IF3_FollowGeneral","IF3_FollowNear"] #TODO: requires knowledge of movement of source.
+  dictionary[4] = ["IF4_Stop", "IF4_StopNear","IF4_Stop4pts"] # TODO: not avoidance
   id_dictionary = {}
   id_dictionary[0] = "Avoid"
   id_dictionary[1] = "Approach"
@@ -208,7 +208,8 @@ if __name__ ==  '__main__':
     prefix = '_test_IF_'
 
   counter = 0
-  mode = "Join"
+  mode = "Ignore"
+  radius = 5
 
   if mode == "Single":
     for r in tqdm(range(repeat)):
@@ -216,26 +217,28 @@ if __name__ ==  '__main__':
       dictionary_single = dictionary[field_id]
       weight=np.zeros((1,len(dictionary_single)))
       unique1 = random.randint(0,len(dictionary_single)-1)
-      unique2 = random.randint(0,len(dictionary_single)-1)
+      # unique2 = random.randint(0,len(dictionary_single)-1)
       weight[0,unique1] = 1
-      weight[0,unique2] = 1
+      # weight[0,unique2] = 1
       actionTimes=np.ones((1,len(dictionary_single)))*(-1)
       inactiveTimes=np.ones((1,len(dictionary_single)))*(-1)
-      T = random.randint(1,9)
-      actionTimes[0,unique2] = T
-      inactiveTimes[0,unique1] = T
+      # T = random.randint(1,9)
+      # actionTimes[0,unique2] = T
+      # inactiveTimes[0,unique1] = T
+      inactiveTimes[0,unique1] = 10
       actionTimes[0,unique1] = 0
-      inactiveTimes[0,unique2] = 10
+      # inactiveTimes[0,unique2] = 10
       
       x0 = 0
       y0 = 0
-      radius = 9
+      # radius = 5 #TODO: Leave for now
       angle = random.uniform(0, 2 * math.pi)
       x = x0 + radius * math.cos(angle)
       y = y0 + radius * math.sin(angle)
       init_positions=np.array([[x0,y0],[x,y]])
 
-      n=str(counter)+prefix+mode+id_dictionary[field_id]+'_T'+str(T)
+      # n=str(counter)+prefix+mode+id_dictionary[field_id]+'_T'+str(T)
+      n=str(counter)+prefix+mode+id_dictionary[field_id]+"_"+str(unique1)
       counter += 1
 
       generate_instance(n,init_positions,weight,actionTimes,inactiveTimes,category,dictionary_single,mode)
@@ -264,7 +267,7 @@ if __name__ ==  '__main__':
       
       x0 = 0
       y0 = 0
-      radius = 9
+      # radius = 5
       angle = random.uniform(0, 2 * math.pi)
       x = x0 + radius * math.cos(angle)
       y = y0 + radius * math.sin(angle)
@@ -298,7 +301,7 @@ if __name__ ==  '__main__':
       
       x0 = 0
       y0 = 0
-      radius = 9
+      # radius = 5
       angle = random.uniform(0, 2 * math.pi)
       x = x0 + radius * math.cos(angle)
       y = y0 + radius * math.sin(angle)
@@ -332,7 +335,7 @@ if __name__ ==  '__main__':
       
       x0 = 0
       y0 = 0
-      radius = 9
+      # radius = 9
       angle = random.uniform(0, 2 * math.pi)
       x = x0 + radius * math.cos(angle)
       y = y0 + radius * math.sin(angle)
@@ -366,7 +369,7 @@ if __name__ ==  '__main__':
       
       x0 = 0
       y0 = 0
-      radius = 9
+      # radius = 9
       angle = random.uniform(0, 2 * math.pi)
       x = x0 + radius * math.cos(angle)
       y = y0 + radius * math.sin(angle)

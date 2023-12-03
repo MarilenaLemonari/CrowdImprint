@@ -29,9 +29,11 @@ import cv2
 
 # Parameters
 current_file_dir = os.path.dirname(os.path.abspath(__file__))
-# name = "SpatialLandmarks"
-# name = "TemporalLandmarks"
-name = "NoLandmarksExt" #TODO change according to mode
+name = "Single"
+# name = "Join"
+# name = "Visit"
+# name = "Meet"
+# name = "Ignore"
 category = "Training"
 # name = "TemporalLandmarks/TestData"
 path = "\Trajectories\\" + name + "\\"
@@ -321,6 +323,22 @@ def process_frame_range(args):
 
     return empty_images_predictions
 
+def create_images(key, value, dataset_name, resolution= 32):
+    pixel_pos_x = value["pos_x"] * resolution
+    pixel_pos_z = value["pos_z"] * resolution
+    image = np.zeros((resolution,resolution), np.float32)
+    for i in range(len(pixel_pos_x)):
+        pixel_x = int(pixel_pos_x[i])
+        pixel_z = int(pixel_pos_z[i])
+        image[pixel_x,pixel_z] = 1 #color pixel
+
+    dir_name = current_file_dir + "\Images\\" + dataset_name + "\\"
+    os.makedirs(dir_name, exist_ok=True)
+    dir_full_name = dir_name
+    filename = key
+    tifffile.imwrite(dir_full_name + filename + '.tif', image)
+    
+
 def parallel_create_images(key,frame_dict, env_dict, step, separation, dataset_name, kernel_size, stride, thicken_radius, n_processes=None):
     if n_processes is None:
         n_processes = os.cpu_count()
@@ -340,6 +358,43 @@ def parallel_create_images(key,frame_dict, env_dict, step, separation, dataset_n
         all_empty_predictions.update(empty_predictions)
 
     return all_empty_predictions
+
+def read_csv_files(csv_directory,framerate, bound = 11):
+    csv_files = [f for f in os.listdir(csv_directory) if f.endswith('.csv')]
+
+    data_dict = {}
+    all_dfs = []
+
+    row_threshold = 3
+    for filename in csv_files:
+        # Read the CSV file into a pandas DataFrame and assign column names
+        df = pd.read_csv(os.path.join(csv_directory, filename), 
+            header=None, names=['frame', 'pos_x', 'pos_z','or_x','or_z'], 
+            skiprows=None,
+            #skiprows=lambda index: index == 0 or skip_rows(index, row_step),
+            usecols=[0, 1, 2])
+        if df.shape[0] < row_threshold:
+            continue
+        
+        data_dict[filename] = df
+        all_dfs.append(df)
+
+    all_data = pd.concat(all_dfs, ignore_index=True)
+    min_pos_x = np.min(all_data['pos_x'])
+    max_pos_x = np.max(all_data['pos_x'])
+    min_pos_z = np.min(all_data['pos_z'])
+    max_pos_z = np.max(all_data['pos_z'])
+    
+    # Make from [-12,12] to [0,1]
+    for filename, df in data_dict.items():
+        # Remove outliers
+        df = df[(df['pos_x'] >= -bound) & (df['pos_x'] <= bound)]
+        df = df[(df['pos_z'] >= -bound) & (df['pos_z'] <= bound)]
+        # Normalize
+        df["pos_x"] = (df['pos_x'] + bound) / (2 *bound)
+        df["pos_z"] = (df['pos_z'] + bound) / (2 *bound)
+        data_dict[filename] = df
+    return data_dict
 
 def read_csv_files_and_env_json(csv_directory,row_step,framerate):
     with open(csv_directory + "env.json") as json_file:
@@ -445,7 +500,7 @@ def get_grid_separation(width, height, multiplier):
 
 # Execute
 if __name__ ==  '__main__':
-    csv_data, env_dict, agent_dict = read_csv_files_and_env_json(csv_directory,row_step,framerate)
+    csv_data = read_csv_files(csv_directory,framerate)
 
     frame_interval = 200
     kernel_size = 2
@@ -460,14 +515,16 @@ if __name__ ==  '__main__':
     n_csvs = len(csv_data)
     dict_list = list(csv_data.items())
 
-    for i in range(n_csvs):
+    for i in tqdm(range(n_csvs)):
         key, value = dict_list[i]
-        csv_data_ind = {key: value}
-        frame_dict = create_frame_dict(csv_data_ind)
+        # csv_data_ind = {key: value}
+        # frame_dict = create_frame_dict(csv_data_ind)
         prefix = 'img_'+key.split("_")[0]
-        folder_path = "C:\\PROJECTS\\BehavioralLandmarks\\BehavioralLandmarks_Python\\Data\\Images\\NoLandmarksExt"
+        folder_path = "C:\\PROJECTS\\SocialLandmarks\\SocialLandmarks_Python\\Data\\Images\\Single"
+        dataset_name = "Single"
         files = os.listdir(folder_path)
         file_exists = any(file.startswith(prefix) for file in files)
         if file_exists == False:
             # Change structure of dictionary to add points of agents in each frame
-            empty_predictions = parallel_create_images(key, frame_dict, env_dict, frame_interval, separation, name, kernel_size, stride, thicken_radius, n_processes=n_processes)
+            empty_predictions = create_images(key, value, dataset_name)
+            #empty_predictions = parallel_create_images(key, frame_dict, env_dict, frame_interval, separation, name, kernel_size, stride, thicken_radius, n_processes=n_processes)

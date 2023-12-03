@@ -16,9 +16,13 @@
 /SocialLandmarks_Python/Data/Images/Single/
 /SocialLandmarks_Python/Data/Images/Join/
 /SocialLandmarks_Python/Data/Images/Visit/
+/SocialLandmarks_Python/Data/Images/Meet/
+/SocialLandmarks_Python/Data/Images/Ignore/
 /SocialLandmarks_Python/Data/Images/Single/TestData/
 /SocialLandmarks_Python/Data/Images/Join/TestData/
 /SocialLandmarks_Python/Data/Images/Visit/TestData/
+/SocialLandmarks_Python/Data/Images/Meet/TestData/
+/SocialLandmarks_Python/Data/Images/Ignore/TestData/
 
 /SocialLandmarks_Python/Data/Trajectories/Single/
 /SocialLandmarks_Python/Data/Trajectories/Join/
