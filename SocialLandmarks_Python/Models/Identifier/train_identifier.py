@@ -44,11 +44,14 @@ file_list = os.listdir(folder_path)
 npz_files = [file for file in file_list if file.endswith('.npz')]
 loaded_images = []
 field_ID = []
-class_0 = 0 # Avoid
-class_1 = 0 # Approach
-class_2 = 0 # Disperse
-class_3 = 0 # Follow
-class_4 = 0 # Stop
+class_0 = 0 
+class_1 = 0 
+class_2 = 0 
+class_3 = 0 
+class_4 = 0 
+class_5 = 0 
+class_6 = 0 
+class_7 = 0 
 for npz_file in tqdm(npz_files):
 
     name_parts = npz_file.split('_')
@@ -77,14 +80,20 @@ for npz_file in tqdm(npz_files):
         class_3 += 1
     elif (value_after_type == 4):
         class_4 += 1
+    elif (value_after_type == 5):
+        class_5 += 1
+    elif (value_after_type == 6):
+        class_6 += 1
+    elif (value_after_type == 7):
+        class_7 += 1
     else:
         print("ERROR: Invalid Field ID.")
         exit()
 
-# min_class =(np.min(np.array([class_0,class_1,class_2,class_3])))
-# max_class =(np.max(np.array([class_0,class_1,class_2,class_3])))
-# print(class_0,class_1,class_2,class_3,class_4) #21402 22362 21730 20598 22122
-# exit()
+min_class =(np.min(np.array([class_0,class_1,class_2,class_3])))
+max_class =(np.max(np.array([class_0,class_1,class_2,class_3])))
+print(class_0,class_1,class_2,class_3,class_4, class_5, class_6, class_7) #21402 22362 21730 20598 22122
+exit()
 
 # NORMALIZE DATA
 gt = np.array(field_ID)
@@ -143,7 +152,7 @@ model.add(Dense(128))
 model.add(Activation('relu'))
 model.add(Dropout(0.2))
 
-model.add(Dense(5))
+model.add(Dense(8))
 # model.add(Activation('sigmoid'))
 model.add(Activation('softmax')) # TODO
 
@@ -165,7 +174,7 @@ config.batch_size = batch_size
 model.fit(x_train, y_train, epochs=config.epochs, batch_size=config.batch_size,
           validation_data=(x_val, y_val),
           callbacks=[WandbCallback()])
-model.save("C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Models\Identifier\identifier_v1.h5")
+model.save("C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Models\Identifier\identifier_v2.h5")
 print("MODEL IS SAVED!!")
 wandb.finish()
 

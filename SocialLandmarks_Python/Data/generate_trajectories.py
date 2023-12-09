@@ -184,200 +184,52 @@ def generate_instance(n,init_positions,weight,actionTimes,inactiveTimes,category
 
 if __name__ ==  '__main__':
 
-  dictionary ={}
-  dictionary[0] = ["IF0_AvoidFar","IF0_AvoidNear", "IF0_OvertakeNear", "IF0_OvertakeFar"] #TODO: If far enough? what then?
-  dictionary[1] = ["IF1_ApproachFront", "IF1_ApproachFrontSide","IF1_ApproachStraight"] #TODO: more than 1?
-  dictionary[2] = ["IF2_DisperseDown", "IF2_DisperseDownLeft","IF2_DisperseDownRight",
-                   "IF2_DisperseGeneral","IF2_DisperseLeft","IF2_DisperseRight","IF2_DisperseUp"
-                   ,"IF2_DisperseUpLeft","IF2_DisperseUpRight"]
-  dictionary[3] = ["IF3_FollowAjar", "IF3_FollowFar","IF3_FollowGeneral","IF3_FollowNear"] #TODO: requires knowledge of movement of source.
-  dictionary[4] = ["IF4_Stop", "IF4_StopNear","IF4_Stop4pts"] # TODO: not avoidance
-  id_dictionary = {}
-  id_dictionary[0] = "Avoid"
-  id_dictionary[1] = "Approach"
-  id_dictionary[2] = "Disperse"
-  id_dictionary[3] = "Follow"
-  id_dictionary[4] = "Stop"
+  # behavior_list = ["Attractive_ExternalEntity","Attractive_Multidirectional","Attractive_Tridirectional","Attractive_Unidirectional","Other_CircleAround",
+  #                  "Other_Repulsive","StopFar","Unidirectional_Down","Unidirectional_DownwardLeft","Unidirectional_DownwardRight","Unidirectional_Left",
+  #                  "Unidirectional_Right","Unidirectional_Up","Unidirectional_UpperLeft","Unidirectional_UpperRight"]
+
+  behavior_list = ["Attractive_ExternalEntity","Attractive_Multidirectional","Attractive_Tridirectional","Attractive_Unidirectional","Other_CircleAround",
+                   "Other_Repulsive","StopFar","Unidirectional_Down"]
+
+  dictionary = {}
+  for i in range(len(behavior_list)):
+    dictionary[i] = behavior_list[i]
 
   category = "Training" 
   if category == "Training":
-    repeat = 1000
+    repeat = 1000 * len(behavior_list) # TODO:change
     prefix = '_IF_'
   elif category == "Testing":
     repeat = 100
     prefix = '_test_IF_'
 
   counter = 0
-  mode = "Ignore"
+  mode = "Single"
   radius = 5
 
   if mode == "Single":
     for r in tqdm(range(repeat)):
-      field_id=random.randint(0,4)
-      dictionary_single = dictionary[field_id]
-      weight=np.zeros((1,len(dictionary_single)))
-      unique1 = random.randint(0,len(dictionary_single)-1)
-      # unique2 = random.randint(0,len(dictionary_single)-1)
-      weight[0,unique1] = 1
-      # weight[0,unique2] = 1
-      actionTimes=np.ones((1,len(dictionary_single)))*(-1)
-      inactiveTimes=np.ones((1,len(dictionary_single)))*(-1)
+      field_id=random.randint(0,len(behavior_list)-1)
+      weight=np.zeros((1,len(behavior_list)))
+      weight[0,field_id] = 1
+      actionTimes=np.ones((1,len(behavior_list)))*(-1)
+      inactiveTimes=np.ones((1,len(behavior_list)))*(-1)
       # T = random.randint(1,9)
-      # actionTimes[0,unique2] = T
-      # inactiveTimes[0,unique1] = T
-      inactiveTimes[0,unique1] = 10
-      actionTimes[0,unique1] = 0
-      # inactiveTimes[0,unique2] = 10
+      inactiveTimes[0,field_id] = 10
+      actionTimes[0,field_id] = 0
       
       x0 = 0
       y0 = 0
-      # radius = 5 #TODO: Leave for now
       angle = random.uniform(0, 2 * math.pi)
       x = x0 + radius * math.cos(angle)
       y = y0 + radius * math.sin(angle)
       init_positions=np.array([[x0,y0],[x,y]])
 
       # n=str(counter)+prefix+mode+id_dictionary[field_id]+'_T'+str(T)
-      n=str(counter)+prefix+mode+id_dictionary[field_id]+"_"+str(unique1)
+      n=str(counter)+prefix+str(field_id)+mode
       counter += 1
 
-      generate_instance(n,init_positions,weight,actionTimes,inactiveTimes,category,dictionary_single,mode)
-
-  elif mode == "Join":
-    for r in tqdm(range(repeat)):
-      dictionary_approach = dictionary[1]
-      dictionary_follow = dictionary[3]
-      dictionary_full = dictionary_approach + dictionary_follow
-      weight=np.zeros((1,len(dictionary_full)))
-
-      approach_id=random.randint(0,len(dictionary_approach)-1)
-      follow_id=random.randint(0,len(dictionary_follow)-1)
-      weight[0,approach_id] = 1
-      weight[0, len(dictionary_approach)+follow_id] = 1
-
-      actionTimes=np.ones((1,len(dictionary_full)))*(-1)
-      inactiveTimes=np.ones((1,len(dictionary_full)))*(-1)
-      T = random.randint(1,9)
-      unique1 = approach_id
-      unique2 = len(dictionary_approach) + follow_id
-      actionTimes[0,unique2] = T
-      inactiveTimes[0,unique1] = T
-      actionTimes[0,unique1] = 0
-      inactiveTimes[0,unique2] = 10
-      
-      x0 = 0
-      y0 = 0
-      # radius = 5
-      angle = random.uniform(0, 2 * math.pi)
-      x = x0 + radius * math.cos(angle)
-      y = y0 + radius * math.sin(angle)
-      init_positions=np.array([[x0,y0],[x,y]])
-
-      n=str(counter)+prefix+mode+'_T'+str(T)
-      counter += 1
-      generate_instance(n,init_positions,weight,actionTimes,inactiveTimes,category,dictionary_full,mode)
-
-  elif mode == "Visit":
-    for r in tqdm(range(repeat)):
-      dictionary_approach = dictionary[1]
-      dictionary_disperse = dictionary[2]
-      dictionary_full = dictionary_approach + dictionary_disperse
-      weight=np.zeros((1,len(dictionary_full)))
-
-      approach_id=random.randint(0,len(dictionary_approach)-1)
-      disperse_id=random.randint(0,len(dictionary_disperse)-1)
-      weight[0,approach_id] = 1
-      weight[0, len(dictionary_approach)+disperse_id] = 1
-
-      actionTimes=np.ones((1,len(dictionary_full)))*(-1)
-      inactiveTimes=np.ones((1,len(dictionary_full)))*(-1)
-      T = random.randint(1,9)
-      unique1 = approach_id
-      unique2 = len(dictionary_approach) + disperse_id
-      actionTimes[0,unique2] = T
-      inactiveTimes[0,unique1] = T
-      actionTimes[0,unique1] = 0
-      inactiveTimes[0,unique2] = 10
-      
-      x0 = 0
-      y0 = 0
-      # radius = 5
-      angle = random.uniform(0, 2 * math.pi)
-      x = x0 + radius * math.cos(angle)
-      y = y0 + radius * math.sin(angle)
-      init_positions=np.array([[x0,y0],[x,y]])
-
-      n=str(counter)+prefix+mode+'_T'+str(T)
-      counter += 1
-      generate_instance(n,init_positions,weight,actionTimes,inactiveTimes,category,dictionary_full,mode)
-
-  elif mode == "Meet":
-    for r in tqdm(range(repeat)):
-      dictionary_avoid = dictionary[0]
-      dictionary_approach = dictionary[1]
-      dictionary_full = dictionary_avoid + dictionary_approach
-      weight=np.zeros((1,len(dictionary_full)))
-
-      avoid_id=random.randint(0,len(dictionary_avoid)-1)
-      approach_id=random.randint(0,len(dictionary_approach)-1)
-      weight[0,avoid_id] = 1
-      weight[0, len(dictionary_avoid)+approach_id] = 1
-
-      actionTimes=np.ones((1,len(dictionary_full)))*(-1)
-      inactiveTimes=np.ones((1,len(dictionary_full)))*(-1)
-      T = random.randint(1,9)
-      unique1 = avoid_id
-      unique2 = len(dictionary_avoid) + approach_id
-      actionTimes[0,unique2] = T
-      inactiveTimes[0,unique1] = T
-      actionTimes[0,unique1] = 0
-      inactiveTimes[0,unique2] = 10
-      
-      x0 = 0
-      y0 = 0
-      # radius = 9
-      angle = random.uniform(0, 2 * math.pi)
-      x = x0 + radius * math.cos(angle)
-      y = y0 + radius * math.sin(angle)
-      init_positions=np.array([[x0,y0],[x,y]])
-
-      n=str(counter)+prefix+mode+'_T'+str(T)
-      counter += 1
-      generate_instance(n,init_positions,weight,actionTimes,inactiveTimes,category,dictionary_full,mode)
-
-  elif mode == "Ignore":
-    for r in tqdm(range(repeat)):
-      dictionary_avoid = dictionary[0]
-      dictionary_stop = dictionary[4]
-      dictionary_full = dictionary_avoid + dictionary_stop
-      weight=np.zeros((1,len(dictionary_full)))
-
-      avoid_id=random.randint(0,len(dictionary_avoid)-1)
-      stop_id=random.randint(0,len(dictionary_stop)-1)
-      weight[0,avoid_id] = 1
-      weight[0, len(dictionary_avoid)+stop_id] = 1
-
-      actionTimes=np.ones((1,len(dictionary_full)))*(-1)
-      inactiveTimes=np.ones((1,len(dictionary_full)))*(-1)
-      T = random.randint(1,9)
-      unique1 = avoid_id
-      unique2 = len(dictionary_avoid) + stop_id
-      actionTimes[0,unique2] = T
-      inactiveTimes[0,unique1] = T
-      actionTimes[0,unique1] = 0
-      inactiveTimes[0,unique2] = 10
-      
-      x0 = 0
-      y0 = 0
-      # radius = 9
-      angle = random.uniform(0, 2 * math.pi)
-      x = x0 + radius * math.cos(angle)
-      y = y0 + radius * math.sin(angle)
-      init_positions=np.array([[x0,y0],[x,y]])
-
-      n=str(counter)+prefix+mode+'_T'+str(T)
-      counter += 1
-      generate_instance(n,init_positions,weight,actionTimes,inactiveTimes,category,dictionary_full,mode)
+      generate_instance(n,init_positions,weight,actionTimes,inactiveTimes,category,dictionary,mode)
 
   else:
     print("Error: Wrong Mode. Select a valid mode.")

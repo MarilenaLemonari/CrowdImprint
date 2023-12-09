@@ -30,10 +30,6 @@ import cv2
 # Parameters
 current_file_dir = os.path.dirname(os.path.abspath(__file__))
 name = "Single"
-# name = "Join"
-# name = "Visit"
-# name = "Meet"
-# name = "Ignore"
 category = "Training"
 # name = "TemporalLandmarks/TestData"
 path = "\Trajectories\\" + name + "\\"
@@ -324,6 +320,7 @@ def process_frame_range(args):
     return empty_images_predictions
 
 def create_images(key, value, dataset_name, resolution= 32):
+    # default_int = 0.5
     pixel_pos_x = value["pos_x"] * resolution
     pixel_pos_z = value["pos_z"] * resolution
     image = np.zeros((resolution,resolution), np.float32)

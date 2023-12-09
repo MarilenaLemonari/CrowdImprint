@@ -59,7 +59,13 @@ counter = 0
 # DATA PRE-PROCESSING:
 folder_path = 'C:/PROJECTS/SocialLandmarks/SocialLandmarks_Python/Data/Images/Single' 
 all_files = os.listdir(folder_path)
-class_dict = {"Avoid": 0, "Approach" : 1, "Disperse" : 2, "Follow" : 3, "Stop" : 4}
+behavior_list = ["Attractive_ExternalEntity","Attractive_Multidirectional","Attractive_Tridirectional","Attractive_Unidirectional","Other_CircleAround",
+                "Other_Repulsive","StopFar","Unidirectional_Down"]
+
+class_dict = {}
+for i in range(len(behavior_list)):
+    class_dict[i] = behavior_list[i] 
+
 tif_files = [file for file in all_files if file.lower().endswith('.tif')]
 for tif_file in tqdm(tif_files):
     old_name = tif_file.split(substring, 1)[0]
@@ -88,6 +94,6 @@ for tif_file in tqdm(tif_files):
             np.savez(f'C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\PythonFiles\Identifier\{old_name}_{counter}_noisy_type_{class_id}_rot_{int(angle)}.npz', add_gaussian_noise(normalize(image_rotated)))
     except Exception as e:
         print(f"Error loading image '{tif_file}': {e}")
-print("SIMPLE IMAGES LOADED!")
+print("SINGLE BEHAVIOR IMAGES LOADED!")
 
 exit()
