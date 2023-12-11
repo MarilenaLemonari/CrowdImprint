@@ -11,7 +11,7 @@ import pickle
 import torch.utils.data as data
 import tifffile
 
-# python3 C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Models\Identifier\preprocess_identifier_data.py
+# python3 C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Models\Detector\preprocess_detector_data.py
 
 # HELPER FUNCTIONS
 def zoom_image(image):
@@ -49,7 +49,7 @@ counter = 0
 #         image_path = os.path.join(folder_path_3, tif_file)
 #         image = cv2.imread(image_path, cv2.IMREAD_UNCHANGED)
 #         #landmark_type.append(2) #2: No Landmark
-#         np.savez(f'C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\PythonFiles\Identifier\TestData\{old_name}_{counter}_type_2_rot_0.npz', image)
+#         np.savez(f'C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\PythonFiles\Detector\TestData\{old_name}_{counter}_type_2_rot_0.npz', image)
 #     except Exception as e:
 #         print(f"Error loading image '{tif_file}': {e}")
 # print("SIMPLE TEST IMAGES LOADED!")
@@ -57,31 +57,31 @@ counter = 0
 # exit()
 
 # DATA PRE-PROCESSING:
-folder_path = 'C:/PROJECTS/SocialLandmarks/SocialLandmarks_Python/Data/Images/Single' 
+folder_path = 'C:/PROJECTS/SocialLandmarks/SocialLandmarks_Python/Data/Images/Mixed' 
 all_files = os.listdir(folder_path)
-behavior_list = ["Attractive_ExternalEntity","Attractive_Multidirectional","Attractive_Tridirectional","Attractive_Unidirectional","Other_CircleAround",
-                "Other_Repulsive","StopFar","Unidirectional_Down"]
 
-class_dict = {}
-for i in range(len(behavior_list)):
-    class_dict[i] = behavior_list[i] 
+# behavior_list = ["Attractive_ExternalEntity","Attractive_Multidirectional","Attractive_Tridirectional","Attractive_Unidirectional","Other_CircleAround",
+#                 "Other_Repulsive","StopFar","Unidirectional_Down"]
+
+# class_dict = {}
+# for i in range(len(behavior_list)):
+#     class_dict[i] = behavior_list[i] 
 
 tif_files = [file for file in all_files if file.lower().endswith('.tif')]
 for tif_file in tqdm(tif_files):
     old_name = tif_file.split(substring, 1)[0]
-    # print(tif_file.split("_")[2].split("Single")[0])
-    # class_name = (old_name.split("_")[2]).split("Single")[1]
-    class_id = tif_file.split("_")[2].split("Single")[0]
+    # field_1 = tif_file.split("IF_")[1].split("_")[0]
+    # field_2 = tif_file.split("IF_")[1].split("_")[1]
     try:
         counter += 1
         image_path = os.path.join(folder_path, tif_file)
         image = cv2.imread(image_path, cv2.IMREAD_UNCHANGED)
-        np.savez(f'C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\PythonFiles\Identifier\{old_name}_{counter}_type_{class_id}_rot_0.npz', image)
-        # tifffile.imwrite("C:\\PROJECTS\\SocialLandmarks\\SocialLandmarks_Python\\Data\\PythonFiles\Identifier\\unnormalized.tif", image)
-        # np.savez(f'C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\PythonFiles\Identifier\{old_name}_{counter}_norm_type_{class_id}_rot_0.npz', normalize(image))
-        np.savez(f'C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\PythonFiles\Identifier\{old_name}_{counter}_noisy_type_{class_id}_rot_0.npz', add_gaussian_noise(normalize(image)))
-        # tifffile.imwrite("C:\\PROJECTS\\SocialLandmarks\\SocialLandmarks_Python\\Data\\PythonFiles\Identifier\\normal.tif",  normalize(image))
-        # tifffile.imwrite("C:\\PROJECTS\\SocialLandmarks\\SocialLandmarks_Python\\Data\\PythonFiles\Identifier\\noisy.tif",  add_gaussian_noise(normalize(image)))
+        np.savez(f'C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\PythonFiles\Detector\{old_name}_{counter}_rot_0.npz', image)
+        # tifffile.imwrite("C:\\PROJECTS\\SocialLandmarks\\SocialLandmarks_Python\\Data\\PythonFiles\Detector\\unnormalized.tif", image)
+        # np.savez(f'C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\PythonFiles\Detector\{old_name}_{counter}_norm_type_{class_id}_rot_0.npz', normalize(image))
+        np.savez(f'C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\PythonFiles\Detector\{old_name}_{counter}_noisy_rot_0.npz', add_gaussian_noise(normalize(image)))
+        # tifffile.imwrite("C:\\PROJECTS\\SocialLandmarks\\SocialLandmarks_Python\\Data\\PythonFiles\Detector\\normal.tif",  normalize(image))
+        # tifffile.imwrite("C:\\PROJECTS\\SocialLandmarks\\SocialLandmarks_Python\\Data\\PythonFiles\Detector\\noisy.tif",  add_gaussian_noise(normalize(image)))
         height, width = image.shape[:2]
         min_angle = -179
         max_angle = 179
@@ -90,11 +90,11 @@ for tif_file in tqdm(tif_files):
             center = (width // 2, height // 2)
             rotation_matrix = cv2.getRotationMatrix2D(center, angle, 1.0)
             image_rotated = cv2.warpAffine(image, rotation_matrix, (width, height), flags=cv2.INTER_LINEAR)
-            np.savez(f'C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\PythonFiles\Identifier\{old_name}_{counter}_type_{class_id}_rot_{int(angle)}.npz', image_rotated)
-            # np.savez(f'C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\PythonFiles\Identifier\{old_name}_{counter}_norm_type_2_rot_{int(angle)}.npz', normalize(image_rotated))
-            np.savez(f'C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\PythonFiles\Identifier\{old_name}_{counter}_noisy_type_{class_id}_rot_{int(angle)}.npz', add_gaussian_noise(normalize(image_rotated)))
+            np.savez(f'C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\PythonFiles\Detector\{old_name}_{counter}_rot_{int(angle)}.npz', image_rotated)
+            # np.savez(f'C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\PythonFiles\Detector\{old_name}_{counter}_norm_type_2_rot_{int(angle)}.npz', normalize(image_rotated))
+            np.savez(f'C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\PythonFiles\Detector\{old_name}_{counter}_rot_{int(angle)}.npz', add_gaussian_noise(normalize(image_rotated)))
     except Exception as e:
         print(f"Error loading image '{tif_file}': {e}")
-print("SINGLE BEHAVIOR IMAGES LOADED!")
+print("Mixed BEHAVIOR IMAGES LOADED!")
 
 exit()

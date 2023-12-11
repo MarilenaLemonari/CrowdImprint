@@ -15,26 +15,14 @@
 /SocialLandmarks_Python/Tool/Data/Visit/
 
 /SocialLandmarks_Python/Data/Images/Single/
-/SocialLandmarks_Python/Data/Images/Join/
-/SocialLandmarks_Python/Data/Images/Visit/
-/SocialLandmarks_Python/Data/Images/Meet/
-/SocialLandmarks_Python/Data/Images/Ignore/
 /SocialLandmarks_Python/Data/Images/Single/TestData/
-/SocialLandmarks_Python/Data/Images/Join/TestData/
-/SocialLandmarks_Python/Data/Images/Visit/TestData/
-/SocialLandmarks_Python/Data/Images/Meet/TestData/
-/SocialLandmarks_Python/Data/Images/Ignore/TestData/
+/SocialLandmarks_Python/Data/Images/Mixed/
+/SocialLandmarks_Python/Data/Images/Mixed/TestData/
 
 /SocialLandmarks_Python/Data/Trajectories/Single/
-/SocialLandmarks_Python/Data/Trajectories/Join/
-/SocialLandmarks_Python/Data/Trajectories/Visit/
-/SocialLandmarks_Python/Data/Trajectories/Meet/
-/SocialLandmarks_Python/Data/Trajectories/Ignore/
 /SocialLandmarks_Python/Data/Trajectories/Single/TestData/
-/SocialLandmarks_Python/Data/Trajectories/Join/TestData/
-/SocialLandmarks_Python/Data/Trajectories/Visit/TestData/
-/SocialLandmarks_Python/Data/Trajectories/Meet/TestData
-/SocialLandmarks_Python/Data/Trajectories/Ignore/TestData
+/SocialLandmarks_Python/Data/Trajectories/Mixed/
+/SocialLandmarks_Python/Data/Trajectories/Mixed/TestData/
 
 /SocialLandmarks_Python/Data/PythonFiles/
 /SocialLandmarks_Python/Data/PythonFiles/TestData/

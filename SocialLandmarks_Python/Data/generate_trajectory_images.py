@@ -29,7 +29,7 @@ import cv2
 
 # Parameters
 current_file_dir = os.path.dirname(os.path.abspath(__file__))
-name = "Single"
+name = "Mixed"
 category = "Training"
 # name = "TemporalLandmarks/TestData"
 path = "\Trajectories\\" + name + "\\"
@@ -324,10 +324,18 @@ def create_images(key, value, dataset_name, resolution= 32):
     pixel_pos_x = value["pos_x"] * resolution
     pixel_pos_z = value["pos_z"] * resolution
     image = np.zeros((resolution,resolution), np.float32)
+    image[int(resolution/2), int(resolution/2)] = 1
     for i in range(len(pixel_pos_x)):
         pixel_x = int(pixel_pos_x[i])
         pixel_z = int(pixel_pos_z[i])
         image[pixel_x,pixel_z] = 1 #color pixel
+        if i == 0:
+            tol = 1
+            left = int(max(pixel_x-tol,0))
+            right = int(min(pixel_x+tol,resolution))
+            top = int(min(pixel_z+tol,resolution))
+            bottom = int(max(pixel_z-tol,0))
+            image[left:right,bottom:top] = 1
 
     dir_name = current_file_dir + "\Images\\" + dataset_name + "\\"
     os.makedirs(dir_name, exist_ok=True)
@@ -517,8 +525,8 @@ if __name__ ==  '__main__':
         # csv_data_ind = {key: value}
         # frame_dict = create_frame_dict(csv_data_ind)
         prefix = 'img_'+key.split("_")[0]
-        folder_path = "C:\\PROJECTS\\SocialLandmarks\\SocialLandmarks_Python\\Data\\Images\\Single"
-        dataset_name = "Single"
+        folder_path = "C:\\PROJECTS\\SocialLandmarks\\SocialLandmarks_Python\\Data\\Images\\Mixed"
+        dataset_name = "Mixed"
         files = os.listdir(folder_path)
         file_exists = any(file.startswith(prefix) for file in files)
         if file_exists == False:

@@ -19,11 +19,13 @@ from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Activa
 from sklearn.metrics import confusion_matrix
 from sklearn.model_selection import train_test_split
 from keras.layers import Dropout
+from tensorflow.keras.optimizers import Adam
+from keras import backend as K
 
 os.environ['WANDB_API_KEY']="29162836c3095b286c169bf889de71652ed3201b"
 
 #TODO: go to cd C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data
-# Execute python3 C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Models\Identifier\train_identifier.py
+# Execute python3 C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Models\Detector\train_Detector.py
 
 # HELPER FUNCTIONS
 def visualize_image(array):
@@ -37,26 +39,45 @@ def scale_to_standard_normal(images):
     std = np.std(images)
     scaled_images = (images - mean) / std
     return scaled_images
+def accuracy_first(y_true, y_pred):
+    return K.mean(K.equal(K.round(y_true[:, 0]), K.round(y_pred[:, 0])), axis=-1)
+def accuracy_second(y_true, y_pred):
+    return K.mean(K.equal(K.round(y_true[:, 1]), K.round(y_pred[:, 1])), axis=-1)
 
 # LOAD DATA
-folder_path = 'PythonFiles\\Identifier\\'  
+folder_path = 'PythonFiles\\Detector\\'  
 file_list = os.listdir(folder_path)
 npz_files = [file for file in file_list if file.endswith('.npz')]
 loaded_images = []
-field_ID = []
-class_0 = 0 
-class_1 = 0 
-class_2 = 0 
-class_3 = 0 
-class_4 = 0 
-class_5 = 0 
-class_6 = 0 
-class_7 = 0 
+field_IDs = []
+gt = []
+gt_dict = {"0_0": 0, "0_1": 1, "0_2": 2, "0_3": 3, "1_0": 4, "1_1": 5, "1_2": 6, "1_3": 7, "2_0": 8, "2_1": 9, "2_2": 10, "2_3": 11, "3_0": 12, "3_1": 13, "3_2": 14,
+           "3_3": 15}
+class_0 = 0
+class_1 = 0
+class_2 = 0
+class_3 = 0
+class_4 = 0
+class_5 = 0
+class_6 = 0
+class_7 = 0
+class_8 = 0
+class_9 = 0
+class_10 = 0
+class_11 = 0
+class_12 = 0
+class_13 = 0
+class_14 = 0
+class_15 = 0
 for npz_file in tqdm(npz_files):
 
-    name_parts = npz_file.split('_')
-    type_index = name_parts.index("type")
-    value_after_type = int(name_parts[type_index + 1])
+    # name_parts = npz_file.split('_')
+    # type_index = name_parts.index("type")
+    class_index = npz_file.split("_IF_")[1].split("_T")[0]
+    field_1 = npz_file.split("IF_")[1].split("_")[0]
+    field_2 = npz_file.split("IF_")[1].split("_")[1]
+    fields = np.array([field_1, field_2],dtype = np.float32)
+    # value_after_type = int(name_parts[type_index + 1])
 
     # Read image:
     file_path = os.path.join(folder_path, npz_file)
@@ -68,37 +89,57 @@ for npz_file in tqdm(npz_files):
         print(file_path)
         exit()
     loaded_images.append(array)
-        
-    field_ID.append(value_after_type)
-    if (value_after_type == 0):
+    field_IDs.append(fields)
+    class_type = gt_dict[class_index]
+    gt.append(class_type)
+
+    if class_type == 0:
         class_0 += 1
-    elif (value_after_type == 1):
+    elif class_type == 1:
         class_1 += 1
-    elif (value_after_type == 2):
+    elif class_type == 2:
         class_2 += 1
-    elif (value_after_type == 3):
+    elif class_type == 3:
         class_3 += 1
-    elif (value_after_type == 4):
+    elif class_type == 4:
         class_4 += 1
-    elif (value_after_type == 5):
+    elif class_type == 5:
         class_5 += 1
-    elif (value_after_type == 6):
+    elif class_type == 6:
         class_6 += 1
-    elif (value_after_type == 7):
+    elif class_type == 7:
         class_7 += 1
+    elif class_type == 8:
+        class_8 += 1
+    elif class_type == 9:
+        class_9 += 1
+    elif class_type == 10:
+        class_10 += 1
+    elif class_type == 11:
+        class_11 += 1
+    elif class_type == 12:
+        class_12 += 1
+    elif class_type == 13:
+        class_13 += 1
+    elif class_type == 14:
+        class_14 += 1
+    elif class_type == 15:
+        class_15 += 1
     else:
-        print("ERROR: Invalid Field ID.")
+        print("Wrong Type: ",class_type)
         exit()
 
-# min_class =(np.min(np.array([class_0,class_1,class_2,class_3]))) # 138022
-# max_class =(np.max(np.array([class_0,class_1,class_2,class_3])))
-# print(class_0,class_1,class_2,class_3,class_4, class_5, class_6, class_7) #17574 17710 17662 16824 16954 16890 17482 16926
+
+# print(class_0,class_1,class_2,class_3,class_4,class_5,class_6,class_7,class_8,class_9,class_10,class_11,class_12,class_13,class_14,class_15)
+# # 4064 3931 3279 3695 3876 3649 3394 3610 3870 3529 3772 3621 3876 3423 3739 3750
 # exit()
 
 # NORMALIZE DATA
-gt = np.array(field_ID)
+gt = np.array(gt)
 #loaded_images = np.array(loaded_images)
 x = scale_to_standard_normal(loaded_images)
+# print(gt.shape, x.shape)
+# exit()
 
 # index =513
 # print(loaded_images[index].shape)
@@ -125,7 +166,7 @@ class CustomDataset(Dataset):
         return image, label
 
 dataset = CustomDataset(x,gt)
-batch_size = 64 #TODO: change to 32
+batch_size = 32
 dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
 
 x_train, x_val, y_train, y_val = train_test_split(x, gt, test_size=0.2, random_state=42)
@@ -152,7 +193,7 @@ model.add(Dense(128))
 model.add(Activation('relu'))
 model.add(Dropout(0.2))
 
-model.add(Dense(8))
+model.add(Dense(16))
 # model.add(Activation('sigmoid'))
 model.add(Activation('softmax')) # TODO
 
@@ -168,13 +209,13 @@ model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=
 # HYPERPARAMETERS
 wandb.init(project="SocialLandmarks")
 config = wandb.config
-config.epochs = 100
+config.epochs = 50
 config.batch_size = batch_size
 
 model.fit(x_train, y_train, epochs=config.epochs, batch_size=config.batch_size,
           validation_data=(x_val, y_val),
           callbacks=[WandbCallback()])
-model.save("C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Models\Identifier\identifier_v3.h5")
+model.save("C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Models\Detector\Detector_v1.h5")
 print("MODEL IS SAVED!!")
 wandb.finish()
 

@@ -188,23 +188,23 @@ if __name__ ==  '__main__':
   #                  "Other_Repulsive","StopFar","Unidirectional_Down","Unidirectional_DownwardLeft","Unidirectional_DownwardRight","Unidirectional_Left",
   #                  "Unidirectional_Right","Unidirectional_Up","Unidirectional_UpperLeft","Unidirectional_UpperRight"]
 
-  behavior_list = ["Attractive_ExternalEntity","Attractive_Multidirectional","Attractive_Tridirectional","Attractive_Unidirectional","Other_CircleAround",
-                   "Other_Repulsive","StopFar","Unidirectional_Down"]
+  behavior_list = ["Unidirectional_Down","Attractive_Multidirectional","Other_CircleAround", "Stop"]
 
   dictionary = {}
-  for i in range(len(behavior_list)):
+  for i in range(len(behavior_list)-1):
     dictionary[i] = behavior_list[i]
 
   category = "Training" 
   if category == "Training":
-    repeat = 1000 * len(behavior_list) # TODO:change
+    repeat = 5000 # 1000 * len(behavior_list) # TODO:change
     prefix = '_IF_'
   elif category == "Testing":
     repeat = 100
     prefix = '_test_IF_'
 
   counter = 0
-  mode = "Single"
+  # mode = "Single"
+  mode = "Mixed"
   radius = 5
 
   if mode == "Single":
@@ -227,6 +227,46 @@ if __name__ ==  '__main__':
 
       # n=str(counter)+prefix+mode+id_dictionary[field_id]+'_T'+str(T)
       n=str(counter)+prefix+str(field_id)+mode
+      counter += 1
+
+      generate_instance(n,init_positions,weight,actionTimes,inactiveTimes,category,dictionary,mode)
+
+  elif mode == "Mixed":
+    for r in tqdm(range(repeat)):
+      field_1=random.randint(0,len(behavior_list)-1)
+      field_2=random.randint(0,len(behavior_list)-1)
+
+      weight=np.zeros((1,len(behavior_list)-1))
+      actionTimes=np.ones((1,len(behavior_list)-1))*(-1)
+      inactiveTimes=np.ones((1,len(behavior_list)-1))*(-1)
+      T = random.randint(1,9)
+
+      if field_1 != 3 and field_2 != 3:
+        weight[0,field_1] = 1
+        weight[0,field_2] = 1
+
+        inactiveTimes[0,field_1] = T
+        actionTimes[0,field_2] = T
+
+        inactiveTimes[0,field_2] = 10
+        actionTimes[0,field_1] = 0
+      elif field_1 == 3 and field_2 != 3:
+        weight[0,field_2] = 1
+        inactiveTimes[0,field_2] = 10
+        actionTimes[0,field_2] = T
+      elif field_1 != 3 and field_2 == 3:
+        weight[0,field_1] = 1
+        inactiveTimes[0,field_1] = T
+        actionTimes[0,field_1] = 0
+
+      x0 = 0
+      y0 = 0
+      angle = random.uniform(0, 2 * math.pi)
+      x = x0 + radius * math.cos(angle)
+      y = y0 + radius * math.sin(angle)
+      init_positions=np.array([[x0,y0],[x,y]])
+
+      n=str(counter)+prefix+str(field_1)+"_"+str(field_2)+"_T_"+str(T)
       counter += 1
 
       generate_instance(n,init_positions,weight,actionTimes,inactiveTimes,category,dictionary,mode)
