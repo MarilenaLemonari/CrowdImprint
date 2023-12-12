@@ -209,13 +209,13 @@ model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=
 # HYPERPARAMETERS
 wandb.init(project="SocialLandmarks")
 config = wandb.config
-config.epochs = 50
+config.epochs = 150
 config.batch_size = batch_size
 
 model.fit(x_train, y_train, epochs=config.epochs, batch_size=config.batch_size,
           validation_data=(x_val, y_val),
           callbacks=[WandbCallback()])
-model.save("C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Models\Detector\Detector_v1.h5")
+model.save("C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Models\Detector\Detector_v2.h5")
 print("MODEL IS SAVED!!")
 wandb.finish()
 
