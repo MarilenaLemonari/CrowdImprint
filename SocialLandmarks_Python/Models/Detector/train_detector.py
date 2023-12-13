@@ -70,7 +70,6 @@ class_13 = 0
 class_14 = 0
 class_15 = 0
 for npz_file in tqdm(npz_files):
-
     # name_parts = npz_file.split('_')
     # type_index = name_parts.index("type")
     class_index = npz_file.split("_IF_")[1].split("_T")[0]

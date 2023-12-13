@@ -103,7 +103,7 @@ def build_SCENARIOxml(desired_name,desired_files):
   root = minidom.Document()
   xml = root.createElement('Simulation')
   xml.setAttribute('delta_time','0.1')
-  xml.setAttribute('end_time',"11,1") # Difference!
+  xml.setAttribute('end_time',"15") # Difference!
   root.appendChild(xml)
   world=root.createElement('World') 
   world.setAttribute('type', 'Infinite')
@@ -196,13 +196,13 @@ if __name__ ==  '__main__':
 
   category = "Training" 
   if category == "Training":
-    repeat = 5000 # 1000 * len(behavior_list) # TODO:change
+    repeat = 15000 # 1000 * len(behavior_list) # TODO:change
     prefix = '_IF_'
   elif category == "Testing":
     repeat = 100
     prefix = '_test_IF_'
 
-  counter = 0
+  counter = 5000
   # mode = "Single"
   mode = "Mixed"
   radius = 5
@@ -239,7 +239,7 @@ if __name__ ==  '__main__':
       weight=np.zeros((1,len(behavior_list)-1))
       actionTimes=np.ones((1,len(behavior_list)-1))*(-1)
       inactiveTimes=np.ones((1,len(behavior_list)-1))*(-1)
-      T = random.randint(1,9)
+      T = random.randint(2,8)
 
       if field_1 != 3 and field_2 != 3:
         weight[0,field_1] = 1

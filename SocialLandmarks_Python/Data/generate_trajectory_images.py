@@ -2,6 +2,7 @@
 import os
 import csv
 import math
+from turtle import speed
 import numpy as np
 import pandas as pd
 from sklearn.cluster import DBSCAN
@@ -325,17 +326,31 @@ def create_images(key, value, dataset_name, resolution= 32):
     pixel_pos_z = value["pos_z"] * resolution
     image = np.zeros((resolution,resolution), np.float32)
     image[int(resolution/2), int(resolution/2)] = 1
+    same_speed_count = 0
     for i in range(len(pixel_pos_x)):
         pixel_x = int(pixel_pos_x[i])
         pixel_z = int(pixel_pos_z[i])
-        image[pixel_x,pixel_z] = 1 #color pixel
         if i == 0:
+            # tol = 1
+            # left = int(max(pixel_x-tol,0))
+            # right = int(min(pixel_x+tol,resolution))
+            # top = int(min(pixel_z+tol,resolution))
+            # bottom = int(max(pixel_z-tol,0))
+            # image[left:right,bottom:top] = 1
+            image[pixel_x,pixel_z] = 1
+        elif (value["speed"][i] == value["speed"][i-1]):
+            same_speed_count += 1
+
+        cur_speed = (1- value["speed"][i])*0.8
+        if same_speed_count >= 5:
             tol = 1
             left = int(max(pixel_x-tol,0))
             right = int(min(pixel_x+tol,resolution))
             top = int(min(pixel_z+tol,resolution))
             bottom = int(max(pixel_z-tol,0))
-            image[left:right,bottom:top] = 1
+            image[left:right,bottom:top] = cur_speed
+        else:
+            image[pixel_x,pixel_z] = cur_speed
 
     dir_name = current_file_dir + "\Images\\" + dataset_name + "\\"
     os.makedirs(dir_name, exist_ok=True)
@@ -366,12 +381,13 @@ def parallel_create_images(key,frame_dict, env_dict, step, separation, dataset_n
 
 def read_csv_files(csv_directory,framerate, bound = 11):
     csv_files = [f for f in os.listdir(csv_directory) if f.endswith('.csv')]
+    # csv_files = [ csv_files[0], csv_files[1] ]
 
     data_dict = {}
     all_dfs = []
 
     row_threshold = 3
-    for filename in csv_files:
+    for filename in tqdm(csv_files):
         # Read the CSV file into a pandas DataFrame and assign column names
         df = pd.read_csv(os.path.join(csv_directory, filename), 
             header=None, names=['frame', 'pos_x', 'pos_z','or_x','or_z'], 
@@ -381,6 +397,11 @@ def read_csv_files(csv_directory,framerate, bound = 11):
         if df.shape[0] < row_threshold:
             continue
         
+        num_rows = df.shape[0]
+        df["speed"] = 0
+        for i in range(1, len(df)):
+            df.loc[i, "speed"] = math.sqrt((df.loc[i, 'pos_x'] - df.loc[i - 1, 'pos_x']) ** 2 + (df.loc[i, 'pos_z'] - df.loc[i - 1, 'pos_z']) ** 2)
+
         data_dict[filename] = df
         all_dfs.append(df)
 
@@ -524,7 +545,7 @@ if __name__ ==  '__main__':
         key, value = dict_list[i]
         # csv_data_ind = {key: value}
         # frame_dict = create_frame_dict(csv_data_ind)
-        prefix = 'img_'+key.split("_")[0]
+        prefix = 'img_'+ key.split("_")[0]
         folder_path = "C:\\PROJECTS\\SocialLandmarks\\SocialLandmarks_Python\\Data\\Images\\Mixed"
         dataset_name = "Mixed"
         files = os.listdir(folder_path)
