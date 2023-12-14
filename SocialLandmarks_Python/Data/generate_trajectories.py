@@ -194,7 +194,7 @@ if __name__ ==  '__main__':
   for i in range(len(behavior_list)-1):
     dictionary[i] = behavior_list[i]
 
-  category = "Training" 
+  category = "Testing" 
   if category == "Training":
     repeat = 15000 # 1000 * len(behavior_list) # TODO:change
     prefix = '_IF_'
@@ -202,7 +202,7 @@ if __name__ ==  '__main__':
     repeat = 100
     prefix = '_test_IF_'
 
-  counter = 5000
+  counter = 0
   # mode = "Single"
   mode = "Mixed"
   radius = 5

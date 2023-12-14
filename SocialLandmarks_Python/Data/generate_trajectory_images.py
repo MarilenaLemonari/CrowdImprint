@@ -30,8 +30,8 @@ import cv2
 
 # Parameters
 current_file_dir = os.path.dirname(os.path.abspath(__file__))
-name = "Mixed"
-category = "Training"
+name = "Mixed/TestData"
+category = "Testing"
 # name = "TemporalLandmarks/TestData"
 path = "\Trajectories\\" + name + "\\"
 csv_directory = current_file_dir + path
@@ -546,8 +546,8 @@ if __name__ ==  '__main__':
         # csv_data_ind = {key: value}
         # frame_dict = create_frame_dict(csv_data_ind)
         prefix = 'img_'+ key.split("_")[0]
-        folder_path = "C:\\PROJECTS\\SocialLandmarks\\SocialLandmarks_Python\\Data\\Images\\Mixed"
-        dataset_name = "Mixed"
+        folder_path = "C:\\PROJECTS\\SocialLandmarks\\SocialLandmarks_Python\\Data\\Images\\Mixed\\TestData"
+        dataset_name = "Mixed\\TestData"
         files = os.listdir(folder_path)
         file_exists = any(file.startswith(prefix) for file in files)
         if file_exists == False:
