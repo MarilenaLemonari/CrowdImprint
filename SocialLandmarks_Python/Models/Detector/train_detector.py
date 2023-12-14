@@ -21,6 +21,7 @@ from sklearn.model_selection import train_test_split
 from keras.layers import Dropout
 from tensorflow.keras.optimizers import Adam
 from keras import backend as K
+from tensorflow.keras import regularizers
 
 os.environ['WANDB_API_KEY']="29162836c3095b286c169bf889de71652ed3201b"
 
@@ -199,6 +200,28 @@ model.add(Activation('softmax')) # TODO
 # Creating an instance of the model
 model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
 
+################################################################################################ REGULARIZATION MODEL
+# model = Sequential()
+# model.add(Conv2D(16, kernel_size=3, strides=1, padding='same', input_shape=(32, 32, 1))) 
+# model.add(Activation('relu'))
+# model.add(MaxPooling2D(pool_size=2))
+# model.add(Dropout(0.1))
+# model.add(Conv2D(32, kernel_size=3, strides=1, padding='same')) 
+# model.add(Activation('relu'))
+# model.add(MaxPooling2D(pool_size=2))
+# model.add(Dropout(0.1))
+# model.add(Flatten())
+# model.add(Dense(1024, kernel_regularizer=regularizers.l2(0.01)))  
+# model.add(Activation('relu'))
+# model.add(Dropout(0.2))
+# model.add(Dense(128, kernel_regularizer=regularizers.l2(0.01)))  
+# model.add(Activation('relu'))
+# model.add(Dropout(0.2))
+# model.add(Dense(16))
+# model.add(Activation('softmax'))
+# model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
+################################################################################################
+
 # #inputs= torch.randn(batch_size, 32, 32,requires_grad=True)
 # inputs = np.random.random((batch_size, 32, 32, 1))
 # outputs =  model(inputs)
@@ -208,7 +231,7 @@ model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=
 # HYPERPARAMETERS
 wandb.init(project="SocialLandmarks")
 config = wandb.config
-config.epochs = 150
+config.epochs = 50
 config.batch_size = batch_size
 
 model.fit(x_train, y_train, epochs=config.epochs, batch_size=config.batch_size,
