@@ -182,7 +182,7 @@ def make_trajectory(n,n_agents,mode,category):
     if os.path.exists(file2)==True:
       os.remove(file2)
   os.getcwd()
-  os.system(f"C:\\PROJECTS\\DataDrivenInteractionFields\\InteractionFieldsUMANS\\build\\Release\\UMANS-ConsoleApplication-Windows.exe -i Scenario_social.xml -o C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\Trajectories\{folder}")
+  os.system(f"C:\\PROJECTS\\DataDrivenInteractionFields\\InteractionFieldsUMANS\\buildConsole\\Release\\UMANS-ConsoleApplication-Windows.exe -i Scenario_social.xml -o C:\\PROJECTS\\SocialLandmarks\\SocialLandmarks_Python\\Data\\Trajectories\\{folder}")
   S_true=[]
   for i in range(1,n_agents):
     os.rename(f"C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\Trajectories\{folder}\output_{i}.csv",f"C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\Trajectories\{folder}\{n}_a{i}.csv")
@@ -195,14 +195,9 @@ def generate_instance(n,init_positions,weight,actionTimes,inactiveTimes,or_x, or
   n_agents=init_positions.shape[0]
   update_gtIFxml(f"{pathIF}InteractionField_social.xml",weight,actionTimes,inactiveTimes,len(dictionary))
   update_Agentxml(f"{pathA}Agent_social.xml",or_x,or_y)
-  exit()
   S_true=make_trajectory(n,n_agents,mode,category)
 
 if __name__ ==  '__main__':
-
-  # behavior_list = ["Attractive_ExternalEntity","Attractive_Multidirectional","Attractive_Tridirectional","Attractive_Unidirectional","Other_CircleAround",
-  #                  "Other_Repulsive","StopFar","Unidirectional_Down","Unidirectional_DownwardLeft","Unidirectional_DownwardRight","Unidirectional_Left",
-  #                  "Unidirectional_Right","Unidirectional_Up","Unidirectional_UpperLeft","Unidirectional_UpperRight"]
 
   behavior_list = ["Unidirectional_Down","Attractive_Multidirectional","Other_CircleAround", "IF0_AvoidFar", "IF3_hide", "Stop"]
 
@@ -212,16 +207,16 @@ if __name__ ==  '__main__':
 
   category = "Training" 
   if category == "Training":
-    repeat = 1000 * len(behavior_list) # TODO:change
-    prefix = '_IF_'
+    repeat = 100 * len(behavior_list) # TODO:change
+    prefix = 'IF_'
   elif category == "Testing":
     repeat = 100
     prefix = '_test_IF_'
 
   counter = 0
-  mode = "Mixed"
+  mode = "SingleSwitch"
 
-  if mode == "Mixed":
+  if mode == "SingleSwitch":
     for r in tqdm(range(repeat)):
       end_time = random.randint(5,15)
       radius = end_time/2 # 5 for 10 sec
@@ -261,11 +256,10 @@ if __name__ ==  '__main__':
 
 
       random_angle = random.uniform(0, 2 * math.pi)
-      random_angle = math.pi/2
       or_x = math.cos(random_angle)
       or_y = math.sin(random_angle)
 
-      n=str(counter)+prefix+str(field_1)+"_"+str(field_2)+"_T_"+str(T)
+      n=str(counter)+prefix+str(field_1)+"_"+str(field_2)+"_T"+str(T)+"_s"+str(end_time)
       counter += 1
 
       generate_instance(n,init_positions,weight,actionTimes,inactiveTimes,or_x, or_y, category,dictionary,mode)

@@ -10,19 +10,11 @@
 /SocialLandmarks_Python/Data/wandb/
 /SocialLandmarks_Python/Data/Full_Model/wandb/
 /SocialLandmarks_Python/Step1/Data/
-/SocialLandmarks_Python/Tool/Data/Single/
-/SocialLandmarks_Python/Tool/Data/Join/
-/SocialLandmarks_Python/Tool/Data/Visit/
 
-/SocialLandmarks_Python/Data/Images/Single/
-/SocialLandmarks_Python/Data/Images/Single/TestData/
-/SocialLandmarks_Python/Data/Images/Mixed/
-/SocialLandmarks_Python/Data/Images/Mixed/TestData/
-
-/SocialLandmarks_Python/Data/Trajectories/Single/
-/SocialLandmarks_Python/Data/Trajectories/Single/TestData/
-/SocialLandmarks_Python/Data/Trajectories/Mixed/
-/SocialLandmarks_Python/Data/Trajectories/Mixed/TestData/
+/SocialLandmarks_Python/Data/Images/SingleSwitch/
+/SocialLandmarks_Python/Data/Images/SingleSwitch/TestData/
+/SocialLandmarks_Python/Data/Trajectories/SingleSwitch/
+/SocialLandmarks_Python/Data/Trajectories/SingleSwitch/TestData/
 
 /SocialLandmarks_Python/Data/PythonFiles/
 /SocialLandmarks_Python/Data/PythonFiles/TestData/

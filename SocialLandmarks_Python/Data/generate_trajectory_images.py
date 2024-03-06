@@ -30,9 +30,8 @@ import cv2
 
 # Parameters
 current_file_dir = os.path.dirname(os.path.abspath(__file__))
-name = "Mixed/TestData"
-category = "Testing"
-# name = "TemporalLandmarks/TestData"
+name = "SingleSwitch/"
+category = "Training"
 path = "\Trajectories\\" + name + "\\"
 csv_directory = current_file_dir + path
 row_step = 1
@@ -337,11 +336,13 @@ def create_images(key, value, dataset_name, resolution= 32):
             # top = int(min(pixel_z+tol,resolution))
             # bottom = int(max(pixel_z-tol,0))
             # image[left:right,bottom:top] = 1
+            pixel_x_init = pixel_x
+            pixel_z_init = pixel_z
             image[pixel_x,pixel_z] = 1
         elif (value["speed"][i] == value["speed"][i-1]):
             same_speed_count += 1
 
-        cur_speed = (1- value["speed"][i])*0.8
+        cur_speed = (1- value["speed"][i])*0.6
         if same_speed_count >= 5:
             tol = 1
             left = int(max(pixel_x-tol,0))
@@ -352,6 +353,9 @@ def create_images(key, value, dataset_name, resolution= 32):
         else:
             image[pixel_x,pixel_z] = cur_speed
 
+
+    image[pixel_x_init,pixel_z_init] = 1
+
     dir_name = current_file_dir + "\Images\\" + dataset_name + "\\"
     os.makedirs(dir_name, exist_ok=True)
     dir_full_name = dir_name
@@ -359,27 +363,7 @@ def create_images(key, value, dataset_name, resolution= 32):
     tifffile.imwrite(dir_full_name + filename + '.tif', image)
     
 
-def parallel_create_images(key,frame_dict, env_dict, step, separation, dataset_name, kernel_size, stride, thicken_radius, n_processes=None):
-    if n_processes is None:
-        n_processes = os.cpu_count()
-
-    counts = math.ceil(len(frame_dict) / step)
-    tasks = []
-
-    for count in range(counts):
-        start_index, end_index = step * count, step * (count + 1)
-        tasks.append((key,frame_dict, env_dict, step, separation, dataset_name, kernel_size, stride, thicken_radius, start_index, end_index))
-
-    all_empty_predictions = {}
-    with concurrent.futures.ProcessPoolExecutor(max_workers=n_processes) as executor:
-        results = list(tqdm(executor.map(process_frame_range, tasks), total=len(tasks), desc="Images Generation"))
-
-    for empty_predictions in results:
-        all_empty_predictions.update(empty_predictions)
-
-    return all_empty_predictions
-
-def read_csv_files(csv_directory,framerate, bound = 11):
+def read_csv_files(csv_directory,framerate, bound = 16):
     csv_files = [f for f in os.listdir(csv_directory) if f.endswith('.csv')]
     # csv_files = [ csv_files[0], csv_files[1] ]
 
@@ -507,50 +491,22 @@ def read_csv_files_and_env_json(csv_directory,row_step,framerate):
 
     return data_dict, scene_objects_dict, final_agent_dict
 
-def get_grid_separation(width, height, multiplier):
-    # Calculate the greatest common divisor (GCD) of the width and height
-    divisor = math.gcd(width, height)
-    # Divide the width and height by the GCD
-    width_normalized = width / divisor
-    height_normalized = height / divisor
-    # Find the larger value between width and height
-    larger_value = max(width_normalized, height_normalized)
-    # Divide both width and height by the larger value
-    width_normalized /= larger_value
-    height_normalized /= larger_value
-
-    width_normalized = math.floor(multiplier * width_normalized)
-    height_normalized = math.floor(multiplier * height_normalized)
-
-    return (width_normalized, height_normalized)
-
 # Execute
 if __name__ ==  '__main__':
     csv_data = read_csv_files(csv_directory,framerate)
-
-    frame_interval = 200
-    kernel_size = 2
-    stride = 1
-    video_width = 600
-    video_height = 480
-    grid_multiplier = 4
-    separation = get_grid_separation(video_width, video_height, grid_multiplier)
-    thicken_radius = 2
-    n_processes = 16
-
     n_csvs = len(csv_data)
     dict_list = list(csv_data.items())
 
+    # key, value = dict_list[521]
+    # print(key, value)
+    # exit()
+
     for i in tqdm(range(n_csvs)):
         key, value = dict_list[i]
-        # csv_data_ind = {key: value}
-        # frame_dict = create_frame_dict(csv_data_ind)
         prefix = 'img_'+ key.split("_")[0]
-        folder_path = "C:\\PROJECTS\\SocialLandmarks\\SocialLandmarks_Python\\Data\\Images\\Mixed\\TestData"
-        dataset_name = "Mixed\\TestData"
+        folder_path = "C:\\PROJECTS\\SocialLandmarks\\SocialLandmarks_Python\\Data\\Images\\SingleSwitch"
+        dataset_name = "SingleSwitch"
         files = os.listdir(folder_path)
         file_exists = any(file.startswith(prefix) for file in files)
         if file_exists == False:
-            # Change structure of dictionary to add points of agents in each frame
             empty_predictions = create_images(key, value, dataset_name)
-            #empty_predictions = parallel_create_images(key, frame_dict, env_dict, frame_interval, separation, name, kernel_size, stride, thicken_radius, n_processes=n_processes)
