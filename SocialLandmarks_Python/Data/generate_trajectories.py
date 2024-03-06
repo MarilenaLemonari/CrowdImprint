@@ -83,6 +83,11 @@ def build_AGENTxml(desired_name,positions,s_positions,mode,dictionary):
     sourceGoal.setAttribute('x', '0')
     sourceGoal.setAttribute('y', '0')
     sourceIF.appendChild(sourceGoal)
+    if i==0:
+      sourceOr = root.createElement('orientation')
+      sourceOr.setAttribute('x', '0')
+      sourceOr.setAttribute('y', '1')
+      sourceIF.appendChild(sourceOr)
     sourcePolicy = root.createElement('Policy')
     sourcePolicy.setAttribute('id', '0')
     sourceIF.appendChild(sourcePolicy)
@@ -103,7 +108,7 @@ def build_SCENARIOxml(desired_name,desired_files):
   root = minidom.Document()
   xml = root.createElement('Simulation')
   xml.setAttribute('delta_time','0.1')
-  xml.setAttribute('end_time',"15") # Difference!
+  xml.setAttribute('end_time',f"{end_time}")
   root.appendChild(xml)
   world=root.createElement('World') 
   world.setAttribute('type', 'Infinite')
@@ -115,7 +120,7 @@ def build_SCENARIOxml(desired_name,desired_files):
   agents.setAttribute('file', f'{pathA}Agent_{desired_files}.xml')
   xml.appendChild(agents)
   policies=root.createElement('Policies') 
-  policies.setAttribute('file', f'{pathP}InteractionFieldsWithCollisionAvoidance.xml')
+  policies.setAttribute('file', f'{pathP}InteractionFieldsWithCollisionAvoidance.xml') #TODO: RVO
   xml.appendChild(policies)
   ifs=root.createElement('InteractionFields') 
   ifs.setAttribute('file', f'{pathIF}InteractionField_{desired_files}.xml')
@@ -147,6 +152,15 @@ def update_gtIFxml(IFxml_file,W,actionTimes,inactiveTimes,unique_size):
         #element.set('action_time', str(actionTime))
       tree.write(IFxml_file, encoding = "UTF-8", xml_declaration = True)
 
+def update_Agentxml(AgentxmlFile, or_x, or_y):
+  import xml.etree.ElementTree as ET
+  tree = ET.parse(AgentxmlFile)
+  root=tree.getroot()
+  element = root[0] #source
+  element[2].set('x', f'{or_x}')
+  element[2].set('y', f'{or_y}')
+  tree.write(AgentxmlFile, encoding = "UTF-8", xml_declaration = True)
+
 #--------------------------------------------------------------------------------------------------------------
 #Make S_true:
 def load_trajectories(file_name, resume_time):
@@ -176,10 +190,12 @@ def make_trajectory(n,n_agents,mode,category):
   return S_true
 #---------------------------------------------------------------------------------------------------------------
 
-def generate_instance(n,init_positions,weight,actionTimes,inactiveTimes,category,dictionary,mode):
+def generate_instance(n,init_positions,weight,actionTimes,inactiveTimes,or_x, or_y,category,dictionary,mode):
   build_xml(n,init_positions,dictionary)
   n_agents=init_positions.shape[0]
   update_gtIFxml(f"{pathIF}InteractionField_social.xml",weight,actionTimes,inactiveTimes,len(dictionary))
+  update_Agentxml(f"{pathA}Agent_social.xml",or_x,or_y)
+  exit()
   S_true=make_trajectory(n,n_agents,mode,category)
 
 if __name__ ==  '__main__':
@@ -188,73 +204,50 @@ if __name__ ==  '__main__':
   #                  "Other_Repulsive","StopFar","Unidirectional_Down","Unidirectional_DownwardLeft","Unidirectional_DownwardRight","Unidirectional_Left",
   #                  "Unidirectional_Right","Unidirectional_Up","Unidirectional_UpperLeft","Unidirectional_UpperRight"]
 
-  behavior_list = ["Unidirectional_Down","Attractive_Multidirectional","Other_CircleAround", "Stop"]
+  behavior_list = ["Unidirectional_Down","Attractive_Multidirectional","Other_CircleAround", "IF0_AvoidFar", "IF3_hide", "Stop"]
 
   dictionary = {}
   for i in range(len(behavior_list)-1):
     dictionary[i] = behavior_list[i]
 
-  category = "Testing" 
+  category = "Training" 
   if category == "Training":
-    repeat = 15000 # 1000 * len(behavior_list) # TODO:change
+    repeat = 1000 * len(behavior_list) # TODO:change
     prefix = '_IF_'
   elif category == "Testing":
     repeat = 100
     prefix = '_test_IF_'
 
   counter = 0
-  # mode = "Single"
   mode = "Mixed"
-  radius = 5
 
-  if mode == "Single":
+  if mode == "Mixed":
     for r in tqdm(range(repeat)):
-      field_id=random.randint(0,len(behavior_list)-1)
-      weight=np.zeros((1,len(behavior_list)))
-      weight[0,field_id] = 1
-      actionTimes=np.ones((1,len(behavior_list)))*(-1)
-      inactiveTimes=np.ones((1,len(behavior_list)))*(-1)
-      # T = random.randint(1,9)
-      inactiveTimes[0,field_id] = 10
-      actionTimes[0,field_id] = 0
-      
-      x0 = 0
-      y0 = 0
-      angle = random.uniform(0, 2 * math.pi)
-      x = x0 + radius * math.cos(angle)
-      y = y0 + radius * math.sin(angle)
-      init_positions=np.array([[x0,y0],[x,y]])
+      end_time = random.randint(5,15)
+      radius = end_time/2 # 5 for 10 sec
 
-      # n=str(counter)+prefix+mode+id_dictionary[field_id]+'_T'+str(T)
-      n=str(counter)+prefix+str(field_id)+mode
-      counter += 1
-
-      generate_instance(n,init_positions,weight,actionTimes,inactiveTimes,category,dictionary,mode)
-
-  elif mode == "Mixed":
-    for r in tqdm(range(repeat)):
       field_1=random.randint(0,len(behavior_list)-1)
       field_2=random.randint(0,len(behavior_list)-1)
 
       weight=np.zeros((1,len(behavior_list)-1))
       actionTimes=np.ones((1,len(behavior_list)-1))*(-1)
       inactiveTimes=np.ones((1,len(behavior_list)-1))*(-1)
-      T = random.randint(2,8)
+      T = random.randint(2,int(end_time-2))
 
-      if field_1 != 3 and field_2 != 3:
+      if field_1 != 5 and field_2 != 5:
         weight[0,field_1] = 1
         weight[0,field_2] = 1
 
         inactiveTimes[0,field_1] = T
         actionTimes[0,field_2] = T
 
-        inactiveTimes[0,field_2] = 10
+        inactiveTimes[0,field_2] = end_time
         actionTimes[0,field_1] = 0
-      elif field_1 == 3 and field_2 != 3:
+      elif field_1 == 5 and field_2 != 5:
         weight[0,field_2] = 1
-        inactiveTimes[0,field_2] = 10
+        inactiveTimes[0,field_2] = end_time
         actionTimes[0,field_2] = T
-      elif field_1 != 3 and field_2 == 3:
+      elif field_1 != 5 and field_2 == 5:
         weight[0,field_1] = 1
         inactiveTimes[0,field_1] = T
         actionTimes[0,field_1] = 0
@@ -266,10 +259,16 @@ if __name__ ==  '__main__':
       y = y0 + radius * math.sin(angle)
       init_positions=np.array([[x0,y0],[x,y]])
 
+
+      random_angle = random.uniform(0, 2 * math.pi)
+      random_angle = math.pi/2
+      or_x = math.cos(random_angle)
+      or_y = math.sin(random_angle)
+
       n=str(counter)+prefix+str(field_1)+"_"+str(field_2)+"_T_"+str(T)
       counter += 1
 
-      generate_instance(n,init_positions,weight,actionTimes,inactiveTimes,category,dictionary,mode)
+      generate_instance(n,init_positions,weight,actionTimes,inactiveTimes,or_x, or_y, category,dictionary,mode)
 
   else:
     print("Error: Wrong Mode. Select a valid mode.")
