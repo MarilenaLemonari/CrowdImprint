@@ -251,6 +251,10 @@ model.add(Dropout(0.1))
 model.add(Flatten())
 
 # Fully connected layers
+model.add(Dense(2048))
+model.add(Activation('relu'))
+model.add(Dropout(0.2)) # extra
+
 model.add(Dense(1024))
 model.add(Activation('relu'))
 model.add(Dropout(0.2))
@@ -260,8 +264,7 @@ model.add(Activation('relu'))
 model.add(Dropout(0.2))
 
 model.add(Dense(36))
-# model.add(Activation('sigmoid'))
-model.add(Activation('softmax')) # TODO
+model.add(Activation('softmax')) 
 
 # Creating an instance of the model
 model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])

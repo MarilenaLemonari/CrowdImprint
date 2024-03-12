@@ -72,20 +72,20 @@ for tif_file in tqdm(tif_files):
         np.savez(f'C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\PythonFiles\SingleSwitch\{old_name}_{counter}_rot_0.npz', image)
         # tifffile.imwrite("C:\\PROJECTS\\SocialLandmarks\\SocialLandmarks_Python\\Data\\PythonFiles\SingleSwitch\\unnormalized.tif", image)
         # np.savez(f'C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\PythonFiles\SingleSwitch\{old_name}_{counter}_norm_type_{class_id}_rot_0.npz', normalize(image))
-        np.savez(f'C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\PythonFiles\SingleSwitch\{old_name}_{counter}_noisy_rot_0.npz', add_gaussian_noise(normalize(image)))
+        # np.savez(f'C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\PythonFiles\SingleSwitch\{old_name}_{counter}_noisy_rot_0.npz', add_gaussian_noise(normalize(image)))
         # tifffile.imwrite("C:\\PROJECTS\\SocialLandmarks\\SocialLandmarks_Python\\Data\\PythonFiles\SingleSwitch\\normal.tif",  normalize(image))
         # tifffile.imwrite("C:\\PROJECTS\\SocialLandmarks\\SocialLandmarks_Python\\Data\\PythonFiles\SingleSwitch\\noisy.tif",  add_gaussian_noise(normalize(image)))
         height, width = image.shape[:2]
         min_angle = -179
         max_angle = 179
-        random_angles = np.random.uniform(min_angle, max_angle, size=10)
-        # for i, angle in enumerate(random_angles):
-        #     center = (width // 2, height // 2)
-        #     rotation_matrix = cv2.getRotationMatrix2D(center, angle, 1.0)
-        #     image_rotated = cv2.warpAffine(image, rotation_matrix, (width, height), flags=cv2.INTER_LINEAR)
-        #     np.savez(f'C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\PythonFiles\SingleSwitch\{old_name}_{counter}_rot_{int(angle)}.npz', image_rotated)
-        #     # np.savez(f'C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\PythonFiles\SingleSwitch\{old_name}_{counter}_norm_type_2_rot_{int(angle)}.npz', normalize(image_rotated))
-        #     np.savez(f'C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\PythonFiles\SingleSwitch\{old_name}_{counter}_rot_{int(angle)}.npz', add_gaussian_noise(normalize(image_rotated)))
+        random_angles = np.random.uniform(min_angle, max_angle, size=5) #size was 10
+        for i, angle in enumerate(random_angles):
+            center = (width // 2, height // 2)
+            rotation_matrix = cv2.getRotationMatrix2D(center, angle, 1.0)
+            image_rotated = cv2.warpAffine(image, rotation_matrix, (width, height), flags=cv2.INTER_LINEAR)
+            np.savez(f'C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\PythonFiles\SingleSwitch\{old_name}_{counter}_rot_{int(angle)}.npz', image_rotated)
+            # np.savez(f'C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\PythonFiles\SingleSwitch\{old_name}_{counter}_norm_type_2_rot_{int(angle)}.npz', normalize(image_rotated))
+            # np.savez(f'C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\PythonFiles\SingleSwitch\{old_name}_{counter}_rot_{int(angle)}.npz', add_gaussian_noise(normalize(image_rotated)))
     except Exception as e:
         print(f"Error loading image '{tif_file}': {e}")
 print("SingleSwitch BEHAVIOR IMAGES LOADED!")
