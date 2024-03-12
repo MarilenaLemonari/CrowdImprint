@@ -26,7 +26,8 @@ from scipy import stats
 from skimage import io
 import cv2
 
- #TODO: remove source csv.
+#TODO: remove source csv.
+# cd C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data
 
 # Parameters
 current_file_dir = os.path.dirname(os.path.abspath(__file__))

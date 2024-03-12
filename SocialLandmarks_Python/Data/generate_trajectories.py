@@ -199,7 +199,7 @@ def generate_instance(n,init_positions,weight,actionTimes,inactiveTimes,or_x, or
 
 if __name__ ==  '__main__':
 
-  behavior_list = ["Unidirectional_Down","Attractive_Multidirectional","Other_CircleAround", "IF0_AvoidFar", "IF3_hide", "Stop"]
+  behavior_list = ["Unidirectional_Down","Attractive_Multidirectional","Other_CircleAround", "AvoidNew", "MoveTF", "Stop"]
 
   dictionary = {}
   for i in range(len(behavior_list)-1):
@@ -207,7 +207,7 @@ if __name__ ==  '__main__':
 
   category = "Training" 
   if category == "Training":
-    repeat = 100 * len(behavior_list) # TODO:change
+    repeat = 1000 * len(behavior_list) # TODO:change
     prefix = 'IF_'
   elif category == "Testing":
     repeat = 100

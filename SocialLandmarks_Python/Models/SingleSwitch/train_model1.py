@@ -26,7 +26,7 @@ from tensorflow.keras import regularizers
 os.environ['WANDB_API_KEY']="29162836c3095b286c169bf889de71652ed3201b"
 
 #TODO: go to cd C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data
-# Execute python3 C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Models\Detector\train_Detector.py
+# Execute python3 C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Models\SingleSwitch\train_model1.py
 
 # HELPER FUNCTIONS
 def visualize_image(array):
@@ -46,14 +46,18 @@ def accuracy_second(y_true, y_pred):
     return K.mean(K.equal(K.round(y_true[:, 1]), K.round(y_pred[:, 1])), axis=-1)
 
 # LOAD DATA
-folder_path = 'PythonFiles\\Detector\\'  
+folder_path = 'PythonFiles\\SingleSwitch\\'  
 file_list = os.listdir(folder_path)
 npz_files = [file for file in file_list if file.endswith('.npz')]
 loaded_images = []
 field_IDs = []
 gt = []
-gt_dict = {"0_0": 0, "0_1": 1, "0_2": 2, "0_3": 3, "1_0": 4, "1_1": 5, "1_2": 6, "1_3": 7, "2_0": 8, "2_1": 9, "2_2": 10, "2_3": 11, "3_0": 12, "3_1": 13, "3_2": 14,
-           "3_3": 15}
+gt_dict = {"0_0": 0, "0_1": 1, "0_2": 2, "0_3": 3, "0_4": 4, "0_5": 5,
+           "1_0": 6, "1_1": 7, "1_2": 8, "1_3": 9, "1_4": 10, "1_5": 11, 
+           "2_0": 12, "2_1": 13, "2_2": 14, "2_3": 15, "2_4": 16, "2_5": 17,
+            "3_0": 18, "3_1": 19, "3_2": 20,"3_3": 21, "3_4": 22, "3_5": 23,
+            "4_0": 24, "4_1": 25, "4_2": 26, "4_3": 27, "4_4": 28, "4_5": 29,
+            "5_0": 30, "5_1": 31, "5_2": 32, "5_3": 33, "5_4": 34, "5_5": 35}
 class_0 = 0
 class_1 = 0
 class_2 = 0
@@ -70,10 +74,30 @@ class_12 = 0
 class_13 = 0
 class_14 = 0
 class_15 = 0
+class_16 = 0
+class_17 = 0
+class_18 = 0
+class_19 = 0
+class_20 = 0
+class_21 = 0
+class_22 = 0
+class_23 = 0
+class_24 = 0
+class_25 = 0
+class_26 = 0
+class_27 = 0
+class_28 = 0
+class_29 = 0
+class_30 = 0
+class_31 = 0
+class_32 = 0
+class_33 = 0
+class_34 = 0
+class_35 = 0
 for npz_file in tqdm(npz_files):
     # name_parts = npz_file.split('_')
     # type_index = name_parts.index("type")
-    class_index = npz_file.split("_IF_")[1].split("_T")[0]
+    class_index = npz_file.split("IF_")[1].split("_T")[0]
     field_1 = npz_file.split("IF_")[1].split("_")[0]
     field_2 = npz_file.split("IF_")[1].split("_")[1]
     fields = np.array([field_1, field_2],dtype = np.float32)
@@ -125,13 +149,55 @@ for npz_file in tqdm(npz_files):
         class_14 += 1
     elif class_type == 15:
         class_15 += 1
+    elif class_type == 16:
+        class_16 += 1
+    elif class_type == 17:
+        class_17 += 1
+    elif class_type == 18:
+        class_18 += 1
+    elif class_type == 19:
+        class_19 += 1
+    elif class_type == 20:
+        class_20 += 1
+    elif class_type == 21:
+        class_21 += 1
+    elif class_type == 22:
+        class_22 += 1
+    elif class_type == 23:
+        class_23 += 1
+    elif class_type == 24:
+        class_24 += 1
+    elif class_type == 25:
+        class_25 += 1
+    elif class_type == 26:
+        class_26 += 1
+    elif class_type == 27:
+        class_27 += 1
+    elif class_type == 28:
+        class_28 += 1
+    elif class_type == 29:
+        class_29 += 1
+    elif class_type == 30:
+        class_30 += 1
+    elif class_type == 31:
+        class_31 += 1
+    elif class_type == 32:
+        class_32 += 1
+    elif class_type == 33:
+        class_33 += 1
+    elif class_type == 34:
+        class_34 += 1
+    elif class_type == 35:
+        class_35 += 1
     else:
         print("Wrong Type: ",class_type)
         exit()
 
 
-# print(class_0,class_1,class_2,class_3,class_4,class_5,class_6,class_7,class_8,class_9,class_10,class_11,class_12,class_13,class_14,class_15)
-# # 4064 3931 3279 3695 3876 3649 3394 3610 3870 3529 3772 3621 3876 3423 3739 3750
+# print(class_0,class_1,class_2,class_3,class_4,class_5,class_6,class_7,class_8,class_9,class_10,class_11,class_12,class_13,class_14,class_15,
+#       class_16, class_17, class_18, class_19, class_20, class_21, class_22, class_23, class_24, class_25, class_26, class_27, class_28, class_29, class_30,
+#       class_31, class_32, class_33, class_34, class_35)
+# # 326 332 312 318 364 308 332 314 350 330 336 316 348 338 340 316 338 360 328 340 358 354 330 348 320 348 342 354 308 338 294 340 328 354 312 326
 # exit()
 
 # NORMALIZE DATA
@@ -193,7 +259,7 @@ model.add(Dense(128))
 model.add(Activation('relu'))
 model.add(Dropout(0.2))
 
-model.add(Dense(16))
+model.add(Dense(36))
 # model.add(Activation('sigmoid'))
 model.add(Activation('softmax')) # TODO
 
@@ -237,7 +303,7 @@ config.batch_size = batch_size
 model.fit(x_train, y_train, epochs=config.epochs, batch_size=config.batch_size,
           validation_data=(x_val, y_val),
           callbacks=[WandbCallback()])
-model.save("C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Models\Detector\Detector_v3.h5")
+model.save("C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Models\SingleSwitch\exp_1.h5")
 print("MODEL IS SAVED!!")
 wandb.finish()
 
