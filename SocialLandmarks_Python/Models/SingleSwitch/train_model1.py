@@ -303,7 +303,7 @@ config.batch_size = batch_size
 model.fit(x_train, y_train, epochs=config.epochs, batch_size=config.batch_size,
           validation_data=(x_val, y_val),
           callbacks=[WandbCallback()])
-model.save("C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Models\SingleSwitch\exp_1.h5")
+model.save("C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Models\SingleSwitch\exp_2.h5")
 print("MODEL IS SAVED!!")
 wandb.finish()
 
@@ -314,9 +314,11 @@ y_train_pred_classes = y_train_pred.argmax(axis=-1)
 confusion = confusion_matrix(y_train, y_train_pred_classes)
 print("Confusion Matrix for Training Data:")
 print(confusion)
+print(np.max(confusion), np.argmax(confusion))
 
 y_val_pred = model.predict(x_val)
 y_val_pred_classes = y_val_pred.argmax(axis=-1)
 confusion = confusion_matrix(y_val, y_val_pred_classes)
 print("Confusion Matrix for Validation Data:")
 print(confusion)
+print(np.max(confusion), np.argmax(confusion))
