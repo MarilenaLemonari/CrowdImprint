@@ -18,7 +18,6 @@ def preprocess_data():
 
 
 if __name__ ==  '__main__':
-
   print("Main")
   array = preprocess_data()
-  
+
