@@ -43,26 +43,30 @@ def preprocess_data(source):
       num_agents = int(df["Pedestrian_ID"].max())
       agents_traj_list = []
       for agent_id in range(1,num_agents+1):
+
         agent_traj = df[df["Pedestrian_ID"] == agent_id]
         agent_traj = agent_traj.drop("Pedestrian_ID", axis = 1)
         agents_traj_values = agent_traj.values
-        print(agents_traj_values.shape)
+        # Remove non existent agent IDs
+        if len(agents_traj_values) == 0:
+          continue
+        frame_cutoff = agents_traj_values[-1,0] # TODO: Custom e.g.25
         start_frame = agents_traj_values[0,0]
         cutoff = 0
         cutoff_list = []
         start_list = [0]
         for i in range(1,agents_traj_values.shape[0]):
           end_frame = agents_traj_values[i,0]
-          if end_frame-start_frame > 25:
+          if end_frame-start_frame > frame_cutoff:
             cutoff += 1
             cutoff_list.append(i)
             start_list.append(i)
             start_frame = end_frame
-        cutoff_list.append(agents_traj_values.shape[0])
-        print(start_list, cutoff_list)
-        for c in range(cutoff):
-          agents_traj_list.append(agents_traj_values[start_list[c]:cutoff_list[c],:,:])
-        exit()
+        cutoff_list.append(agents_traj_values.shape[0]+1)
+
+        for c in range(cutoff+1):
+          agents_traj_list.append(agents_traj_values[start_list[c]:cutoff_list[c],:])
+
       agents_traj.append(agents_traj_list)
 
     return agents_traj
@@ -77,9 +81,12 @@ def visualize_agent_traj(agents_traj, title):
   max_dist = []
   max_width = []
   processed_points = []
-  for i, agent_traj in enumerate(agents_traj[:5]):
+  for i, agent_traj in enumerate(agents_traj[:10]):
     if len(agent_traj) <= 0:
       continue #TODO: pedestrian id 21
+    
+    if np.ndim(agent_traj) == 1:
+      agent_traj = agent_traj.reshape((1,3))
 
     start_pos_x = agent_traj[0,1]
     start_pos_y = agent_traj[0,2]
@@ -90,7 +97,7 @@ def visualize_agent_traj(agents_traj, title):
     end_pos_x = x_s[-1]
     end_pos_y = y_s[-1]
 
-    if end_pos_y < 0.001:
+    if abs(end_pos_y) < 0.001:
       continue #TODO: why stationary characters?
     
     tan_value = end_pos_x/end_pos_y
@@ -110,7 +117,7 @@ def visualize_agent_traj(agents_traj, title):
     processed_points.append(rotated_points)
     max_dist.append(rotated_points[-1,1])
     max_width.append(max(rotated_points[:,0]))
-    
+
   max_value = max_dist[np.argmax(np.abs(max_dist))]
   max_value_w = max_width[np.argmax(np.abs(max_width))]
   if abs(max_value) >= abs(max_value_w):
