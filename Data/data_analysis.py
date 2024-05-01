@@ -157,21 +157,29 @@ def perform_dtw():
   n_points = 100
 
   x =  np.linspace(1,100, n_points)
-  x_2 = np.linspace(1,100,50)
+  x_2 = np.linspace(1,100,100)
 
   y_1 = x + 10
   y_2 = x_2
-  y_3 = x*3
+  y_3 = x_2*3
   y_4 = x*4
   y_5 = x**2
   y_6 = x**2 + 100
 
-  data = np.array([np.column_stack((x,y_1)),np.column_stack((x_2,y_2)),np.column_stack((x,y_3)),
+  # max_length = max(100, 50)
+  # data_1 = np.array([np.column_stack((x,y_1)), np.column_stack((x,y_4)),np.column_stack((x,y_5)),np.column_stack((x,y_6))])
+  # data_2 = np.array([np.column_stack((x_2,y_2)),np.column_stack((x_2,y_3))])
+
+  # padded_data_1 = np.pad(data_1, ((0, 0), (max_length - 100, 0), (0, 0)), mode='constant')
+  # padded_data_2 = np.pad(data_2, ((0, 0), (max_length - 50, 0), (0, 0)), mode='constant')
+  # data = np.vstack((padded_data_1, padded_data_2))
+
+  data = np.array([np.column_stack((x,y_1)), np.column_stack((x,y_2)), np.column_stack((x,y_3)),
                    np.column_stack((x,y_4)),np.column_stack((x,y_5)),np.column_stack((x,y_6))])
 
   # print(data.shape)
   # data_reshaped = data.reshape(n_arrays, n_points, -1)
-  data_reshaped = data
+  data_reshaped = data.reshape(n_arrays, -1, 2)
   # print(data_reshaped.shape)
   # exit()
 
@@ -183,14 +191,14 @@ def perform_dtw():
 
   plt.figure(figsize=(8, 6))
   for centroid in centroids:
-      plt.plot(centroid[:, 0], centroid[:, 1],'r.')
+      plt.plot(centroid[:, 0], centroid[:, 1])
 
-  plt.plot(x,y_1,'k')
-  plt.plot(x,y_2,'k')
-  plt.plot(x,y_3,'k')
-  plt.plot(x,y_4,'k')
-  plt.plot(x,y_5,'k')
-  plt.plot(x,y_6,'k')
+  # plt.plot(x,y_1,'k')
+  # plt.plot(x_2,y_2,'k')
+  # plt.plot(x_2,y_3,'k')
+  # plt.plot(x,y_4,'k')
+  # plt.plot(x,y_5,'k')
+  # plt.plot(x,y_6,'k')
 
   plt.title('Representative Curves using DTW')
   plt.xlabel('X-axis')
