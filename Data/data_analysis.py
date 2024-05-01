@@ -5,6 +5,7 @@ import pandas as pd
 import os
 import matplotlib.pyplot as plt
 from tslearn.clustering import TimeSeriesKMeans
+from scipy.interpolate import interp1d
 
 # INSTRUCTIONS:
 #   cd C:\PROJECTS\SocialLandmarks
@@ -82,7 +83,7 @@ def visualize_agent_traj(agents_traj, title):
   max_dist = []
   max_width = []
   processed_points = []
-  for i, agent_traj in enumerate(agents_traj[:5]):
+  for i, agent_traj in enumerate(agents_traj[:10]):
     if len(agent_traj) <= 0:
       continue #TODO: pedestrian id 21
     
@@ -147,22 +148,44 @@ def visualize_agent_traj(agents_traj, title):
   plt.xlim(-abs(max_value_w)-tol_x, abs(max_value_w)+tol_x) 
   plt.show()
 
-  return data
+  return data, [max_value, max_value_h, max_value_w]
 
-def perform_dtw(data):
+def perform_dtw(data, max_list):
 
   print("perform_dtw()")
 
-  # n_arrays = 6
-  # n_points = 100
-  # x =  np.linspace(1,100, n_points)
-  # x_2 = np.linspace(1,100,100)
-  # y_1 = x + 10
-  # y_2 = x_2
-  # y_3 = x_2*3
-  # y_4 = x*4
-  # y_5 = x**2
-  # y_6 = x**2 + 100
+  # x = np.array([ 0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+  # 0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+  # 0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+  # 0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+  # 0.00000000e+00,  0.00000000e+00,  0.00000000e+00, 0.00000000e+00,
+  # 0.00000000e+00, -8.12579934e-03, -1.29995256e-02, -6.27880755e-02,
+  # -4.60151318e-03,  1.80790258e-16] )
+  # y = np.array([ 0. ,         0.,          0.,          0.  ,        0. ,         0.,
+  # 0.      ,    0. ,         0. ,         0. ,         0. ,         0.,
+  # 0. ,         0.  ,        0. ,         0. ,         0.  ,        0.,
+  # 0.   ,       0.  ,        0. ,        -1.03871126, -1.66169846, -2.8771257,
+  # -5.73785893, -7.72248985])
+  # # y = np.array([ 0.00000000e+00, -8.12579934e-03, -1.29995256e-02, -6.27880755e-02,
+  # # -4.60151318e-03,  1.80790258e-16] )
+  # # x = np.array([ 0. ,        -1.03871126, -1.66169846, -2.8771257,
+  # # -5.73785893, -7.72248985])
+  # plt.plot(x,y)
+  # indices = np.column_stack((0,np.where(x != 0)))
+  # unique_y = x[indices[0,:]]
+  # unique_x = y[indices[0,:]]
+  # degree = 3
+  # coefficients = np.polyfit(unique_x,unique_y, degree)
+  # poly_func = np.poly1d(coefficients)
+  # # interp_func = interp1d(np.unique(x), np.unique(y), kind = 'linear')
+  # x_interp = np.linspace(unique_x.min(), unique_x.max(), 1000)
+  # y_interp = poly_func(x_interp)
+  # # y_interp = interp_func(x_interp)
+  # plt.plot(y_interp,x_interp,'r.-')
+  # plt.show()
+  # exit()
+
+  [max_value, max_value_h, max_value_w] = max_list
 
   n_points = []
   for i,datapoints in enumerate(data):
@@ -170,30 +193,22 @@ def perform_dtw(data):
   max_length =  max(n_points)
  
   # Padd data:
+  plt.figure(figsize=(8, 6))
+  plt.plot(0,0,'k',marker='.', markersize=8)
+  plt.plot(0,max_value,'k',marker='.', markersize=8)
+  tol_y = 1.5
+  plt.ylim(-abs(max_value_h)-tol_y, abs(max_value_h)+tol_y)
+  tol_x = 0.1
+  plt.xlim(-abs(max_value_w)-tol_x, abs(max_value_w)+tol_x) 
+
   for i,datapoints in enumerate(data):
     datapoints = datapoints.reshape((1,datapoints.shape[0], datapoints.shape[1]))
     padded_data = np.pad(datapoints, ((0, 0), (max_length - n_points[i], 0), (0, 0)), mode='constant')
+    plt.plot(padded_data[0,:,0], padded_data[0,:,1],'dimgray',linestyle = 'dotted')
     if i == 0:
       data_full = padded_data
     else:
       data_full = np.vstack((data_full, padded_data))
-
-  # max_length = max(100, 50)
-  # data_1 = np.array([np.column_stack((x,y_1)), np.column_stack((x,y_4)),np.column_stack((x,y_5)),np.column_stack((x,y_6))])
-  # data_2 = np.array([np.column_stack((x_2,y_2)),np.column_stack((x_2,y_3))])
-
-  # padded_data_1 = np.pad(data_1, ((0, 0), (max_length - 100, 0), (0, 0)), mode='constant')
-  # padded_data_2 = np.pad(data_2, ((0, 0), (max_length - 50, 0), (0, 0)), mode='constant')
-  # data = np.vstack((padded_data_1, padded_data_2))
-
-  # data = np.array([np.column_stack((x,y_1)), np.column_stack((x,y_2)), np.column_stack((x,y_3)),
-  #                  np.column_stack((x,y_4)),np.column_stack((x,y_5)),np.column_stack((x,y_6))])
-
-  # print(data.shape)
-  # data_reshaped = data.reshape(n_arrays, n_points, -1)
-  # data_reshaped = data.reshape(n_arrays, -1, 2)
-  # print(data_reshaped.shape)
-  # exit()
 
   n_clusters = 3
   kmeans = TimeSeriesKMeans(n_clusters=n_clusters, metric="dtw")
@@ -201,16 +216,21 @@ def perform_dtw(data):
 
   centroids = kmeans.cluster_centers_
 
-  plt.figure(figsize=(8, 6))
   for centroid in centroids:
-      plt.plot(centroid[:, 0], centroid[:, 1],'r.-')
-
-  # plt.plot(x,y_1,'k')
-  # plt.plot(x_2,y_2,'k')
-  # plt.plot(x_2,y_3,'k')
-  # plt.plot(x,y_4,'k')
-  # plt.plot(x,y_5,'k')
-  # plt.plot(x,y_6,'k')
+      x = centroid[:, 0]
+      y = centroid[:, 1]
+      plt.plot(x, y,'firebrick', linestyle = 'dashdot')
+      indices = np.column_stack((0,np.where(x != 0)))
+      unique_y = x[indices[0,:]]
+      unique_x = y[indices[0,:]]
+      degree = 5
+      coefficients = np.polyfit(unique_x,unique_y, degree)
+      poly_func = np.poly1d(coefficients)
+      # interp_func = interp1d(np.unique(x), np.unique(y), kind = 'linear')
+      x_interp = np.linspace(unique_x.min(), unique_x.max(), 1000)
+      y_interp = poly_func(x_interp)
+      # y_interp = interp_func(x_interp)
+      plt.plot(y_interp,x_interp,'b')
 
   plt.title('Representative Curves using DTW')
   plt.xlabel('X-axis')
@@ -221,8 +241,8 @@ def perform_dtw(data):
 if __name__ ==  '__main__':
   print("Main")
   agents_traj = preprocess_data(source = "ETH")
-  data = visualize_agent_traj(agents_traj = agents_traj[0], title = "ETH_Hotel Trajectories")
+  data, [max_value, max_value_h, max_value_w] = visualize_agent_traj(agents_traj = agents_traj[0], title = "ETH_Hotel Trajectories")
   # visualize_agent_traj(agents_traj = agents_traj[1], title = "ETH_Road Trajectories")
-  perform_dtw(data)
+  perform_dtw(data, [max_value, max_value_h, max_value_w])
 
 
