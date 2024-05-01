@@ -127,15 +127,14 @@ def visualize_agent_traj(agents_traj, title):
   #   max_overall = max_value_w
   
   max_height = []
+  data = []
   for i, points in enumerate(processed_points):   
     scale_factor = max_value/points[-1,1]
     y_stretched = [scale_factor * yi for yi in points[:,1]]
     max_height.append(max(np.abs(y_stretched)))
-    print(points[:,0].shape)
-    print(np.array(y_stretched).shape)
-    exit()
+    datapoints = np.column_stack((points[:,0],np.array(y_stretched)))
+    data.append(datapoints)
     plt.plot(points[:,0], y_stretched, 'firebrick')
-
   
   max_value_h = max_height[np.argmax(np.abs(max_height))]
   plt.plot(0,0,'k',marker='.', markersize=8)
@@ -148,23 +147,36 @@ def visualize_agent_traj(agents_traj, title):
   plt.xlim(-abs(max_value_w)-tol_x, abs(max_value_w)+tol_x) 
   plt.show()
 
-def perform_dtw():
+  return data
+
+def perform_dtw(data):
 
   print("perform_dtw()")
 
-  # Generate example data: 500 curves, each with 100 points
-  n_arrays = 6
-  n_points = 100
+  # n_arrays = 6
+  # n_points = 100
+  # x =  np.linspace(1,100, n_points)
+  # x_2 = np.linspace(1,100,100)
+  # y_1 = x + 10
+  # y_2 = x_2
+  # y_3 = x_2*3
+  # y_4 = x*4
+  # y_5 = x**2
+  # y_6 = x**2 + 100
 
-  x =  np.linspace(1,100, n_points)
-  x_2 = np.linspace(1,100,100)
-
-  y_1 = x + 10
-  y_2 = x_2
-  y_3 = x_2*3
-  y_4 = x*4
-  y_5 = x**2
-  y_6 = x**2 + 100
+  n_points = []
+  for i,datapoints in enumerate(data):
+    n_points.append(datapoints.shape[0])
+  max_length =  max(n_points)
+ 
+  # Padd data:
+  for i,datapoints in enumerate(data):
+    datapoints = datapoints.reshape((1,datapoints.shape[0], datapoints.shape[1]))
+    padded_data = np.pad(datapoints, ((0, 0), (max_length - n_points[i], 0), (0, 0)), mode='constant')
+    if i == 0:
+      data_full = padded_data
+    else:
+      data_full = np.vstack((data_full, padded_data))
 
   # max_length = max(100, 50)
   # data_1 = np.array([np.column_stack((x,y_1)), np.column_stack((x,y_4)),np.column_stack((x,y_5)),np.column_stack((x,y_6))])
@@ -174,24 +186,24 @@ def perform_dtw():
   # padded_data_2 = np.pad(data_2, ((0, 0), (max_length - 50, 0), (0, 0)), mode='constant')
   # data = np.vstack((padded_data_1, padded_data_2))
 
-  data = np.array([np.column_stack((x,y_1)), np.column_stack((x,y_2)), np.column_stack((x,y_3)),
-                   np.column_stack((x,y_4)),np.column_stack((x,y_5)),np.column_stack((x,y_6))])
+  # data = np.array([np.column_stack((x,y_1)), np.column_stack((x,y_2)), np.column_stack((x,y_3)),
+  #                  np.column_stack((x,y_4)),np.column_stack((x,y_5)),np.column_stack((x,y_6))])
 
   # print(data.shape)
   # data_reshaped = data.reshape(n_arrays, n_points, -1)
-  data_reshaped = data.reshape(n_arrays, -1, 2)
+  # data_reshaped = data.reshape(n_arrays, -1, 2)
   # print(data_reshaped.shape)
   # exit()
 
   n_clusters = 3
   kmeans = TimeSeriesKMeans(n_clusters=n_clusters, metric="dtw")
-  kmeans.fit(data_reshaped)
+  kmeans.fit(data_full)
 
   centroids = kmeans.cluster_centers_
 
   plt.figure(figsize=(8, 6))
   for centroid in centroids:
-      plt.plot(centroid[:, 0], centroid[:, 1])
+      plt.plot(centroid[:, 0], centroid[:, 1],'r.-')
 
   # plt.plot(x,y_1,'k')
   # plt.plot(x_2,y_2,'k')
@@ -208,9 +220,9 @@ def perform_dtw():
 
 if __name__ ==  '__main__':
   print("Main")
-  # agents_traj = preprocess_data(source = "ETH")
-  # visualize_agent_traj(agents_traj = agents_traj[0], title = "ETH_Hotel Trajectories")
+  agents_traj = preprocess_data(source = "ETH")
+  data = visualize_agent_traj(agents_traj = agents_traj[0], title = "ETH_Hotel Trajectories")
   # visualize_agent_traj(agents_traj = agents_traj[1], title = "ETH_Road Trajectories")
-  perform_dtw()
+  perform_dtw(data)
 
 
