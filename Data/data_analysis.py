@@ -4,6 +4,7 @@ from tqdm import tqdm
 import pandas as pd
 import os
 import matplotlib.pyplot as plt
+from tslearn.clustering import TimeSeriesKMeans
 
 # INSTRUCTIONS:
 #   cd C:\PROJECTS\SocialLandmarks
@@ -81,7 +82,7 @@ def visualize_agent_traj(agents_traj, title):
   max_dist = []
   max_width = []
   processed_points = []
-  for i, agent_traj in enumerate(agents_traj[:10]):
+  for i, agent_traj in enumerate(agents_traj[:5]):
     if len(agent_traj) <= 0:
       continue #TODO: pedestrian id 21
     
@@ -120,16 +121,19 @@ def visualize_agent_traj(agents_traj, title):
 
   max_value = max_dist[np.argmax(np.abs(max_dist))]
   max_value_w = max_width[np.argmax(np.abs(max_width))]
-  if abs(max_value) >= abs(max_value_w):
-    max_overall = max_value
-  else:
-    max_overall = max_value_w
+  # if abs(max_value) >= abs(max_value_w):
+  #   max_overall = max_value
+  # else:
+  #   max_overall = max_value_w
   
   max_height = []
   for i, points in enumerate(processed_points):   
     scale_factor = max_value/points[-1,1]
     y_stretched = [scale_factor * yi for yi in points[:,1]]
     max_height.append(max(np.abs(y_stretched)))
+    print(points[:,0].shape)
+    print(np.array(y_stretched).shape)
+    exit()
     plt.plot(points[:,0], y_stretched, 'firebrick')
 
   
@@ -138,19 +142,67 @@ def visualize_agent_traj(agents_traj, title):
   plt.plot(0,max_value,'k',marker='.', markersize=8)
   plt.title(f"{title}")
   tol_y = 1.5
-  print(max_value_h)
   plt.ylim(-abs(max_value_h)-tol_y, abs(max_value_h)+tol_y)
   # plt.xlim(-abs(int(max_overall/4))-1, abs(int(max_overall/4))+1) #TODO: regulate
   tol_x = 0.1
   plt.xlim(-abs(max_value_w)-tol_x, abs(max_value_w)+tol_x) 
   plt.show()
 
+def perform_dtw():
+
+  print("perform_dtw()")
+
+  # Generate example data: 500 curves, each with 100 points
+  n_arrays = 6
+  n_points = 100
+
+  x =  np.linspace(1,100, n_points)
+  x_2 = np.linspace(1,100,50)
+
+  y_1 = x + 10
+  y_2 = x_2
+  y_3 = x*3
+  y_4 = x*4
+  y_5 = x**2
+  y_6 = x**2 + 100
+
+  data = np.array([np.column_stack((x,y_1)),np.column_stack((x_2,y_2)),np.column_stack((x,y_3)),
+                   np.column_stack((x,y_4)),np.column_stack((x,y_5)),np.column_stack((x,y_6))])
+
+  # print(data.shape)
+  # data_reshaped = data.reshape(n_arrays, n_points, -1)
+  data_reshaped = data
+  # print(data_reshaped.shape)
+  # exit()
+
+  n_clusters = 3
+  kmeans = TimeSeriesKMeans(n_clusters=n_clusters, metric="dtw")
+  kmeans.fit(data_reshaped)
+
+  centroids = kmeans.cluster_centers_
+
+  plt.figure(figsize=(8, 6))
+  for centroid in centroids:
+      plt.plot(centroid[:, 0], centroid[:, 1],'r.')
+
+  plt.plot(x,y_1,'k')
+  plt.plot(x,y_2,'k')
+  plt.plot(x,y_3,'k')
+  plt.plot(x,y_4,'k')
+  plt.plot(x,y_5,'k')
+  plt.plot(x,y_6,'k')
+
+  plt.title('Representative Curves using DTW')
+  plt.xlabel('X-axis')
+  plt.ylabel('Y-axis')
+  #plt.legend(["one","two","three"])
+  plt.show()
 
 if __name__ ==  '__main__':
   print("Main")
-  agents_traj = preprocess_data(source = "ETH")
-  visualize_agent_traj(agents_traj = agents_traj[0], title = "ETH_Hotel Trajectories")
+  # agents_traj = preprocess_data(source = "ETH")
+  # visualize_agent_traj(agents_traj = agents_traj[0], title = "ETH_Hotel Trajectories")
   # visualize_agent_traj(agents_traj = agents_traj[1], title = "ETH_Road Trajectories")
-
+  perform_dtw()
 
 
