@@ -194,17 +194,10 @@ def perform_dtw(data, max_list):
  
   # Padd data:
   plt.figure(figsize=(8, 6))
-  plt.plot(0,0,'k',marker='.', markersize=8)
-  plt.plot(0,max_value,'k',marker='.', markersize=8)
-  tol_y = 1.5
-  plt.ylim(-abs(max_value_h)-tol_y, abs(max_value_h)+tol_y)
-  tol_x = 0.1
-  plt.xlim(-abs(max_value_w)-tol_x, abs(max_value_w)+tol_x) 
-
   for i,datapoints in enumerate(data):
     datapoints = datapoints.reshape((1,datapoints.shape[0], datapoints.shape[1]))
     padded_data = np.pad(datapoints, ((0, 0), (max_length - n_points[i], 0), (0, 0)), mode='constant')
-    plt.plot(padded_data[0,:,0], padded_data[0,:,1],'dimgray',linestyle = 'dotted')
+    plt.plot(padded_data[0,:,0], padded_data[0,:,1],'lightgrey',linestyle = 'dotted')
     if i == 0:
       data_full = padded_data
     else:
@@ -223,15 +216,21 @@ def perform_dtw(data, max_list):
       indices = np.column_stack((0,np.where(x != 0)))
       unique_y = x[indices[0,:]]
       unique_x = y[indices[0,:]]
-      degree = 5
+      degree = 3
       coefficients = np.polyfit(unique_x,unique_y, degree)
       poly_func = np.poly1d(coefficients)
       # interp_func = interp1d(np.unique(x), np.unique(y), kind = 'linear')
       x_interp = np.linspace(unique_x.min(), unique_x.max(), 1000)
       y_interp = poly_func(x_interp)
       # y_interp = interp_func(x_interp)
-      plt.plot(y_interp,x_interp,'b')
+      plt.plot(y_interp,x_interp,'dimgrey', linewidth = 2)
 
+  plt.plot(0,0,'orange',marker='.', markersize=10)
+  plt.plot(0,max_value,'orange',marker='.', markersize=10)
+  tol_y = 1.5
+  plt.ylim(-abs(max_value_h)-tol_y, abs(max_value_h)+tol_y)
+  tol_x = 0.1
+  plt.xlim(-abs(max_value_w)-tol_x, abs(max_value_w)+tol_x) 
   plt.title('Representative Curves using DTW')
   plt.xlabel('X-axis')
   plt.ylabel('Y-axis')
