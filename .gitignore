@@ -5,6 +5,7 @@
 
 /.venv/
 /**/*.pv
+/**/*.csv
 /**/*.h5
 /SocialLandmarks_Python/Data/wandb/*/
 /SocialLandmarks_Python/Data/wandb/
