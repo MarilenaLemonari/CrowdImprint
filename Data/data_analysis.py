@@ -13,6 +13,12 @@ from scipy.interpolate import interp1d
 #   cd .\Data\
 #   python3 .\data_analysis.py
 
+def skiprows(index):
+    if index < 0:
+        return True
+    else:
+        return (index % 10 != 0)
+
 def preprocess_data(source):
   # opentraj
   print("preprocess_data()")
@@ -132,28 +138,92 @@ def preprocess_data(source):
     agents_traj.append(agents_traj_list)
     return agents_traj
 
+  elif source == "Zara":
+    """
+    returns: list 'agents_traj'
+          list of #zara files i.e., zara1, zara2, zara3,
+          within which a list of #agents,
+          of positional arrays of shape (#frames, 5) with columns: [frame_no, pos_x, pos_y, pixel_x, pixel_y].
+          2.5fps
+    """
+  
+    traj_dir = "C:/PROJECTS/SocialLandmarks/Data/Trajectories/Zara/"
+    zara_folders = [folder for folder in os.listdir(traj_dir) if os.path.isdir(os.path.join(traj_dir, folder))]
+    agents_traj = []
+    timestep = 0.4
+    column_names = ["Timestep", "pos_x", "pos_y", "pixel_x", "pixel_y"]
+
+    for i, zara_folder in enumerate(zara_folders):
+      all_agent_files = os.listdir(traj_dir+zara_folder)
+      agents_traj_list = []
+      if zara_folder == "Zara03":
+        column_names = ["Timestep", "pos_x", "pos_y"]
+
+      # Load agent trajectory:
+      for agent_id,agent_file in enumerate(all_agent_files):
+        agent_traj = pd.read_csv(traj_dir+zara_folder+"/"+agent_file, header=None, skiprows= skiprows)
+        agent_traj[column_names] = agent_traj[0].str.split(';', expand=True)
+        agent_traj[column_names[0]] = agent_traj[column_names[0]].astype(float) 
+        agent_traj[column_names[1]] = agent_traj[column_names[1]].astype(float)
+        agent_traj[column_names[2]] = agent_traj[column_names[2]].astype(float)
+        agent_traj.drop(0, axis=1, inplace=True)
+        if zara_folder != "Zara03":
+          agent_traj = agent_traj.drop("pixel_x", axis = 1)
+          agent_traj = agent_traj.drop("pixel_y", axis = 1)
+        agents_traj_values = agent_traj.values
+
+        # Cutoff trajectories according to specified framerate/duration:
+        frame_cutoff = int(agents_traj_values[-1,0]/timestep + 1) # TODO: Custom e.g.25
+        start_frame = int(agents_traj_values[0,0]/timestep + 1)
+        cutoff = 0
+        cutoff_list = []
+        start_list = [0]
+        for i in range(1,agents_traj_values.shape[0]):
+          end_frame = int(agents_traj_values[i,0]/timestep + 1)
+          if end_frame-start_frame > frame_cutoff:
+            cutoff += 1
+            cutoff_list.append(i)
+            start_list.append(i)
+            start_frame = end_frame
+        cutoff_list.append(agents_traj_values.shape[0]+1)
+
+        for c in range(cutoff+1):
+          agents_traj_list.append(agents_traj_values[start_list[c]:cutoff_list[c],:])
+        # agents_traj_list.append(agents_traj_values)
+      
+      agents_traj.append(agents_traj_list)
+
+    return agents_traj
+    
+
   else:
     print("INPUT ERROR: Source Type Not Supported!")
     return
 
-def visualize_agent_traj(agents_traj, title):
+def visualize_agent_traj(agents_traj, title, plot = True):
   print("visualize_agent_traj()")
 
   max_dist = []
   max_width = []
   processed_points = []
-  for i, agent_traj in enumerate(agents_traj[:20]):
+  num_traj = len(agents_traj)
+
+  for i, agent_traj in enumerate(agents_traj):
     if len(agent_traj) <= 0:
       continue #TODO: pedestrian id 21
     
     if np.ndim(agent_traj) == 1:
       agent_traj = agent_traj.reshape((1,3))
 
+    # plt.plot(agent_traj[:,1], agent_traj[:,2], 'slategrey')
+
     start_pos_x = agent_traj[0,1]
     start_pos_y = agent_traj[0,2]
 
+
     x_s = agent_traj[:,1]-start_pos_x
     y_s = agent_traj[:,2]-start_pos_y
+    # plt.plot(x_s, y_s, 'slategrey')
 
     end_pos_x = x_s[-1]
     end_pos_y = y_s[-1]
@@ -194,56 +264,27 @@ def visualize_agent_traj(agents_traj, title):
     max_height.append(max(np.abs(y_stretched)))
     datapoints = np.column_stack((points[:,0],np.array(y_stretched)))
     data.append(datapoints)
-    plt.plot(points[:,0], y_stretched, 'firebrick')
+    plt.plot(points[:,0], y_stretched, 'slategrey')
   
   max_value_h = max_height[np.argmax(np.abs(max_height))]
   plt.plot(0,0,'k',marker='.', markersize=8)
   plt.plot(0,max_value,'k',marker='.', markersize=8)
-  plt.title(f"{title}")
+  plt.title(f"{title} (total of {num_traj} trajectories)")
   tol_y = 1.5
-  plt.ylim(-abs(max_value_h)-tol_y, abs(max_value_h)+tol_y)
+  # plt.ylim(-abs(max_value_h)-tol_y, abs(max_value_h)+tol_y)
   # plt.xlim(-abs(int(max_overall/4))-1, abs(int(max_overall/4))+1) #TODO: regulate
   tol_x = 0.1
-  plt.xlim(-abs(max_value_w)-tol_x, abs(max_value_w)+tol_x) 
-  plt.savefig(f"{title}")
-  plt.show()
+  # plt.xlim(-abs(max_value_w)-tol_x, abs(max_value_w)+tol_x) 
+
+  if plot == True:
+    plt.savefig(f"{title}")
+    plt.show()
 
   return data, [max_value, max_value_h, max_value_w]
 
 def perform_dtw(data, max_list, n_clusters, degree):
 
   print("perform_dtw()")
-
-  # x = np.array([ 0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
-  # 0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
-  # 0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
-  # 0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
-  # 0.00000000e+00,  0.00000000e+00,  0.00000000e+00, 0.00000000e+00,
-  # 0.00000000e+00, -8.12579934e-03, -1.29995256e-02, -6.27880755e-02,
-  # -4.60151318e-03,  1.80790258e-16] )
-  # y = np.array([ 0. ,         0.,          0.,          0.  ,        0. ,         0.,
-  # 0.      ,    0. ,         0. ,         0. ,         0. ,         0.,
-  # 0. ,         0.  ,        0. ,         0. ,         0.  ,        0.,
-  # 0.   ,       0.  ,        0. ,        -1.03871126, -1.66169846, -2.8771257,
-  # -5.73785893, -7.72248985])
-  # # y = np.array([ 0.00000000e+00, -8.12579934e-03, -1.29995256e-02, -6.27880755e-02,
-  # # -4.60151318e-03,  1.80790258e-16] )
-  # # x = np.array([ 0. ,        -1.03871126, -1.66169846, -2.8771257,
-  # # -5.73785893, -7.72248985])
-  # plt.plot(x,y)
-  # indices = np.column_stack((0,np.where(x != 0)))
-  # unique_y = x[indices[0,:]]
-  # unique_x = y[indices[0,:]]
-  # degree = 3
-  # coefficients = np.polyfit(unique_x,unique_y, degree)
-  # poly_func = np.poly1d(coefficients)
-  # # interp_func = interp1d(np.unique(x), np.unique(y), kind = 'linear')
-  # x_interp = np.linspace(unique_x.min(), unique_x.max(), 1000)
-  # y_interp = poly_func(x_interp)
-  # # y_interp = interp_func(x_interp)
-  # plt.plot(y_interp,x_interp,'r.-')
-  # plt.show()
-  # exit()
 
   [max_value, max_value_h, max_value_w] = max_list
 
@@ -263,6 +304,10 @@ def perform_dtw(data, max_list, n_clusters, degree):
     else:
       data_full = np.vstack((data_full, padded_data))
 
+  # data_full_x = data_full[:,:,0]
+  # data_full_y = data_full[:,:,1]
+  # data_full[:,:,0] = data_full_y
+  # data_full[:,:,1] = data_full_x
   # n_clusters = 5
   kmeans = TimeSeriesKMeans(n_clusters=n_clusters, metric="dtw")
   kmeans.fit(data_full)
@@ -283,7 +328,7 @@ def perform_dtw(data, max_list, n_clusters, degree):
       counter += 1
       x = centroid[:, 0]
       y = centroid[:, 1]
-      plt.plot(x, y,'firebrick', linestyle = 'dashdot', label = f'centroid_{counter}')
+      plt.plot(x, y, linestyle  = 'dashdot', markersize=2, color='firebrick',label = f'centroid_{counter}')
       indices = np.column_stack((0,np.where(x != 0)))
       unique_y = x[indices[0,:]]
       unique_x = y[indices[0,:]]
@@ -329,11 +374,13 @@ def perform_dtw(data, max_list, n_clusters, degree):
 if __name__ ==  '__main__':
   print("Main")
   # agents_traj = preprocess_data(source = "ETH")
-  agents_traj = preprocess_data(source = "Flock")
+  # agents_traj = preprocess_data(source = "Flock")
+  agents_traj = preprocess_data(source = "Zara")
+
   # data, [max_value, max_value_h, max_value_w] = visualize_agent_traj(agents_traj = agents_traj[0], title = "ETH_Hotel Trajectories")
-  # visualize_agent_traj(agents_traj = agents_traj[1], title = "ETH_Road Trajectories")
-  data, [max_value, max_value_h, max_value_w] = visualize_agent_traj(agents_traj = agents_traj[0], title = "Flock Trajectories")
-  exit()
+  # data, [max_value, max_value_h, max_value_w] = visualize_agent_traj(agents_traj = agents_traj[1], title = "ETH_Road Trajectories")
+  # data, [max_value, max_value_h, max_value_w] = visualize_agent_traj(agents_traj = agents_traj[0], title = "Flock Trajectories")
+  # data, [max_value, max_value_h, max_value_w] = visualize_agent_traj(agents_traj = agents_traj[0], title = "Zara_1 Trajectories")
+  data, [max_value, max_value_h, max_value_w] = visualize_agent_traj(agents_traj = agents_traj[1], title = "Zara_2 Trajectories")
+  
   perform_dtw(data, [max_value, max_value_h, max_value_w], n_clusters = 5, degree = 3)
-
-
