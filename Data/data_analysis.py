@@ -195,6 +195,57 @@ def preprocess_data(source):
 
     return agents_traj
     
+  elif source == "Students":
+    """
+    returns: list 'agents_traj'
+          list of #student files i.e., student1, student3,
+          within which a list of #agents,
+          of positional arrays of shape (#frames, 5) with columns: [frame_no, pos_x, pos_y].
+          2.5fps
+    """
+  
+    traj_dir = "C:/PROJECTS/SocialLandmarks/Data/Trajectories/Students/"
+    student_folders = [folder for folder in os.listdir(traj_dir) if os.path.isdir(os.path.join(traj_dir, folder))]
+    agents_traj = []
+    timestep = 0.4
+    column_names = ["Timestep", "pos_x", "pos_y"]
+
+    for i, student_folder in enumerate(student_folders):
+      all_agent_files = os.listdir(traj_dir+student_folder)
+      agents_traj_list = []
+
+      # Load agent trajectory:
+      for agent_id,agent_file in enumerate(all_agent_files):
+        agent_traj = pd.read_csv(traj_dir+student_folder+"/"+agent_file, header=None, skiprows= skiprows)
+        agent_traj[column_names] = agent_traj[0].str.split(';', expand=True)
+        agent_traj[column_names[0]] = agent_traj[column_names[0]].astype(float) 
+        agent_traj[column_names[1]] = agent_traj[column_names[1]].astype(float)
+        agent_traj[column_names[2]] = agent_traj[column_names[2]].astype(float)
+        agent_traj.drop(0, axis=1, inplace=True)
+        agents_traj_values = agent_traj.values
+
+        # Cutoff trajectories according to specified framerate/duration:
+        frame_cutoff = int(agents_traj_values[-1,0]/timestep + 1) # TODO: Custom e.g.25
+        start_frame = int(agents_traj_values[0,0]/timestep + 1)
+        cutoff = 0
+        cutoff_list = []
+        start_list = [0]
+        for i in range(1,agents_traj_values.shape[0]):
+          end_frame = int(agents_traj_values[i,0]/timestep + 1)
+          if end_frame-start_frame > frame_cutoff:
+            cutoff += 1
+            cutoff_list.append(i)
+            start_list.append(i)
+            start_frame = end_frame
+        cutoff_list.append(agents_traj_values.shape[0]+1)
+
+        for c in range(cutoff+1):
+          agents_traj_list.append(agents_traj_values[start_list[c]:cutoff_list[c],:])
+        # agents_traj_list.append(agents_traj_values)
+      
+      agents_traj.append(agents_traj_list)
+
+    return agents_traj
 
   else:
     print("INPUT ERROR: Source Type Not Supported!")
@@ -375,12 +426,16 @@ if __name__ ==  '__main__':
   print("Main")
   # agents_traj = preprocess_data(source = "ETH")
   # agents_traj = preprocess_data(source = "Flock")
-  agents_traj = preprocess_data(source = "Zara")
+  # agents_traj = preprocess_data(source = "Zara")
+  agents_traj = preprocess_data(source = "Students")
 
   # data, [max_value, max_value_h, max_value_w] = visualize_agent_traj(agents_traj = agents_traj[0], title = "ETH_Hotel Trajectories")
   # data, [max_value, max_value_h, max_value_w] = visualize_agent_traj(agents_traj = agents_traj[1], title = "ETH_Road Trajectories")
   # data, [max_value, max_value_h, max_value_w] = visualize_agent_traj(agents_traj = agents_traj[0], title = "Flock Trajectories")
   # data, [max_value, max_value_h, max_value_w] = visualize_agent_traj(agents_traj = agents_traj[0], title = "Zara_1 Trajectories")
-  data, [max_value, max_value_h, max_value_w] = visualize_agent_traj(agents_traj = agents_traj[1], title = "Zara_2 Trajectories")
+  # data, [max_value, max_value_h, max_value_w] = visualize_agent_traj(agents_traj = agents_traj[1], title = "Zara_2 Trajectories")
+  # data, [max_value, max_value_h, max_value_w] = visualize_agent_traj(agents_traj = agents_traj[2], title = "Zara_3 Trajectories")
+  # data, [max_value, max_value_h, max_value_w] = visualize_agent_traj(agents_traj = agents_traj[0], title = "Students_1 Trajectories")
+  data, [max_value, max_value_h, max_value_w] = visualize_agent_traj(agents_traj = agents_traj[1], title = "Students_3 Trajectories")
   
   perform_dtw(data, [max_value, max_value_h, max_value_w], n_clusters = 5, degree = 3)
