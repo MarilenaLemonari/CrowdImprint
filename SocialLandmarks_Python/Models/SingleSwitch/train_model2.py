@@ -13,15 +13,11 @@ import cv2
 import matplotlib.pyplot as plt
 import wandb
 from wandb.keras import WandbCallback
-import tensorflow as tf
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Activation, BatchNormalization
 from sklearn.metrics import confusion_matrix
 from sklearn.model_selection import train_test_split
-from keras.layers import Dropout
-from tensorflow.keras.optimizers import Adam
-from keras import backend as K
-from tensorflow.keras import regularizers
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
 
 os.environ['WANDB_API_KEY']="29162836c3095b286c169bf889de71652ed3201b"
 
@@ -238,47 +234,70 @@ dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
 
 x_train, x_val, y_train, y_val = train_test_split(x, gt, test_size=0.2, random_state=42)
 
-# ############################################################################################# Model:1
-model = Sequential()
-model.add(Conv2D(16, kernel_size=3, strides=1, padding='same', input_shape=(32, 32, 1)))
-model.add(BatchNormalization())  # BatchNormalization after Conv2D
-model.add(Activation('relu'))
-model.add(MaxPooling2D(pool_size=2))
-model.add(Dropout(0.1))
+train_dataset = CustomDataset(x_train, y_train)
+train_loader  = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
 
-model.add(Conv2D(32, kernel_size=3, strides=1, padding='same'))
-model.add(BatchNormalization())  # BatchNormalization after Conv2D
-model.add(Activation('relu'))
-model.add(MaxPooling2D(pool_size=2))
-model.add(Dropout(0.1))
 
-model.add(Flatten())
-model.add(Dense(2048))
-model.add(BatchNormalization())  # BatchNormalization after Dense
-model.add(Activation('relu'))
-model.add(Dropout(0.2)) 
+class CNN(nn.Module):
+    def __init__(self):
+        super(CNN, self).__init__()
+        self.conv1 = nn.Conv2d(in_channels=1, out_channels=16, kernel_size=3, stride=1, padding=1)
+        self.relu1 = nn.ReLU()
+        self.pool1 = nn.MaxPool2d(kernel_size=2, stride=2)
+        
+        # Second Convolutional Layer: input size (16x16x16), output size (8x8x32)
+        self.conv2 = nn.Conv2d(in_channels=16, out_channels=32, kernel_size=3, stride=1, padding=1)
+        self.relu2 = nn.ReLU()
+        self.pool2 = nn.MaxPool2d(kernel_size=2, stride=2)
+        
+        # Flatten layer
+        self.flatten = nn.Flatten()
+        
+        # Fully connected layers
+        self.fc1 = nn.Linear(8*8*32, 256)
+        self.relu3 = nn.ReLU()
+        self.fc2 = nn.Linear(256, 128)
+        self.relu4 = nn.ReLU()
+        self.fc3 = nn.Linear(128, 64)
+        self.relu5 = nn.ReLU()
+        self.fc4 = nn.Linear(64, 36)  # Output layer with 36 classes
 
-model.add(Dense(1024))
-model.add(BatchNormalization())  # BatchNormalization after Dense
-model.add(Activation('relu'))
-model.add(Dropout(0.2))
+    def forward(self, x):
+        # Convolutional layers
+        x = self.conv1(x)
+        x = self.relu1(x)
+        x = self.pool1(x)
+        x = self.conv2(x)
+        x = self.relu2(x)
+        x = self.pool2(x)
+        
+        # Flatten the output of the last convolutional layer
+        x = self.flatten(x)
+        
+        # Fully connected layers
+        x = self.fc1(x)
+        x = self.relu3(x)
+        x = self.fc2(x)
+        x = self.relu4(x)
+        x = self.fc3(x)
+        x = self.relu5(x)
+        x = self.fc4(x)
+        
+        return x
+        
+        return x
 
-model.add(Dense(128))
-model.add(BatchNormalization())  # BatchNormalization after Dense
-model.add(Activation('relu'))
-model.add(Dropout(0.2))
+# Instantiate the model
+model = CNN()
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+model.to(device)
 
-model.add(Dense(36))
-model.add(Activation('softmax'))
-
-model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
-#################################################################################################
-
-#inputs= torch.randn(batch_size, 32, 32,requires_grad=True)
-inputs = np.random.random((batch_size, 32, 32, 1))
-outputs =  model(inputs)
-print(outputs.shape)
-exit()
+# inputs= torch.randn(batch_size, 1, 32, 32, requires_grad=True)
+# #inputs = np.random.random((batch_size, 32, 32, 1))
+# print(inputs.shape)
+# outputs =  model(inputs)
+# print(outputs.shape)
+# exit()
 
 # HYPERPARAMETERS
 wandb.init(project="SocialLandmarks")
@@ -286,25 +305,51 @@ config = wandb.config
 config.epochs = 50
 config.batch_size = batch_size
 
-model.fit(x_train, y_train, epochs=config.epochs, batch_size=config.batch_size,
-          validation_data=(x_val, y_val),
-          callbacks=[WandbCallback()])
-model.save("C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Models\SingleSwitch\exp_2.h5")
+
+criterion = nn.CrossEntropyLoss()
+optimizer = optim.Adam(model.parameters(), lr=0.001)
+
+def train(model, train_loader, criterion, optimizer, device, epochs):
+    model.train()
+    for epoch in range(epochs):
+        running_loss = 0.0
+        for i, (inputs, labels) in enumerate(train_loader):
+            inputs, labels = inputs.unsqueeze(1).to(device), labels.long().to(device)
+            optimizer.zero_grad()
+            outputs = model(inputs)
+            print(outputs.shape)
+            loss = criterion(outputs, labels)
+            loss.backward()
+            optimizer.step()
+            running_loss += loss.item()
+            if (i + 1) % 1 == 0:
+                print(f'Epoch [{epoch + 1}/{epochs}], Step [{i + 1}/{len(train_loader)}], Loss: {running_loss / (i + 1):.4f}')
+                
+                # Log metrics to wandb
+                wandb.log({"epoch": epoch+1, "step": i+1, "loss": running_loss / (i + 1)})
+    print('Finished Training')
+
+# Train the model
+wandb.watch(model, log_freq=1)
+train(model, train_loader, criterion, optimizer, device, config.epochs)
+
+# model.save("C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Models\SingleSwitch\exp_2.h5")
+torch.save(model.state_dict(), "C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Models\SingleSwitch\exp_2.h5")
 print("MODEL IS SAVED!!")
 wandb.finish()
 
-# CONFUSION MATRICES:
+# # CONFUSION MATRICES:
 
-y_train_pred = model.predict(x_train)
-y_train_pred_classes = y_train_pred.argmax(axis=-1)
-confusion = confusion_matrix(y_train, y_train_pred_classes)
-print("Confusion Matrix for Training Data:")
-print(confusion)
-print(np.max(confusion), np.argmax(confusion))
+# y_train_pred = model.predict(x_train)
+# y_train_pred_classes = y_train_pred.argmax(axis=-1)
+# confusion = confusion_matrix(y_train, y_train_pred_classes)
+# print("Confusion Matrix for Training Data:")
+# print(confusion)
+# print(np.max(confusion), np.argmax(confusion))
 
-y_val_pred = model.predict(x_val)
-y_val_pred_classes = y_val_pred.argmax(axis=-1)
-confusion = confusion_matrix(y_val, y_val_pred_classes)
-print("Confusion Matrix for Validation Data:")
-print(confusion)
-print(np.max(confusion), np.argmax(confusion))
+# y_val_pred = model.predict(x_val)
+# y_val_pred_classes = y_val_pred.argmax(axis=-1)
+# confusion = confusion_matrix(y_val, y_val_pred_classes)
+# print("Confusion Matrix for Validation Data:")
+# print(confusion)
+# print(np.max(confusion), np.argmax(confusion))

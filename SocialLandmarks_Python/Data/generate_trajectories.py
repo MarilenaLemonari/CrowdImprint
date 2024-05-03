@@ -207,7 +207,7 @@ if __name__ ==  '__main__':
 
   category = "Training" 
   if category == "Training":
-    repeat = 5000 * len(behavior_list) # TODO:change
+    repeat = 1000 * len(behavior_list) # TODO:change
     prefix = 'IF_'
   elif category == "Testing":
     repeat = 100
@@ -227,7 +227,7 @@ if __name__ ==  '__main__':
       weight=np.zeros((1,len(behavior_list)-1))
       actionTimes=np.ones((1,len(behavior_list)-1))*(-1)
       inactiveTimes=np.ones((1,len(behavior_list)-1))*(-1)
-      T = random.randint(2,int(end_time-2))
+      T = random.randint(2,int(end_time-2)) # TODO: min switch
 
       if field_1 != 5 and field_2 != 5:
         weight[0,field_1] = 1
@@ -259,7 +259,7 @@ if __name__ ==  '__main__':
       or_x = math.cos(random_angle)
       or_y = math.sin(random_angle)
 
-      n=str(counter)+prefix+str(field_1)+"_"+str(field_2)+"_T"+str(T)+"_s"+str(end_time)
+      n=str(counter)+prefix+str(field_1)+"_"+str(field_2)+"_T"+str(T)+"_d"+str(end_time)
       counter += 1
 
       generate_instance(n,init_positions,weight,actionTimes,inactiveTimes,or_x, or_y, category,dictionary,mode)

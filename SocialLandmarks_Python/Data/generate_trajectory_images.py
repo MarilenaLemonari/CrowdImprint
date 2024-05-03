@@ -28,6 +28,7 @@ import cv2
 
 #TODO: remove source csv.
 # cd C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data
+# python3 .\generate_trajectory_images.py
 
 # Parameters
 current_file_dir = os.path.dirname(os.path.abspath(__file__))
