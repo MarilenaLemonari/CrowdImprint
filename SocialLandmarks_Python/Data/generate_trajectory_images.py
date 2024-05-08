@@ -495,6 +495,24 @@ def read_csv_files_and_env_json(csv_directory,row_step,framerate):
 
 # Execute
 if __name__ ==  '__main__':
+    """
+    this code reads trajectories in the form of .csv files with the following structure:
+        1. (n_rows, 5) shape,
+        2. Each row corresponding to [timestamp, pos_x, pos_y, or_x, or_y]
+    This functions' parameters are:
+    
+        a. csv_directory
+        b. framerate
+        c. row_step
+    """
+    # current_file_dir = os.path.dirname(os.path.abspath(__file__))
+    # name = "SingleSwitch/"
+    # category = "Training"
+    # path = "\Trajectories\\" + name + "\\"
+    # csv_directory = current_file_dir + path
+    # row_step = 1
+    # framerate = 10
+
     csv_data = read_csv_files(csv_directory,framerate)
     n_csvs = len(csv_data)
     dict_list = list(csv_data.items())

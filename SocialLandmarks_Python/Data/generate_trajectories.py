@@ -199,6 +199,12 @@ def generate_instance(n,init_positions,weight,actionTimes,inactiveTimes,or_x, or
 
 if __name__ ==  '__main__':
 
+  """
+  Generated trajectories are of the form (n_rows, 5), 
+  each row correspodning to [timestamp, pos_x, pos_y, or_x, or_y].
+  Constant timestep of 0.1s
+  """
+
   behavior_list = ["Unidirectional_Down","Attractive_Multidirectional","Other_CircleAround", "AvoidNew", "MoveTF", "Stop"]
 
   dictionary = {}
