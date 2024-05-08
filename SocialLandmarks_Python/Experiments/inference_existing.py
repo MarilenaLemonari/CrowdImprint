@@ -75,7 +75,7 @@ def create_infered_beh_distr(predicted_labels, visualize = False):
         json.dump(beh_distr, json_file)
 
     if visualize:
-        plt.bar(range(len(beh_distr)-1), hist_adj, tick_label=tick_names, color = 'slategrey')
+        plt.bar(range(len(beh_distr)-1), hist_adj, tick_label=tick_names, color = 'slategrey', edgecolor = 'dimgrey')
         plt.xlabel('Inferred Behaviour Combination')
         plt.ylabel('Predicted Behaviour Frequency (%)')
         plt.title(f'Inferred Behaviour Distribution of {dataset_name} Dataset')
@@ -108,7 +108,7 @@ if __name__ ==  '__main__':
     predictions, predicted_labels = model_inference(model_name, model_type, x_test, y_test)
     combinations = decode_predictions(predicted_labels)
 
-    beh_distr = create_infered_beh_distr(predicted_labels, True)
+    beh_distr = create_infered_beh_distr(predicted_labels, False)
     
     # Generate new trajectories based on inferred behaviours:
     generate_trajectories(beh_distr)
