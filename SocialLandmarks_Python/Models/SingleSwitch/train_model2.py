@@ -15,8 +15,6 @@ import wandb
 from wandb.keras import WandbCallback
 from sklearn.metrics import confusion_matrix
 from sklearn.model_selection import train_test_split
-import torch
-import torch.nn as nn
 import torch.nn.functional as F
 
 os.environ['WANDB_API_KEY']="29162836c3095b286c169bf889de71652ed3201b"
@@ -317,13 +315,12 @@ def train(model, train_loader, criterion, optimizer, device, epochs):
             inputs, labels = inputs.unsqueeze(1).to(device), labels.long().to(device)
             optimizer.zero_grad()
             outputs = model(inputs)
-            print(outputs.shape)
             loss = criterion(outputs, labels)
             loss.backward()
             optimizer.step()
             running_loss += loss.item()
             if (i + 1) % 1 == 0:
-                print(f'Epoch [{epoch + 1}/{epochs}], Step [{i + 1}/{len(train_loader)}], Loss: {running_loss / (i + 1):.4f}')
+                #print(f'Epoch [{epoch + 1}/{epochs}], Step [{i + 1}/{len(train_loader)}], Loss: {running_loss / (i + 1):.4f}')
                 
                 # Log metrics to wandb
                 wandb.log({"epoch": epoch+1, "step": i+1, "loss": running_loss / (i + 1)})

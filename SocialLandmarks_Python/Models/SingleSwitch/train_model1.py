@@ -274,22 +274,23 @@ model.add(Activation('softmax'))
 model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
 #################################################################################################
 
-#inputs= torch.randn(batch_size, 32, 32,requires_grad=True)
-inputs = np.random.random((batch_size, 32, 32, 1))
-outputs =  model(inputs)
-print(outputs.shape)
-exit()
+# #inputs= torch.randn(batch_size, 32, 32,requires_grad=True)
+# inputs = np.random.random((batch_size, 32, 32, 1))
+# outputs =  model(inputs)
+# print(outputs.shape)
+# exit()
 
 # HYPERPARAMETERS
 wandb.init(project="SocialLandmarks")
 config = wandb.config
-config.epochs = 50
+config.epochs = 20
 config.batch_size = batch_size
 
 model.fit(x_train, y_train, epochs=config.epochs, batch_size=config.batch_size,
           validation_data=(x_val, y_val),
           callbacks=[WandbCallback()])
-model.save("C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Models\SingleSwitch\exp_2.h5")
+model.save("C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Models\SingleSwitch\model_test.h5")
+model.save("C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Models\SingleSwitch\model_test.pth")
 print("MODEL IS SAVED!!")
 wandb.finish()
 
