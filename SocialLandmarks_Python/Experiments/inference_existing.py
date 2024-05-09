@@ -93,6 +93,7 @@ def generate_trajectories(beh_distr, n_agents):
     # TODO: do the percentage mean probabilities? If not:
     # Count how many agents will share which behavior combinations:
     gen_beh = {}
+    combs = []
     for key, value in beh_distr.items():
         if key == "dataset":
             continue
@@ -100,6 +101,9 @@ def generate_trajectories(beh_distr, n_agents):
         n_values = int(np.round((float_value * n_agents) / 100))
         if n_values != 0:
             gen_beh[key] = n_values
+            for v in range(n_values):
+                combs.append(key)
+            
     print(gen_beh)
 
     os.chdir("C:\PROJECTS\DataDrivenInteractionFields\InteractionFieldsUMANS\examples")
@@ -115,7 +119,7 @@ def generate_trajectories(beh_distr, n_agents):
     source_list = list(np.arange(0,n_agents) * 2) 
     build_xml(init_positions, source_list, dictionary, max_end_time)
 
-    combs = ["['0_0']", "['0_0']"]
+    #combs = ["['0_0']", "['0_0']"]
 
     for r in tqdm(range(len(combs))):
         beh_combination = combs[r]
