@@ -3,6 +3,9 @@ import os
 from tqdm import tqdm
 import json
 import matplotlib.pyplot as plt
+from generate_custom_trajectories import *
+import random
+import math
 
 # Instructions:
 # cd C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Experiments
@@ -84,8 +87,84 @@ def create_infered_beh_distr(predicted_labels, visualize = False):
 
     return beh_distr
 
-def generate_trajectories(beh_distr):
+def generate_trajectories(beh_distr, n_agents):
     print("generate_trajectories()")
+
+    # TODO: do the percentage mean probabilities? If not:
+    # Count how many agents will share which behavior combinations:
+    gen_beh = {}
+    for key, value in beh_distr.items():
+        if key == "dataset":
+            continue
+        float_value = float(value.split('%')[0])
+        n_values = int(np.round((float_value * n_agents) / 100))
+        if n_values != 0:
+            gen_beh[key] = n_values
+    print(gen_beh)
+
+    os.chdir("C:\PROJECTS\DataDrivenInteractionFields\InteractionFieldsUMANS\examples")
+    behavior_list = ["Unidirectional_Down","Attractive_Multidirectional","Other_CircleAround", "AvoidNew", "MoveTF", "Stop"]
+
+    dictionary = {}
+    for i in range(len(behavior_list)-1):
+        dictionary[i] = behavior_list[i]
+
+    max_end_time = 15
+    init_positions = np.array([[0,0],[1,2],[0,0]])
+    init_positions = np.zeros((n_agents*2,2))
+    source_list = list(np.arange(0,n_agents) * 2) 
+    build_xml(init_positions, source_list, dictionary, max_end_time)
+
+    combs = ["['0_0']", "['0_0']"]
+
+    for r in tqdm(range(len(combs))):
+        beh_combination = combs[r]
+        string = beh_combination.strip("[]'")
+        InF1, InF2 = map(int, string.split('_'))
+
+        field_1 = InF1
+        field_2 = InF2
+
+        end_time = random.randint(5,max_end_time)
+        radius = end_time/2 # 5 for 10 sec
+
+        weight = np.zeros((1,len(behavior_list)-1))
+        actionTimes = np.ones((1,len(behavior_list)-1))*(-1)
+        inactiveTimes = np.ones((1,len(behavior_list)-1))*(-1)
+        T = random.randint(2,int(end_time-2)) # TODO: min switch
+
+        if field_1 != 5 and field_2 != 5:
+            weight[0,field_1] = 1
+            weight[0,field_2] = 1
+
+            inactiveTimes[0,field_1] = T
+            actionTimes[0,field_2] = T
+
+            inactiveTimes[0,field_2] = end_time
+            actionTimes[0,field_1] = 0
+        elif field_1 == 5 and field_2 != 5:
+            weight[0,field_2] = 1
+            inactiveTimes[0,field_2] = end_time
+            actionTimes[0,field_2] = T
+        elif field_1 != 5 and field_2 == 5:
+            weight[0,field_1] = 1
+            inactiveTimes[0,field_1] = T
+            actionTimes[0,field_1] = 0
+
+        x0 = 0
+        y0 = 0
+        angle = random.uniform(0, 2 * math.pi)
+        x = x0 + radius * math.cos(angle)
+        y = y0 + radius * math.sin(angle)
+        init_positions=np.array([[x0,y0],[x,y]])
+
+
+        random_angle = random.uniform(0, 2 * math.pi)
+        or_x = math.cos(random_angle)
+        or_y = math.sin(random_angle)
+
+        generate_instance(init_positions,weight,actionTimes,inactiveTimes,or_x, or_y,dictionary, groupID = r)
+
 
 if __name__ ==  '__main__':
 
@@ -109,8 +188,8 @@ if __name__ ==  '__main__':
     combinations = decode_predictions(predicted_labels)
 
     beh_distr = create_infered_beh_distr(predicted_labels, False)
+    print(beh_distr)
     
     # Generate new trajectories based on inferred behaviours:
-    generate_trajectories(beh_distr)
-
-    
+    n_agents = 2
+    generate_trajectories(beh_distr, n_agents)
