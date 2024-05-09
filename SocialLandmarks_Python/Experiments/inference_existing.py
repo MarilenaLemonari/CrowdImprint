@@ -168,6 +168,10 @@ def generate_trajectories(beh_distr, n_agents):
         or_y = math.sin(random_angle)
 
         generate_instance(init_positions,weight,actionTimes,inactiveTimes,or_x, or_y,dictionary, groupID = r)
+    
+    # Save trajectories
+    mode = "Inference\\Flock"
+    S_true=make_trajectory(n_agents,mode)
 
 
 if __name__ ==  '__main__':

@@ -203,7 +203,7 @@ def load_trajectories(file_name, resume_time):
   numpy_array = np.loadtxt(file, delimiter=",")
   numpy_array=numpy_array[resume_time:,:]
   return numpy_array
-def make_trajectory(n,n_agents,mode):
+def make_trajectory(n_agents,mode):
   # if category == "Training":
   #   folder = mode
   # else:
@@ -211,8 +211,8 @@ def make_trajectory(n,n_agents,mode):
 
   folder  = mode
 
-  for i in range(1,n_agents):
-    file=f"C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\Trajectories\{folder}\{n}_a{i}.csv"
+  for i in range(1,n_agents+1):
+    file=f"C:\\PROJECTS\\SocialLandmarks\\SocialLandmarks_Python\\Data\\Trajectories\\{folder}\\agent_{i}.csv"
     file2=f"C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\Trajectories\{folder}\output_{mode}{i}.csv"
     if os.path.exists(file)==True:
       os.remove(file)
@@ -221,9 +221,16 @@ def make_trajectory(n,n_agents,mode):
   os.getcwd()
   os.system(f"C:\\PROJECTS\\DataDrivenInteractionFields\\InteractionFieldsUMANS\\buildConsole\\Release\\UMANS-ConsoleApplication-Windows.exe -i Scenario_social.xml -o C:\\PROJECTS\\SocialLandmarks\\SocialLandmarks_Python\\Data\\Trajectories\\{folder}")
   S_true=[]
-  for i in range(1,n_agents):
-    os.rename(f"C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\Trajectories\{folder}\output_{i}.csv",f"C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\Trajectories\{folder}\{n}_a{i}.csv")
-    S_true.append(load_trajectories(f"C:/PROJECTS/SocialLandmarks/SocialLandmarks_Python/Data/Trajectories/{folder}/{n}_a{i}.csv", 0))
+  index_list = list(np.arange(0,n_agents+1)*2)[1:]
+  #index_list = [1] + index_list
+  counter  = 1
+  for i in range(n_agents*2+1):
+    if i in index_list:
+      os.rename(f"C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\Trajectories\{folder}\output_{i}.csv",f"C:\\PROJECTS\\SocialLandmarks\\SocialLandmarks_Python\\Data\\Trajectories\\{folder}\\agent_{counter}.csv")
+      S_true.append(load_trajectories(f"C:/PROJECTS/SocialLandmarks/SocialLandmarks_Python/Data/Trajectories/{folder}/agent_{counter}.csv", 0))
+      counter += 1
+    else: 
+      os.remove(f"C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\Trajectories\{folder}\output_{i}.csv")
   return S_true
 #---------------------------------------------------------------------------------------------------------------
 
