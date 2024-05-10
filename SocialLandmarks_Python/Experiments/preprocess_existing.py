@@ -29,7 +29,7 @@ import cv2
 # cd C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Experiments
 # python3 .\preprocess_existing.py
     
-def read_csv_files(csv_directory, bound = 16):
+def read_csv_files(csv_directory):
     csv_files = [f for f in os.listdir(csv_directory) if f.endswith('.csv')]
     # TODO: 10second trajectories.
 
@@ -62,7 +62,6 @@ def read_csv_files(csv_directory, bound = 16):
         data_dict[filename] = df
         all_dfs.append(df)
     
-    # Make from [-12,12] to [0,1]
     for filename, df in data_dict.items():
         # Normalize to [0, 0.9]
         bound_min = min(np.min(df["pos_x"]), np.min(df["pos_z"]))
@@ -72,7 +71,13 @@ def read_csv_files(csv_directory, bound = 16):
         df["pos_z"] = (df['pos_z'] - bound_min) / (bound_max - bound_min) * (0.9 - 0) 
 
 
+        s = len(df["pos_x"])
+        source_norm = np.zeros((s))
+        source_norm[0] = (0 - bound_min) / (bound_max - bound_min) * (0.9 - 0)
+        df["norm_source"] = list(source_norm)
+
         data_dict[filename] = df
+
     return data_dict
 
 def create_images(key, value, dataset_name, resolution= 32):

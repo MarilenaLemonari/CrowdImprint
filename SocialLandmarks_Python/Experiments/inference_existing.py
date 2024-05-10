@@ -57,7 +57,7 @@ def decode_predictions(prediction_labels):
 
     return combinations
 
-def create_infered_beh_distr(predicted_labels, visualize = False):
+def create_infered_beh_distr(predicted_labels, dataset_name, visualize = False):
     hist, bins = np.histogram(predicted_labels, bins=np.arange(max(predicted_labels) + 2))
     count_list = np.array(hist.tolist())
     distribution = (count_list * 100) / sum(count_list)
@@ -114,7 +114,7 @@ def generate_trajectories(beh_distr, n_agents):
         dictionary[i] = behavior_list[i]
 
     max_end_time = 15
-    init_positions = np.array([[0,0],[1,2],[0,0]])
+    # init_positions = np.array([[0,0],[1,2],[0,0]])
     init_positions = np.zeros((n_agents*2,2))
     source_list = list(np.arange(0,n_agents) * 2) 
     build_xml(init_positions, source_list, dictionary, max_end_time)
@@ -195,7 +195,7 @@ if __name__ ==  '__main__':
     predictions, predicted_labels = model_inference(model_name, model_type, x_test, y_test)
     combinations = decode_predictions(predicted_labels)
 
-    beh_distr = create_infered_beh_distr(predicted_labels, False)
+    beh_distr = create_infered_beh_distr(predicted_labels, dataset_name, False)
     print(beh_distr)
     
     # Generate new trajectories based on inferred behaviours:

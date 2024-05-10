@@ -15,7 +15,6 @@ import math
 #TODO: go to \examples with cd
 # cd C:\PROJECTS\SocialLandmarks
 # Execute .\.venv\Scripts\activate
-# Go to cd C:\PROJECTS\DataDrivenInteractionFields\InteractionFieldsUMANS\examples
 
 #--------------------------------------------------------------------------------------------------------------
 #SCENARIO SETUP:
@@ -125,12 +124,12 @@ def build_AGENTxml(desired_name,positions,s_positions,mode,dictionary):
       f.write(xml_str)
   return Ns
 #SCENARIO.XML
-def build_SCENARIOxml(desired_name,desired_files, end_time):
+def build_SCENARIOxml(desired_name,desired_files, end_time, delta_time = 0.1):
   from xml.dom import minidom
   import os 
   root = minidom.Document()
   xml = root.createElement('Simulation')
-  xml.setAttribute('delta_time','0.1')
+  xml.setAttribute('delta_time',f'{delta_time}')
   xml.setAttribute('end_time',f"{end_time}")
   root.appendChild(xml)
   world=root.createElement('World') 
@@ -152,10 +151,10 @@ def build_SCENARIOxml(desired_name,desired_files, end_time):
   save_path_file = desired_name 
   with open(save_path_file, "w") as f:
       f.write(xml_str)
-def build_xml(init_positions,source_list, dictionary, end_time):
+def build_xml(init_positions,source_list, dictionary, end_time, delta_time = 0.1):
   build_IFxml(f"{pathIF}InteractionField_social.xml",len(source_list), dictionary)
   Ns=build_AGENTxml(f"{pathA}Agent_social.xml",init_positions,source_list,mode,dictionary)
-  build_SCENARIOxml(f"{path}Scenario_social.xml","social",end_time)
+  build_SCENARIOxml(f"{path}Scenario_social.xml","social",end_time, delta_time)
 
 def update_gtIFxml(IFxml_file,W,actionTimes,inactiveTimes,unique_size, groupID):
   Ns=W.shape[0]
@@ -203,13 +202,14 @@ def load_trajectories(file_name, resume_time):
   numpy_array = np.loadtxt(file, delimiter=",")
   numpy_array=numpy_array[resume_time:,:]
   return numpy_array
-def make_trajectory(n_agents,mode):
+def make_trajectory(n_agents,mode, name = None):
   # if category == "Training":
   #   folder = mode
   # else:
   #   folder=f"{mode}/TestData"
 
   folder  = mode
+
 
   for i in range(1,n_agents+1):
     file=f"C:\\PROJECTS\\SocialLandmarks\\SocialLandmarks_Python\\Data\\Trajectories\\{folder}\\agent_{i}.csv"
@@ -218,9 +218,16 @@ def make_trajectory(n_agents,mode):
       os.remove(file)
     if os.path.exists(file2)==True:
       os.remove(file2)
+      
+  if name!= None:
+    file3 = f"C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\Trajectories\{folder}\eval_{name}"
+    if os.path.exists(file3)==True:
+      os.remove(file3)
+
   os.getcwd()
   os.system(f"C:\\PROJECTS\\DataDrivenInteractionFields\\InteractionFieldsUMANS\\buildConsole\\Release\\UMANS-ConsoleApplication-Windows.exe -i Scenario_social.xml -o C:\\PROJECTS\\SocialLandmarks\\SocialLandmarks_Python\\Data\\Trajectories\\{folder}")
   S_true=[]
+  S_names = []
   index_list = list(np.arange(0,n_agents+1)*2)[1:]
   #index_list = [1] + index_list
   counter  = 1
@@ -228,9 +235,14 @@ def make_trajectory(n_agents,mode):
     if i in index_list:
       os.rename(f"C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\Trajectories\{folder}\output_{i}.csv",f"C:\\PROJECTS\\SocialLandmarks\\SocialLandmarks_Python\\Data\\Trajectories\\{folder}\\agent_{counter}.csv")
       S_true.append(load_trajectories(f"C:/PROJECTS/SocialLandmarks/SocialLandmarks_Python/Data/Trajectories/{folder}/agent_{counter}.csv", 0))
+      S_names.append(f"C:/PROJECTS/SocialLandmarks/SocialLandmarks_Python/Data/Trajectories/{folder}/agent_{counter}.csv")
       counter += 1
     else: 
       os.remove(f"C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\Trajectories\{folder}\output_{i}.csv")
+
+  if name != None:
+    os.rename(S_names[0], f"C:/PROJECTS/SocialLandmarks/SocialLandmarks_Python/Data/Trajectories/{folder}/eval_{name}")
+
   return S_true
 #---------------------------------------------------------------------------------------------------------------
 
