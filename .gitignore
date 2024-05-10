@@ -9,6 +9,7 @@
 /**/*.h5
 /SocialLandmarks_Python/Data/wandb/*/
 /SocialLandmarks_Python/Data/wandb/
+/Data/Results/**/*.png
 /SocialLandmarks_Python/Experiments/**/*.pyc
 /SocialLandmarks_Python/Data/Full_Model/wandb/
 /SocialLandmarks_Python/Step1/Data/

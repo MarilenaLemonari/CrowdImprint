@@ -267,6 +267,7 @@ def visualize_agent_traj(agents_traj, title, plot = True):
       agent_traj = agent_traj.reshape((1,3))
 
     # plt.plot(agent_traj[:,1], agent_traj[:,2], 'slategrey')
+    # plt.title("Raw Trajectories")
 
     start_pos_x = agent_traj[0,1]
     start_pos_y = agent_traj[0,2]
@@ -380,6 +381,7 @@ def perform_dtw(data, max_list, n_clusters, degree):
       x = centroid[:, 0]
       y = centroid[:, 1]
       plt.plot(x, y, linestyle  = 'dashdot', markersize=2, color='firebrick',label = f'centroid_{counter}')
+      # plt.scatter(x, y, s = 2, color='firebrick',label = f'centroid_{counter}')
       indices = np.column_stack((0,np.where(x != 0)))
       unique_y = x[indices[0,:]]
       unique_x = y[indices[0,:]]
@@ -392,8 +394,8 @@ def perform_dtw(data, max_list, n_clusters, degree):
       # y_interp = interp_func(x_interp)
       plt.plot(y_interp,x_interp,'dimgrey', linewidth = 2, label = f'if_{counter}num_{num}')
 
-  plt.plot(0,0,'orange',marker='.', markersize=10, label = 'point_spawn')
-  plt.plot(0,max_value,'orange',marker='.', markersize=10, label = 'point_goal')
+  # plt.plot(0,0,'orange',marker='.', markersize=10, label = 'point_spawn')
+  # plt.plot(0,max_value,'orange',marker='.', markersize=10, label = 'point_goal')
 
   for line in plt.gca().lines:
     line.set_visible(False)
@@ -437,5 +439,5 @@ if __name__ ==  '__main__':
   # data, [max_value, max_value_h, max_value_w] = visualize_agent_traj(agents_traj = agents_traj[2], title = "Zara_3 Trajectories")
   # data, [max_value, max_value_h, max_value_w] = visualize_agent_traj(agents_traj = agents_traj[0], title = "Students_1 Trajectories")
   data, [max_value, max_value_h, max_value_w] = visualize_agent_traj(agents_traj = agents_traj[1], title = "Students_3 Trajectories")
-  
+
   perform_dtw(data, [max_value, max_value_h, max_value_w], n_clusters = 5, degree = 3)
