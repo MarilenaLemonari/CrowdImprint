@@ -205,7 +205,10 @@ if __name__ ==  '__main__':
   Constant timestep of 0.1s
   """
 
-  behavior_list = ["Unidirectional_Down","Attractive_Multidirectional","Other_CircleAround", "AvoidNew", "MoveTF", "Stop"]
+  # behavior_list = ["Unidirectional_Down","Attractive_Multidirectional","Other_CircleAround", "AvoidNew", "MoveTFv2", "Stop"]
+  dir_dict = {0:0, 1:3}
+  behavior_list = ["Other_CircleAround", "Unidirectional_Down","Attractive_Multidirectional","Other_CircleAround",
+                   "AvoidNew", "MoveTFv2", "Stop"] # TODO: antiCircleAround
 
   dictionary = {}
   for i in range(len(behavior_list)-1):
@@ -213,7 +216,7 @@ if __name__ ==  '__main__':
 
   category = "Training" 
   if category == "Training":
-    repeat = 1000 * len(behavior_list) # TODO:change
+    repeat = 1000 * (len(behavior_list)-1) # TODO:change
     prefix = 'IF_'
   elif category == "Testing":
     repeat = 100
@@ -227,15 +230,23 @@ if __name__ ==  '__main__':
       end_time = random.randint(5,15)
       radius = end_time/2 # 5 for 10 sec
 
-      field_1=random.randint(0,len(behavior_list)-1)
-      field_2=random.randint(0,len(behavior_list)-1)
+      field_1=random.randint(1,len(behavior_list)-1)
+      field_2=random.randint(1,len(behavior_list)-1)
+
+      # If sampled field is circle around randomly choose clockwise or anticlockwise options
+      if field_1 == 3:
+        field_dir = random.randint(0,1)
+        field_1 = dir_dict[field_dir]
+      if field_2 == 3:
+        field_dir = random.randint(0,1)
+        field_2 = dir_dict[field_dir]
 
       weight=np.zeros((1,len(behavior_list)-1))
       actionTimes=np.ones((1,len(behavior_list)-1))*(-1)
       inactiveTimes=np.ones((1,len(behavior_list)-1))*(-1)
       T = random.randint(2,int(end_time-2)) # TODO: min switch
 
-      if field_1 != 5 and field_2 != 5:
+      if field_1 != 6 and field_2 != 6:
         weight[0,field_1] = 1
         weight[0,field_2] = 1
 
@@ -244,11 +255,11 @@ if __name__ ==  '__main__':
 
         inactiveTimes[0,field_2] = end_time
         actionTimes[0,field_1] = 0
-      elif field_1 == 5 and field_2 != 5:
+      elif field_1 == 6 and field_2 != 6:
         weight[0,field_2] = 1
         inactiveTimes[0,field_2] = end_time
         actionTimes[0,field_2] = T
-      elif field_1 != 5 and field_2 == 5:
+      elif field_1 != 6 and field_2 == 6:
         weight[0,field_1] = 1
         inactiveTimes[0,field_1] = T
         actionTimes[0,field_1] = 0
