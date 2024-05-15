@@ -61,12 +61,15 @@ def read_csv_files(csv_directory):
         all_dfs.append(df)
     
     for filename, df in data_dict.items():
-        # Normalize to [0, 0.9]
-        bound_min = min(np.min(df["pos_x"]), np.min(df["pos_z"]))
-        bound_max = max(np.max(df["pos_x"]), np.max(df["pos_z"])) 
+        # Normalize to [0, 1]
+        bound_min = min(np.min(df["pos_x"]), np.min(df["pos_z"]), 0)
+        bound_max = max(np.max(df["pos_x"]), np.max(df["pos_z"]), 0)
 
-        df["pos_x"] = (df['pos_x'] - bound_min) / (bound_max - bound_min) * (0.9 - 0) 
-        df["pos_z"] = (df['pos_z'] - bound_min) / (bound_max - bound_min) * (0.9 - 0) 
+        bound_max += 0.3
+        bound_min -= 0.3 
+
+        df["pos_x"] = (df['pos_x'] - bound_min) / (bound_max - bound_min) * (1 - 0) 
+        df["pos_z"] = (df['pos_z'] - bound_min) / (bound_max - bound_min) * (1 - 0) 
 
 
         s = len(df["pos_x"])
@@ -80,13 +83,13 @@ def read_csv_files(csv_directory):
 
 def create_images(key, value, dataset_name, resolution= 32):
     # default_int = 0.5
+    # plt.clf()
+    # plt.plot(value["pos_x"], value["pos_z"])
+    # plt.plot(value["norm_source"][0], value["norm_source"][0], "*")
+    # plt.savefig(dataset_name + "\\" + key)
     pixel_pos_x = value["pos_x"] * (resolution - 1)
     pixel_pos_z = value["pos_z"] * (resolution - 1)
     image = np.zeros((resolution,resolution), np.float32)
-    # Place source 
-    source_pos = value["norm_source"][0] * (resolution - 1)
-    # image[int(resolution/2), int(resolution/2)] = 1
-    image[int(source_pos), int(source_pos)] = 1
     same_speed_count = 0
     for i in range(len(pixel_pos_x)):
         pixel_x = int(pixel_pos_x[i])
@@ -112,6 +115,12 @@ def create_images(key, value, dataset_name, resolution= 32):
 
     image[pixel_x_init,pixel_z_init] = 1
 
+    tifffile.imwrite(dataset_name + "\\" + key + '_s' + '.tif', image)
+
+    # Place source 
+    source_pos = value["norm_source"][0] * (resolution - 1)
+    # image[int(resolution/2), int(resolution/2)] = 1
+    image[int(source_pos), int(source_pos)] = 1
     tifffile.imwrite(dataset_name + "\\" + key + '.tif', image)
 
 # Execute
