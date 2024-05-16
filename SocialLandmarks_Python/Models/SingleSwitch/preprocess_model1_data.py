@@ -62,7 +62,7 @@ all_files = os.listdir(folder_path)
 
 tif_files = [file for file in all_files if file.lower().endswith('.tif')]
 for tif_file in tqdm(tif_files):
-    old_name = tif_file.split(substring, 1)[0]
+    old_name = tif_file.split(substring)[0] + tif_file.split(substring)[1].split(".tif")[0]
     # field_1 = tif_file.split("IF_")[1].split("_")[0]
     # field_2 = tif_file.split("IF_")[1].split("_")[1]
     try:
@@ -84,6 +84,7 @@ for tif_file in tqdm(tif_files):
             rotation_matrix = cv2.getRotationMatrix2D(center, angle, 1.0)
             image_rotated = cv2.warpAffine(image, rotation_matrix, (width, height), flags=cv2.INTER_LINEAR)
             np.savez(f'C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\PythonFiles\SingleSwitch\{old_name}_{counter}_rot_{int(angle)}.npz', image_rotated)
+            # tifffile.imwrite(f"C:\\PROJECTS\\SocialLandmarks\\SocialLandmarks_Python\\Data\\PythonFiles\SingleSwitch\\imgrot_{angle}.tif", image_rotated)
             # np.savez(f'C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\PythonFiles\SingleSwitch\{old_name}_{counter}_norm_type_2_rot_{int(angle)}.npz', normalize(image_rotated))
             # np.savez(f'C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\PythonFiles\SingleSwitch\{old_name}_{counter}_rot_{int(angle)}.npz', add_gaussian_noise(normalize(image_rotated)))
     except Exception as e:
