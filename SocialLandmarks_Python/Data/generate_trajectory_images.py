@@ -65,8 +65,8 @@ def read_csv_files(csv_directory):
         bound_min = min(np.min(df["pos_x"]), np.min(df["pos_z"]), 0)
         bound_max = max(np.max(df["pos_x"]), np.max(df["pos_z"]), 0)
 
-        bound_max += 0.3
-        bound_min -= 0.3 
+        bound_max += 0.5
+        bound_min -= 0.5 
 
         df["pos_x"] = (df['pos_x'] - bound_min) / (bound_max - bound_min) * (1 - 0) 
         df["pos_z"] = (df['pos_z'] - bound_min) / (bound_max - bound_min) * (1 - 0) 
@@ -74,7 +74,7 @@ def read_csv_files(csv_directory):
 
         s = len(df["pos_x"])
         source_norm = np.zeros((s))
-        source_norm[0] = (0 - bound_min) / (bound_max - bound_min) * (0.9 - 0)
+        source_norm[0] = (0 - bound_min) / (bound_max - bound_min) * (1 - 0)
         df["norm_source"] = list(source_norm)
 
         data_dict[filename] = df
@@ -83,13 +83,15 @@ def read_csv_files(csv_directory):
 
 def create_images(key, value, dataset_name, resolution= 32):
     # default_int = 0.5
-    # plt.clf()
-    # plt.plot(value["pos_x"], value["pos_z"])
-    # plt.plot(value["norm_source"][0], value["norm_source"][0], "*")
-    # plt.savefig(dataset_name + "\\" + key)
+    plt.clf()
+    plt.plot(value["pos_x"], value["pos_z"])
+    plt.plot(value["pos_x"][0], value["pos_z"][0], "b*")
+    plt.plot(value["norm_source"][0], value["norm_source"][0], "*")
+    plt.savefig(dataset_name + "\\" + key)
     pixel_pos_x = value["pos_x"] * (resolution - 1)
     pixel_pos_z = value["pos_z"] * (resolution - 1)
     image = np.zeros((resolution,resolution), np.float32)
+    source_pos = value["norm_source"][0] * (resolution - 1)
     same_speed_count = 0
     for i in range(len(pixel_pos_x)):
         pixel_x = int(pixel_pos_x[i])
@@ -118,8 +120,6 @@ def create_images(key, value, dataset_name, resolution= 32):
     tifffile.imwrite(dataset_name + "\\" + key + '_s' + '.tif', image)
 
     # Place source 
-    source_pos = value["norm_source"][0] * (resolution - 1)
-    # image[int(resolution/2), int(resolution/2)] = 1
     image[int(source_pos), int(source_pos)] = 1
     tifffile.imwrite(dataset_name + "\\" + key + '.tif', image)
 
@@ -142,6 +142,13 @@ if __name__ ==  '__main__':
         key, value = dict_list[i]
         prefix = key.split(".")[0]
         folder_path = "C:\\PROJECTS\\SocialLandmarks\\SocialLandmarks_Python\\Data\\Images" + name
+
+        # plt.plot(value["pos_x"], value["pos_z"])
+        # plt.plot(value["pos_x"][0], value["pos_z"][0], "b*")
+        # plt.plot(value["norm_source"][0], value["norm_source"][0], "*")
+        # plt.savefig(folder_path + "\\" + prefix)
+        # plt.clf()
+        
         # dataset_name = name
         files = os.listdir(folder_path)
         file_exists = any(file.startswith(prefix) for file in files)

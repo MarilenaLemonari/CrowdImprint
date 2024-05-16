@@ -207,8 +207,8 @@ if __name__ ==  '__main__':
 
   # behavior_list = ["Unidirectional_Down","Attractive_Multidirectional","Other_CircleAround", "AvoidNew", "MoveTFv2", "Stop"]
   dir_dict = {0:0, 1:3}
-  behavior_list = ["Other_CircleAround", "Unidirectional_Down","Attractive_Multidirectional","Other_CircleAround",
-                   "AvoidNew", "MoveTFv2", "Stop"] # TODO: antiCircleAround
+  behavior_list = ["AntiCircle", "Unidirectional_Down","Attractive_Multidirectional","Other_CircleAround",
+                   "AvoidNew", "MoveTFv2", "Stop"]
 
   dictionary = {}
   for i in range(len(behavior_list)-1):
@@ -216,7 +216,7 @@ if __name__ ==  '__main__':
 
   category = "Training" 
   if category == "Training":
-    repeat = 10 #1000 * (len(behavior_list)-1) # TODO:change
+    repeat = 1 #1000 * (len(behavior_list)-1) # TODO:change
     prefix = 'IF_'
   elif category == "Testing":
     repeat = 100
