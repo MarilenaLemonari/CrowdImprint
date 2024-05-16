@@ -84,9 +84,13 @@ def read_csv_files(csv_directory):
 def create_images(key, value, dataset_name, resolution= 32):
     # default_int = 0.5
     plt.clf()
-    plt.plot(value["pos_x"], value["pos_z"])
-    plt.plot(value["pos_x"][0], value["pos_z"][0], "b*")
-    plt.plot(value["norm_source"][0], value["norm_source"][0], "*")
+    plt.plot(value["pos_x"], value["pos_z"], c = 'slategrey')
+    plt.scatter(value["pos_x"][0], value["pos_z"][0], c = 'slategrey')
+    plt.scatter(value["norm_source"][0], value["norm_source"][0], c = 'firebrick', marker = '*', s = 200)
+    plt.legend(['Path', 'Spawn', 'Source'])
+    plt.xlabel("Position X")
+    plt.ylabel("Position Z")
+    plt.title("Normalized Path Image")
     plt.savefig(dataset_name + "\\" + key)
     pixel_pos_x = value["pos_x"] * (resolution - 1)
     pixel_pos_z = value["pos_z"] * (resolution - 1)
@@ -143,12 +147,16 @@ if __name__ ==  '__main__':
         prefix = key.split(".")[0]
         folder_path = "C:\\PROJECTS\\SocialLandmarks\\SocialLandmarks_Python\\Data\\Images" + name
 
-        # plt.plot(value["pos_x"], value["pos_z"])
-        # plt.plot(value["pos_x"][0], value["pos_z"][0], "b*")
-        # plt.plot(value["norm_source"][0], value["norm_source"][0], "*")
+        # plt.plot(value["pos_x"], value["pos_z"], 'slategrey')
+        # plt.scatter(value["pos_x"][0], value["pos_z"][0], c = 'slategrey')
+        # plt.scatter(value["norm_source"][0], value["norm_source"][0], c='firebrick', marker='*', s = 200)
+        # plt.legend(['Path', 'Spawn', 'Source'])
+        # plt.xlabel("Position X")
+        # plt.ylabel("Position Z")
+        # plt.title("Raw Path Image")
         # plt.savefig(folder_path + "\\" + prefix)
         # plt.clf()
-        
+
         # dataset_name = name
         files = os.listdir(folder_path)
         file_exists = any(file.startswith(prefix) for file in files)

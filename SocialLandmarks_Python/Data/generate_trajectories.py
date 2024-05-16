@@ -216,7 +216,7 @@ if __name__ ==  '__main__':
 
   category = "Training" 
   if category == "Training":
-    repeat = 1 #1000 * (len(behavior_list)-1) # TODO:change
+    repeat = 1000 * (len(behavior_list)-1) # TODO:change
     prefix = 'IF_'
   elif category == "Testing":
     repeat = 100
