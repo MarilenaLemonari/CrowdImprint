@@ -19,7 +19,10 @@ import torch.nn.functional as F
 
 os.environ['WANDB_API_KEY']="29162836c3095b286c169bf889de71652ed3201b"
 
-#TODO: go to cd C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data
+# TODO:
+# cd C:\PROJECTS\SocialLandmarks
+# Execute .\.venv\Scripts\activate 
+# go to cd C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data
 # Execute python3 C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Models\SingleSwitch\train_model2.py
 
 # HELPER FUNCTIONS
@@ -35,10 +38,21 @@ def scale_to_standard_normal(images):
     std = np.std(images)
     scaled_images = (images - mean) / std
     return scaled_images
-def accuracy_first(y_true, y_pred):
-    return K.mean(K.equal(K.round(y_true[:, 0]), K.round(y_pred[:, 0])), axis=-1)
-def accuracy_second(y_true, y_pred):
-    return K.mean(K.equal(K.round(y_true[:, 1]), K.round(y_pred[:, 1])), axis=-1)
+def accuracy_f(y_true, y_prob, correct, total):
+    # Find y_pred:
+    _, y_pred = torch.max(y_prob, 1)
+
+    y_pred_r = y_pred + 1
+
+    matches = (y_pred_r == y_true)
+    correct += matches.sum().item()
+    total += y_true.size(0)
+
+    return correct, total, matches
+def accuracy_overall(matches1, matches2):
+    idx = [i for i in range(len(matches1)) if matches1[i] == matches2[i]]
+    m = (matches1[idx] == True).sum().item()
+    return m
 
 # Main functions:
 def load_data(check = False):
@@ -64,7 +78,7 @@ def load_data(check = False):
     s_class4 = 0
     s_class5 = 0
     s_class6 = 0
-    for npz_file in tqdm(npz_files):
+    for npz_file in tqdm(npz_files[:100]): # TODO: change
         # Read gt fields:
         class_index = npz_file.split("IF_")[1].split("_T")[0]
         field_1 = int(npz_file.split("IF_")[1].split("_")[0])
@@ -144,6 +158,135 @@ def load_data(check = False):
         # 11728 12087 12094 11864 11664 11897
 
     return loaded_images, f_field_IDs, s_field_IDs, gt
+def validate(model, val_loader, criterion, device, CM = False):
+    model.eval()
+    val_loss = 0.0
+    val_loss1 = 0.0
+    val_loss2 = 0.0
+    val_total = 0
+    val_correct = 0
+    val_acc_first = 0
+    val_acc_sec = 0
+
+    with torch.no_grad():
+        for i, (inputs, labels) in enumerate(val_loader):
+            first_fields = []
+            second_fields = []
+            for label in labels:
+                first_fields.append(int(label.split("_")[0]))
+                second_fields.append(int(label.split("_")[1]))
+            first_fields = torch.Tensor(first_fields)
+            second_fields = torch.Tensor(second_fields)
+
+            inputs = inputs.unsqueeze(1).to(device)
+            first_fields = first_fields.long().to(device)
+            second_fields = second_fields.long().to(device)
+
+            field1_prob, field2_prob = model(inputs)
+            loss_first = criterion(field1_prob, first_fields - 1)
+            loss_second = criterion(field2_prob, second_fields - 1)
+            loss = loss_first + loss_second
+            val_loss += loss.item()
+            val_loss1 += loss_first.item()
+            val_loss2 += loss_second.item()
+
+            correct1, total, matches1 = accuracy_f(first_fields, field1_prob, 0, 0)
+            correct2, total, matches2 = accuracy_f(second_fields, field2_prob, 0, 0)
+            val_correct += accuracy_overall(matches1, matches2)
+            val_acc_first += correct1
+            val_acc_sec += correct2
+            val_total += total
+
+    val_loss_avg = val_loss / len(val_loader)
+    val_loss1_avg = val_loss1 / len(val_loader)
+    val_loss2_avg = val_loss2 / len(val_loader)
+    val_acc_first_avg = val_acc_first / val_total
+    val_acc_sec_avg = val_acc_sec / val_total
+    val_acc_overall_avg = val_correct / val_total
+
+    if CM == True:
+        # confusion = confusion_matrix(y_train, y_train_pred_classes)
+        print("Confusion Matrix for Input Data:")
+        # print(confusion)
+        # print(np.max(confusion), np.argmax(confusion))
+
+    return val_loss_avg, val_loss1_avg, val_loss2_avg, val_acc_first_avg, val_acc_sec_avg, val_acc_overall_avg
+def train(model, train_loader, val_loader, criterion, optimizer, device, epochs):
+    model.train()
+    epoch_losses = []
+    epoch_accs_first = []
+    epoch_accs_sec = []
+    acc_overall = []
+
+    for epoch in range(epochs):
+        model.train()
+        epoch_loss = 0.0
+        epoch_loss1 = 0.0
+        epoch_loss2 = 0.0
+        epoch_total = 0
+        correct = 0
+        epoch_acc_first = 0
+        epoch_acc_sec = 0
+        step_loss = []
+        accuracy_first = []
+        accuracy_second = []
+
+        for i, (inputs, labels) in enumerate(train_loader):
+            first_fields = []
+            second_fields = []
+            for label in labels:
+                first_fields.append(int(label.split("_")[0]))
+                second_fields.append(int(label.split("_")[1]))
+            first_fields = torch.Tensor(first_fields)
+            second_fields = torch.Tensor(second_fields)
+
+            inputs = inputs.unsqueeze(1).to(device)
+            first_fields = first_fields.long().to(device)
+            second_fields = second_fields.long().to(device)
+
+            optimizer.zero_grad()
+            field1_prob, field2_prob = model(inputs)
+            loss_first = criterion(field1_prob, first_fields - 1)
+            loss_second = criterion(field2_prob, second_fields - 1)
+            loss = loss_first + loss_second
+            loss.backward()
+            optimizer.step()
+            step_loss.append(loss.item())
+            epoch_loss += loss.item()
+            epoch_loss1 += loss_first.item()
+            epoch_loss2 += loss_second.item()
+
+            correct1, total, matches1 = accuracy_f(first_fields, field1_prob, 0, 0)
+            correct2, total, matches2 = accuracy_f(second_fields, field2_prob, 0, 0)
+            correct += accuracy_overall(matches1, matches2)
+            accuracy_first.append(correct1/total)
+            accuracy_second.append(correct2/total)
+            epoch_acc_first += correct1
+            epoch_acc_sec += correct2
+            epoch_total += total
+
+            if (i + 1) %  1 == 0:
+                print(f'Epoch [{epoch + 1}/{epochs}], Step [{i + 1}/{len(train_loader)}]:: Loss 1: [{epoch_loss1 / (i + 1):.4f}], Loss 2: [{epoch_loss2 / (i + 1):.4f}], Loss: [{epoch_loss / (i + 1):.4f}], Accuracy 1st: {(epoch_acc_first * 100) /epoch_total:.2f}%, Accuracy 2nd: {(epoch_acc_sec * 100) /epoch_total:.2f}%, Accuracy: {(correct * 100) /epoch_total:.2f}%')
+
+                # Run validation
+                val_loss, val_loss1, val_loss2, val_acc_first, val_acc_sec, val_acc_overall = validate(model, val_loader, criterion, device)
+
+                print(f'             Validation:: Loss 1: [{val_loss1:.4f}], Loss 2: [{val_loss2:.4f}], Loss: [{val_loss:.4f}], Accuracy 1st: {(val_acc_first*100):.2f}%, Accuracy 2nd: {val_acc_sec*100:.2f}%, Accuracy: {val_acc_overall*100:.2f}%')
+
+                # Log metrics to wandb
+                wandb.log({"epoch": epoch+1, "step": i + 1/len(train_loader),"loss1": epoch_loss1 / (i + 1), 
+                           "loss2": epoch_loss2 / (i + 1), "train_loss": epoch_loss / (i + 1),
+                            "acc1": (epoch_acc_first) /epoch_total, "acc2": epoch_acc_sec /epoch_total, "tain_acc": correct /epoch_total,
+                            "val_loss1": val_loss1, "val_loss2": val_loss2, "val_loss": val_loss, "val_acc1": val_acc_first, 
+                            "val_acc2": val_acc_sec, "val_acc": val_acc_overall})
+
+        epoch_losses.append(epoch_loss)
+        epoch_accs_first.append(epoch_acc_first / epoch_total)
+        epoch_accs_sec.append(epoch_acc_sec / epoch_total)
+        acc_overall.append(correct / epoch_total)
+
+        
+    print('Finished Training')
 
 # Classes:
 class CustomDataset(Dataset):
@@ -163,44 +306,6 @@ class CustomDataset(Dataset):
         image = torch.from_numpy(image)
 
         return image, label
-
-if __name__ ==  '__main__':
-    """
-    Train Pytorch model to predict separately the 1st and 2nd InF.
-    Preprocessing:
-        Load the npy files and build gt (x,y) pairs.
-    Inputs:
-        Model inputs are (32,32,1) # TODO:check trajectory images.
-    Outputs:
-        Model outputs are predictions of 1st and 2nd InF.
-        The code saves the trained model,
-        and the confusion matrices. #TODO: verify
-    """
-
-    # Define global parameters:
-    batch_size = 32
-
-    # Preprocess data:
-    loaded_images, f_InFs, s_InFs, gt = load_data()
-    # i = 12000 print(gt[i: (i+10)], f_InFs[i: (i+10)], s_InFs[i: (i+10)])
-    images = scale_to_standard_normal(loaded_images) # TODO:PC1
-    print("Loaded Data: ", images.shape, len(gt))
-    # index = 6 visualize_image(loaded_images[index]) visualize_image(images[index]) exit()
-    x_train, x_val, y_train, y_val = train_test_split(images, gt, test_size=0.2, random_state=42)
-    train_dataset = CustomDataset(x_train, y_train)
-    val_dataset = CustomDataset(x_val, y_val)
-    trainloader  = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
-    valoader  = DataLoader(val_dataset, batch_size=batch_size, shuffle=True)
-    
-    # for i, (inputs, labels) in enumerate(trainloader):
-    #     print(inputs.shape)
-    #     print(labels)
-    #     exit()
-
-exit()
-
-
-
 class CNN(nn.Module):
     def __init__(self):
         super(CNN, self).__init__()
@@ -223,7 +328,10 @@ class CNN(nn.Module):
         self.relu4 = nn.ReLU()
         self.fc3 = nn.Linear(128, 64)
         self.relu5 = nn.ReLU()
-        self.fc4 = nn.Linear(64, 36)  # Output layer with 36 classes
+        self.fc4 = nn.Linear(64, 36) 
+
+        self.fist = nn.Linear(36,6)
+        self.second = nn.Linear(36,6)
 
     def forward(self, x):
         # Convolutional layers
@@ -245,74 +353,67 @@ class CNN(nn.Module):
         x = self.fc3(x)
         x = self.relu5(x)
         x = self.fc4(x)
+
+        # Predictions
+        field1 = self.fist(x)
+        field2 = self.second(x)
         
-        return x
-        
-        return x
+        return field1, field2
 
-# Instantiate the model
-model = CNN()
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-model.to(device)
+if __name__ ==  '__main__':
+    """
+    Train Pytorch model to predict separately the 1st and 2nd InF.
+    Preprocessing:
+        Load the npy files and build gt (x,y) pairs.
+    Inputs:
+        Model inputs are (1,32,32) 
+    Outputs:
+        Model outputs are predictions of 1st and 2nd InF.
+        The code saves the trained model,
+        and the confusion matrices. #TODO: verify
+    """
 
-# inputs= torch.randn(batch_size, 1, 32, 32, requires_grad=True)
-# #inputs = np.random.random((batch_size, 32, 32, 1))
-# print(inputs.shape)
-# outputs =  model(inputs)
-# print(outputs.shape)
-# exit()
+    # Define global parameters:
+    batch_size = 32
+    wandb.init(project="SocialLandmarks")
+    config = wandb.config
+    config.epochs = 2
+    config.batch_size = batch_size
 
-# HYPERPARAMETERS
-wandb.init(project="SocialLandmarks")
-config = wandb.config
-config.epochs = 50
-config.batch_size = batch_size
+    # Preprocess data:
+    loaded_images, f_InFs, s_InFs, gt = load_data()
+    # i = 12000 print(gt[i: (i+10)], f_InFs[i: (i+10)], s_InFs[i: (i+10)])
+    images = scale_to_standard_normal(loaded_images) # TODO:PC1
+    print("Loaded Data: ", images.shape, len(gt))
+    # index = 6 visualize_image(loaded_images[index]) visualize_image(images[index]) exit()
+    x_train, x_val, y_train, y_val = train_test_split(images, gt, test_size=0.2, random_state=42)
+    train_dataset = CustomDataset(x_train, y_train)
+    val_dataset = CustomDataset(x_val, y_val)
+    trainloader  = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+    valoader  = DataLoader(val_dataset, batch_size=batch_size, shuffle=True)
+    
+    # Instantiate the model
+    model = CNN()
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    model.to(device)
 
+    # inputs= torch.randn(batch_size, 1, 32, 32, requires_grad=True)
+    # print(inputs.shape)
+    # field1, field2 =  model(inputs)
+    # print(field1.shape, field2.shape)
+    # exit()
 
-criterion = nn.CrossEntropyLoss()
-optimizer = optim.Adam(model.parameters(), lr=0.001)
+    # Model Parameters:
+    criterion = nn.CrossEntropyLoss()
+    optimizer = optim.Adam(model.parameters(), lr=0.001)
 
-def train(model, train_loader, criterion, optimizer, device, epochs):
-    model.train()
-    for epoch in range(epochs):
-        running_loss = 0.0
-        for i, (inputs, labels) in enumerate(train_loader):
-            inputs, labels = inputs.unsqueeze(1).to(device), labels.long().to(device)
-            optimizer.zero_grad()
-            outputs = model(inputs)
-            loss = criterion(outputs, labels)
-            loss.backward()
-            optimizer.step()
-            running_loss += loss.item()
-            if (i + 1) % 1 == 0:
-                #print(f'Epoch [{epoch + 1}/{epochs}], Step [{i + 1}/{len(train_loader)}], Loss: {running_loss / (i + 1):.4f}')
-                
-                # Log metrics to wandb
-                wandb.log({"epoch": epoch+1, "step": i+1, "loss": running_loss / (i + 1)})
-    print('Finished Training')
+    # Train the model
+    wandb.watch(model, log_freq=1)
+    train(model, trainloader, valoader, criterion, optimizer, device, config.epochs)
+    torch.save(model.state_dict(), "C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Models\SingleSwitch\\test_model.h5")
+    print("MODEL IS SAVED!!")
+    wandb.finish()
 
-# Train the model
-wandb.watch(model, log_freq=1)
-train(model, train_loader, criterion, optimizer, device, config.epochs)
-
-# model.save("C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Models\SingleSwitch\exp_2.h5")
-torch.save(model.state_dict(), "C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Models\SingleSwitch\exp_2.h5")
-print("MODEL IS SAVED!!")
-wandb.finish()
-
-# # CONFUSION MATRICES:
-
-# y_train_pred = model.predict(x_train)
-# y_train_pred_classes = y_train_pred.argmax(axis=-1)
-# confusion = confusion_matrix(y_train, y_train_pred_classes)
-# print("Confusion Matrix for Training Data:")
-# print(confusion)
-# print(np.max(confusion), np.argmax(confusion))
-
-# y_val_pred = model.predict(x_val)
-# y_val_pred_classes = y_val_pred.argmax(axis=-1)
-# confusion = confusion_matrix(y_val, y_val_pred_classes)
-# print("Confusion Matrix for Validation Data:")
-# print(confusion)
-# print(np.max(confusion), np.argmax(confusion))
-
+    # # Confusion Matrices:
+    # validate(model, trainloader, criterion, device, True) # Training
+    # validate(model, valoader, criterion, device, True) # Validation
