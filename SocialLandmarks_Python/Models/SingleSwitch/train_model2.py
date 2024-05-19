@@ -16,6 +16,7 @@ from wandb.keras import WandbCallback
 from sklearn.metrics import confusion_matrix
 from sklearn.model_selection import train_test_split
 import torch.nn.functional as F
+import json
 
 os.environ['WANDB_API_KEY']="29162836c3095b286c169bf889de71652ed3201b"
 
@@ -78,7 +79,7 @@ def load_data(check = False):
     s_class4 = 0
     s_class5 = 0
     s_class6 = 0
-    for npz_file in tqdm(npz_files[:100]): # TODO: change
+    for npz_file in tqdm(npz_files): 
         # Read gt fields:
         class_index = npz_file.split("IF_")[1].split("_T")[0]
         field_1 = int(npz_file.split("IF_")[1].split("_")[0])
@@ -248,7 +249,7 @@ def train(model, train_loader, val_loader, criterion, optimizer, device, epochs)
             field1_prob, field2_prob = model(inputs)
             loss_first = criterion(field1_prob, first_fields - 1)
             loss_second = criterion(field2_prob, second_fields - 1)
-            loss = loss_first + loss_second
+            loss = loss_second #TODO
             loss.backward()
             optimizer.step()
             step_loss.append(loss.item())
@@ -265,7 +266,7 @@ def train(model, train_loader, val_loader, criterion, optimizer, device, epochs)
             epoch_acc_sec += correct2
             epoch_total += total
 
-            if (i + 1) %  1 == 0:
+            if (i + 1) %  100 == 0:
                 print(f'Epoch [{epoch + 1}/{epochs}], Step [{i + 1}/{len(train_loader)}]:: Loss 1: [{epoch_loss1 / (i + 1):.4f}], Loss 2: [{epoch_loss2 / (i + 1):.4f}], Loss: [{epoch_loss / (i + 1):.4f}], Accuracy 1st: {(epoch_acc_first * 100) /epoch_total:.2f}%, Accuracy 2nd: {(epoch_acc_sec * 100) /epoch_total:.2f}%, Accuracy: {(correct * 100) /epoch_total:.2f}%')
 
                 # Run validation
@@ -287,6 +288,7 @@ def train(model, train_loader, val_loader, criterion, optimizer, device, epochs)
 
         
     print('Finished Training')
+    return epoch_losses, epoch_accs_first, epoch_accs_sec, acc_overall
 
 # Classes:
 class CustomDataset(Dataset):
@@ -309,53 +311,69 @@ class CustomDataset(Dataset):
 class CNN(nn.Module):
     def __init__(self):
         super(CNN, self).__init__()
+        # First Convolutional Layer
         self.conv1 = nn.Conv2d(in_channels=1, out_channels=16, kernel_size=3, stride=1, padding=1)
+        self.bn1 = nn.BatchNorm2d(16)
         self.relu1 = nn.ReLU()
         self.pool1 = nn.MaxPool2d(kernel_size=2, stride=2)
-        
-        # Second Convolutional Layer: input size (16x16x16), output size (8x8x32)
+
+        # Second Convolutional Layer
         self.conv2 = nn.Conv2d(in_channels=16, out_channels=32, kernel_size=3, stride=1, padding=1)
+        self.bn2 = nn.BatchNorm2d(32)
         self.relu2 = nn.ReLU()
         self.pool2 = nn.MaxPool2d(kernel_size=2, stride=2)
-        
+
         # Flatten layer
         self.flatten = nn.Flatten()
-        
+
         # Fully connected layers
         self.fc1 = nn.Linear(8*8*32, 256)
+        self.bn3 = nn.BatchNorm1d(256)
         self.relu3 = nn.ReLU()
+        
         self.fc2 = nn.Linear(256, 128)
+        self.bn4 = nn.BatchNorm1d(128)
         self.relu4 = nn.ReLU()
+
         self.fc3 = nn.Linear(128, 64)
         self.relu5 = nn.ReLU()
-        self.fc4 = nn.Linear(64, 36) 
+        self.fc4 = nn.Linear(64, 36)
 
-        self.fist = nn.Linear(36,6)
-        self.second = nn.Linear(36,6)
+        # Output layers for two separate fields
+        self.fist = nn.Linear(36, 6)
+        self.second = nn.Linear(36 + 6, 6)
 
     def forward(self, x):
-        # Convolutional layers
+        # Convolutional layers with Batch Normalization
         x = self.conv1(x)
+        x = self.bn1(x)
         x = self.relu1(x)
         x = self.pool1(x)
+
         x = self.conv2(x)
+        x = self.bn2(x)
         x = self.relu2(x)
         x = self.pool2(x)
-        
+
         # Flatten the output of the last convolutional layer
         x = self.flatten(x)
-        
-        # Fully connected layers
+
+        # Fully connected layers with Batch Normalization
         x = self.fc1(x)
+        x = self.bn3(x)
         x = self.relu3(x)
+        
         x = self.fc2(x)
+        x = self.bn4(x)
         x = self.relu4(x)
+        
         x = self.fc3(x)
         x = self.relu5(x)
         x = self.fc4(x)
 
         # Predictions
         field1 = self.fist(x)
+        x = torch.cat((field1, x), dim = 1)
         field2 = self.second(x)
         
         return field1, field2
@@ -377,7 +395,7 @@ if __name__ ==  '__main__':
     batch_size = 32
     wandb.init(project="SocialLandmarks")
     config = wandb.config
-    config.epochs = 2
+    config.epochs = 20
     config.batch_size = batch_size
 
     # Preprocess data:
@@ -409,10 +427,21 @@ if __name__ ==  '__main__':
 
     # Train the model
     wandb.watch(model, log_freq=1)
-    train(model, trainloader, valoader, criterion, optimizer, device, config.epochs)
+    epoch_losses, epoch_accs_first, epoch_accs_sec, acc_overall = train(model, trainloader, valoader, criterion, optimizer, device, config.epochs)
     torch.save(model.state_dict(), "C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Models\SingleSwitch\\test_model.h5")
     print("MODEL IS SAVED!!")
     wandb.finish()
+
+    training_metrics = {
+    "epoch_losses": epoch_losses,
+    "epoch_accs_first": epoch_accs_first,
+    "epoch_accs_sec": epoch_accs_sec,
+    "acc_overall": acc_overall
+    }
+    filename = 'training_metrics.json'
+    with open(filename, 'w') as json_file:
+        json.dump(training_metrics, json_file, indent=4)
+    print(f"Data successfully written to {filename}")
 
     # # Confusion Matrices:
     # validate(model, trainloader, criterion, device, True) # Training
