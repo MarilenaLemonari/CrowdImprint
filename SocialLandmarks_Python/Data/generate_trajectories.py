@@ -216,7 +216,7 @@ if __name__ ==  '__main__':
 
   category = "Training" 
   if category == "Training":
-    repeat = 1000 * (len(behavior_list)-1) # TODO:change
+    repeat = 2000 * (len(behavior_list)-1) # TODO:change
     prefix = 'IF_'
   elif category == "Testing":
     repeat = 100
@@ -224,6 +224,7 @@ if __name__ ==  '__main__':
 
   counter = 0
   mode = "SingleSwitch"
+  # mode = "NoSwitch"
 
   if mode == "SingleSwitch":
     for r in tqdm(range(repeat)):
@@ -281,5 +282,42 @@ if __name__ ==  '__main__':
 
       generate_instance(n,init_positions,weight,actionTimes,inactiveTimes,or_x, or_y, category,dictionary,mode)
 
+  elif mode == "NoSwitch":
+    for r in tqdm(range(repeat)):
+      end_time = random.randint(5,15)
+      radius = end_time/2 # 5 for 10 sec
+
+      field=random.randint(1,len(behavior_list)-1)
+
+      # If sampled field is circle around randomly choose clockwise or anticlockwise options
+      if field == 3:
+        field_dir = random.randint(0,1)
+        field = dir_dict[field_dir]
+
+      weight=np.zeros((1,len(behavior_list)-1))
+      actionTimes=np.ones((1,len(behavior_list)-1))*(-1)
+      inactiveTimes=np.ones((1,len(behavior_list)-1))*(-1)
+
+      if field != 6:
+        weight[0,field] = 1
+        inactiveTimes[0,field] = end_time
+        actionTimes[0,field] = 0
+
+      x0 = 0
+      y0 = 0
+      angle = random.uniform(0, 2 * math.pi)
+      x = x0 + radius * math.cos(angle)
+      y = y0 + radius * math.sin(angle)
+      init_positions=np.array([[x0,y0],[x,y]])
+
+
+      random_angle = random.uniform(0, 2 * math.pi)
+      or_x = math.cos(random_angle)
+      or_y = math.sin(random_angle)
+
+      n=str(counter)+prefix+str(field)+"_"+"_d"+str(end_time)
+      counter += 1
+
+      generate_instance(n,init_positions,weight,actionTimes,inactiveTimes,or_x, or_y, category,dictionary,mode)
   else:
     print("Error: Wrong Mode. Select a valid mode.")

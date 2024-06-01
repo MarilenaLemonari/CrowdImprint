@@ -130,7 +130,8 @@ def create_images(key, value, dataset_name, resolution= 32):
 # Execute
 if __name__ ==  '__main__':
     current_file_dir = "C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\Trajectories"
-    name = "\SingleSwitch"
+    name = "\SingleSwitch" #TODO
+    # name = "\\NoSwitch"
     
     csv_directory  = current_file_dir + name + "\\"
 

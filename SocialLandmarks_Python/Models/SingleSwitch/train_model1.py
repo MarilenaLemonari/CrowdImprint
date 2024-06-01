@@ -52,12 +52,14 @@ npz_files = [file for file in file_list if file.endswith('.npz')]
 loaded_images = []
 field_IDs = []
 gt = []
-gt_dict = {"0_0": 0, "0_1": 1, "0_2": 2, "0_3": 3, "0_4": 4, "0_5": 5,
-           "1_0": 6, "1_1": 7, "1_2": 8, "1_3": 9, "1_4": 10, "1_5": 11, 
-           "2_0": 12, "2_1": 13, "2_2": 14, "2_3": 15, "2_4": 16, "2_5": 17,
-            "3_0": 18, "3_1": 19, "3_2": 20,"3_3": 21, "3_4": 22, "3_5": 23,
-            "4_0": 24, "4_1": 25, "4_2": 26, "4_3": 27, "4_4": 28, "4_5": 29,
-            "5_0": 30, "5_1": 31, "5_2": 32, "5_3": 33, "5_4": 34, "5_5": 35}
+gt_dict = {"1_1": 0, "1_2": 1, "1_3": 2, "1_4": 3, "1_5": 4, "1_6": 5,
+        "2_1": 6, "2_2": 7, "2_3": 8, "2_4": 9, "2_5": 10, "2_6": 11,
+        "3_1": 12, "3_2": 13,"3_3": 14, "3_4": 15, "3_5": 16, "3_6": 17,
+        "4_1": 18, "4_2": 19, "4_3": 20, "4_4": 21, "4_5": 22, "4_6":23,
+        "5_1": 24, "5_2": 25, "5_3": 26, "5_4": 27, "5_5": 28, "5_6": 29,
+        "6_1": 30, "6_2": 31, "6_3": 32, "6_4": 33, "6_5": 34, "6_6": 35,
+        "0_0": 14, "0_1": 12, "0_2": 13, "0_3": 14, "0_4": 15, "0_5": 16, "0_6": 17,
+        "1_0": 2, "2_0": 8, "3_0": 14, "4_0": 20, "5_0": 26, "6_0": 32}
 class_0 = 0
 class_1 = 0
 class_2 = 0
@@ -289,23 +291,23 @@ config.batch_size = batch_size
 model.fit(x_train, y_train, epochs=config.epochs, batch_size=config.batch_size,
           validation_data=(x_val, y_val),
           callbacks=[WandbCallback()])
-model.save("C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Models\SingleSwitch\model_test.h5")
-model.save("C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Models\SingleSwitch\model_test.pth")
+# model.save("C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Models\SingleSwitch\model_test.h5")
+# model.save("C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Models\SingleSwitch\model_test.pth")
 print("MODEL IS SAVED!!")
 wandb.finish()
 
 # CONFUSION MATRICES:
 
-y_train_pred = model.predict(x_train)
-y_train_pred_classes = y_train_pred.argmax(axis=-1)
-confusion = confusion_matrix(y_train, y_train_pred_classes)
-print("Confusion Matrix for Training Data:")
-print(confusion)
-print(np.max(confusion), np.argmax(confusion))
+# y_train_pred = model.predict(x_train)
+# y_train_pred_classes = y_train_pred.argmax(axis=-1)
+# confusion = confusion_matrix(y_train, y_train_pred_classes)
+# print("Confusion Matrix for Training Data:")
+# print(confusion)
+# print(np.max(confusion), np.argmax(confusion))
 
-y_val_pred = model.predict(x_val)
-y_val_pred_classes = y_val_pred.argmax(axis=-1)
-confusion = confusion_matrix(y_val, y_val_pred_classes)
-print("Confusion Matrix for Validation Data:")
-print(confusion)
-print(np.max(confusion), np.argmax(confusion))
+# y_val_pred = model.predict(x_val)
+# y_val_pred_classes = y_val_pred.argmax(axis=-1)
+# confusion = confusion_matrix(y_val, y_val_pred_classes)
+# print("Confusion Matrix for Validation Data:")
+# print(confusion)
+# print(np.max(confusion), np.argmax(confusion))

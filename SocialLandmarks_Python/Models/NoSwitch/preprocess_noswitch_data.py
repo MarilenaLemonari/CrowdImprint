@@ -11,7 +11,7 @@ import pickle
 import torch.utils.data as data
 import tifffile
 
-# python3 C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Models\SingleSwitch\preprocess_model1_data.py
+# python3 C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Models\NoSwitch\preprocess_noswitch_data.py
 
 # HELPER FUNCTIONS
 def zoom_image(image):
@@ -49,7 +49,7 @@ counter = 0
 #         image_path = os.path.join(folder_path_3, tif_file)
 #         image = cv2.imread(image_path, cv2.IMREAD_UNCHANGED)
 #         #landmark_type.append(2) #2: No Landmark
-#         np.savez(f'C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\PythonFiles\SingleSwitch\TestData\{old_name}_{counter}_type_2_rot_0.npz', image)
+#         np.savez(f'C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\PythonFiles\NoSwitch\TestData\{old_name}_{counter}_type_2_rot_0.npz', image)
 #     except Exception as e:
 #         print(f"Error loading image '{tif_file}': {e}")
 # print("SIMPLE TEST IMAGES LOADED!")
@@ -57,7 +57,7 @@ counter = 0
 # exit()
 
 # DATA PRE-PROCESSING:
-folder_path = 'C:/PROJECTS/SocialLandmarks/SocialLandmarks_Python/Data/Images/SingleSwitch' 
+folder_path = 'C:/PROJECTS/SocialLandmarks/SocialLandmarks_Python/Data/Images/NoSwitch' 
 all_files = os.listdir(folder_path)
 
 tif_files = [file for file in all_files if file.lower().endswith('.tif')]
@@ -69,27 +69,28 @@ for tif_file in tqdm(tif_files):
         counter += 1
         image_path = os.path.join(folder_path, tif_file)
         image = cv2.imread(image_path, cv2.IMREAD_UNCHANGED)
-        np.savez(f'C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\PythonFiles\SingleSwitch\{old_name}_{counter}_rot_0.npz', image)
-        # tifffile.imwrite("C:\\PROJECTS\\SocialLandmarks\\SocialLandmarks_Python\\Data\\PythonFiles\SingleSwitch\\unnormalized.tif", image)
-        # np.savez(f'C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\PythonFiles\SingleSwitch\{old_name}_{counter}_norm_type_{class_id}_rot_0.npz', normalize(image))
-        # np.savez(f'C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\PythonFiles\SingleSwitch\{old_name}_{counter}_noisy_rot_0.npz', add_gaussian_noise(normalize(image)))
-        # tifffile.imwrite("C:\\PROJECTS\\SocialLandmarks\\SocialLandmarks_Python\\Data\\PythonFiles\SingleSwitch\\normal.tif",  normalize(image))
-        # tifffile.imwrite("C:\\PROJECTS\\SocialLandmarks\\SocialLandmarks_Python\\Data\\PythonFiles\SingleSwitch\\noisy.tif",  add_gaussian_noise(normalize(image)))
+        np.savez(f'C:\\PROJECTS\\SocialLandmarks\\SocialLandmarks_Python\\Data\\PythonFiles\\NoSwitch\\{old_name}_{counter}_rot_0.npz', image)
+        # tifffile.imwrite("C:\\PROJECTS\\SocialLandmarks\\SocialLandmarks_Python\\Data\\PythonFiles\\NoSwitch\\unnormalized.tif", image)
+        # np.savez(f'C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\PythonFiles\NoSwitch\{old_name}_{counter}_norm_type_{class_id}_rot_0.npz', normalize(image))
+        # np.savez(f'C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\PythonFiles\NoSwitch\{old_name}_{counter}_noisy_rot_0.npz', add_gaussian_noise(normalize(image)))
+        # tifffile.imwrite("C:\\PROJECTS\\SocialLandmarks\\SocialLandmarks_Python\\Data\\PythonFiles\NoSwitch\\normal.tif",  normalize(image))
+        # tifffile.imwrite("C:\\PROJECTS\\SocialLandmarks\\SocialLandmarks_Python\\Data\\PythonFiles\NoSwitch\\noisy.tif",  add_gaussian_noise(normalize(image)))
         height, width = image.shape[:2]
         min_angle = -179
         max_angle = 179
-        # random_angles = np.random.uniform(min_angle, max_angle, size=5) #size was 10
-        random_angles = [90,180,270]
+        random_angles = np.random.uniform(min_angle, max_angle, size=5) #size was 10
+        random_angles = [90, 180, 270]
         for i, angle in enumerate(random_angles):
             center = (width // 2, height // 2)
             rotation_matrix = cv2.getRotationMatrix2D(center, angle, 1.0)
             image_rotated = cv2.warpAffine(image, rotation_matrix, (width, height), flags=cv2.INTER_LINEAR)
-            np.savez(f'C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\PythonFiles\SingleSwitch\{old_name}_{counter}_rot_{int(angle)}.npz', image_rotated)
-            # tifffile.imwrite(f"C:\\PROJECTS\\SocialLandmarks\\SocialLandmarks_Python\\Data\\PythonFiles\SingleSwitch\\imgrot_{angle}.tif", image_rotated)
-            # np.savez(f'C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\PythonFiles\SingleSwitch\{old_name}_{counter}_norm_type_2_rot_{int(angle)}.npz', normalize(image_rotated))
-            # np.savez(f'C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\PythonFiles\SingleSwitch\{old_name}_{counter}_rot_{int(angle)}.npz', add_gaussian_noise(normalize(image_rotated)))
+            np.savez(f'C:\\PROJECTS\\SocialLandmarks\\SocialLandmarks_Python\\Data\\PythonFiles\\NoSwitch\\{old_name}_{counter}_rot_{int(angle)}.npz', image_rotated)
+            # tifffile.imwrite(f"C:\\PROJECTS\\SocialLandmarks\\SocialLandmarks_Python\\Data\\PythonFiles\\NoSwitch\\imgrot_{angle}.tif", image_rotated)
+            # np.savez(f'C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\PythonFiles\NoSwitch\{old_name}_{counter}_norm_type_2_rot_{int(angle)}.npz', normalize(image_rotated))
+            # np.savez(f'C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\PythonFiles\NoSwitch\{old_name}_{counter}_rot_{int(angle)}.npz', add_gaussian_noise(normalize(image_rotated)))
+        # exit()
     except Exception as e:
         print(f"Error loading image '{tif_file}': {e}")
-print("SingleSwitch BEHAVIOR IMAGES LOADED!")
+print("NoSwitch BEHAVIOR IMAGES LOADED!")
 
 exit()

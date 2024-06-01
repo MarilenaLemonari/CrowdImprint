@@ -179,11 +179,26 @@ def validate(model, val_loader, criterion, device, CM = False):
             first_fields = torch.Tensor(first_fields)
             second_fields = torch.Tensor(second_fields)
 
+
             inputs = inputs.unsqueeze(1).to(device)
             first_fields = first_fields.long().to(device)
             second_fields = second_fields.long().to(device)
 
             field1_prob, field2_prob = model(inputs)
+
+            if i == 0:
+                y1_val = first_fields
+                y2_val = second_fields
+                _, y1_val_pred = torch.max(field1_prob, 1)
+                _, y2_val_pred = torch.max(field2_prob, 1)
+            else:
+                y1_val = torch.cat((y1_val, first_fields), dim = 0)
+                y2_val = torch.cat((y2_val, second_fields), dim = 0)
+                _, y1_pred = torch.max(field1_prob, 1)
+                _, y2_pred = torch.max(field2_prob, 1)
+                y1_val_pred = torch.cat((y1_val_pred, y1_pred), dim = 0)
+                y2_val_pred = torch.cat((y2_val_pred, y2_pred), dim = 0)
+
             loss_first = criterion(field1_prob, first_fields - 1)
             loss_second = criterion(field2_prob, second_fields - 1)
             loss = loss_first + loss_second
@@ -206,9 +221,17 @@ def validate(model, val_loader, criterion, device, CM = False):
     val_acc_overall_avg = val_correct / val_total
 
     if CM == True:
-        # confusion = confusion_matrix(y_train, y_train_pred_classes)
-        print("Confusion Matrix for Input Data:")
-        # print(confusion)
+        # print(y1_val)
+        # print(y1_val_pred)
+        confusion1 = confusion_matrix(y1_val, y1_val_pred + 1)
+        print("Validation Confusion Matrix for 1st:")
+        print(confusion1)
+
+        # print(y2_val)
+        # print(y2_val_pred)
+        confusion2 = confusion_matrix(y2_val, y2_val_pred + 1)
+        print("Validation Confusion Matrix for 2nd:")
+        print(confusion2)
         # print(np.max(confusion), np.argmax(confusion))
 
     return val_loss_avg, val_loss1_avg, val_loss2_avg, val_acc_first_avg, val_acc_sec_avg, val_acc_overall_avg
@@ -249,7 +272,7 @@ def train(model, train_loader, val_loader, criterion, optimizer, device, epochs)
             field1_prob, field2_prob = model(inputs)
             loss_first = criterion(field1_prob, first_fields - 1)
             loss_second = criterion(field2_prob, second_fields - 1)
-            loss = loss_second #TODO
+            loss = loss_first + loss_second #TODO
             loss.backward()
             optimizer.step()
             step_loss.append(loss.item())
@@ -266,7 +289,7 @@ def train(model, train_loader, val_loader, criterion, optimizer, device, epochs)
             epoch_acc_sec += correct2
             epoch_total += total
 
-            if (i + 1) %  100 == 0:
+            if (i+1) % 100 == 0:
                 print(f'Epoch [{epoch + 1}/{epochs}], Step [{i + 1}/{len(train_loader)}]:: Loss 1: [{epoch_loss1 / (i + 1):.4f}], Loss 2: [{epoch_loss2 / (i + 1):.4f}], Loss: [{epoch_loss / (i + 1):.4f}], Accuracy 1st: {(epoch_acc_first * 100) /epoch_total:.2f}%, Accuracy 2nd: {(epoch_acc_sec * 100) /epoch_total:.2f}%, Accuracy: {(correct * 100) /epoch_total:.2f}%')
 
                 # Run validation
@@ -274,18 +297,27 @@ def train(model, train_loader, val_loader, criterion, optimizer, device, epochs)
 
                 print(f'             Validation:: Loss 1: [{val_loss1:.4f}], Loss 2: [{val_loss2:.4f}], Loss: [{val_loss:.4f}], Accuracy 1st: {(val_acc_first*100):.2f}%, Accuracy 2nd: {val_acc_sec*100:.2f}%, Accuracy: {val_acc_overall*100:.2f}%')
 
-                # Log metrics to wandb
-                wandb.log({"epoch": epoch+1, "step": i + 1/len(train_loader),"loss1": epoch_loss1 / (i + 1), 
-                           "loss2": epoch_loss2 / (i + 1), "train_loss": epoch_loss / (i + 1),
-                            "acc1": (epoch_acc_first) /epoch_total, "acc2": epoch_acc_sec /epoch_total, "tain_acc": correct /epoch_total,
-                            "val_loss1": val_loss1, "val_loss2": val_loss2, "val_loss": val_loss, "val_acc1": val_acc_first, 
-                            "val_acc2": val_acc_sec, "val_acc": val_acc_overall})
+                # # Log metrics to wandb
+                # wandb.log({"epoch": epoch+1,"loss1": epoch_loss1 / (i + 1), 
+                #            "loss2": epoch_loss2 / (i + 1), "train_loss": epoch_loss / (i + 1),
+                #             "acc1": (epoch_acc_first) /epoch_total, "acc2": epoch_acc_sec /epoch_total, "train_acc": correct /epoch_total,
+                #             "val_loss1": val_loss1, "val_loss2": val_loss2, "val_loss": val_loss, "val_acc1": val_acc_first, 
+                #             "val_acc2": val_acc_sec, "val_acc": val_acc_overall})
 
         epoch_losses.append(epoch_loss)
         epoch_accs_first.append(epoch_acc_first / epoch_total)
         epoch_accs_sec.append(epoch_acc_sec / epoch_total)
         acc_overall.append(correct / epoch_total)
 
+        val_loss, val_loss1, val_loss2, val_acc_first, val_acc_sec, val_acc_overall = validate(model, val_loader, criterion, device, CM = True)
+        # Log metrics to wandb
+        wandb.log({"epoch": epoch+1,"loss1": epoch_loss1 / len(train_loader), 
+                    "loss2": epoch_loss2 / len(train_loader), "train_loss": epoch_loss / len(train_loader),
+                    "acc1": (epoch_acc_first) /epoch_total, "acc2": epoch_acc_sec /epoch_total, "train_acc": correct /epoch_total,
+                    "val_loss1": val_loss1, "val_loss2": val_loss2, "val_loss": val_loss, "val_acc1": val_acc_first, 
+                    "val_acc2": val_acc_sec, "val_acc": val_acc_overall})
+
+        
         
     print('Finished Training')
     return epoch_losses, epoch_accs_first, epoch_accs_sec, acc_overall
@@ -311,44 +343,53 @@ class CustomDataset(Dataset):
 class CNN(nn.Module):
     def __init__(self):
         super(CNN, self).__init__()
-        # First Convolutional Layer
-        self.conv1 = nn.Conv2d(in_channels=1, out_channels=16, kernel_size=3, stride=1, padding=1)
-        self.bn1 = nn.BatchNorm2d(16)
-        self.relu1 = nn.ReLU()
-        self.pool1 = nn.MaxPool2d(kernel_size=2, stride=2)
 
-        # Second Convolutional Layer
+        # Common Convolutional Layer
+        self.conv = nn.Conv2d(in_channels=1, out_channels=16, kernel_size=3, stride=1, padding=1)
+        self.bn = nn.BatchNorm2d(16)
+        self.relu = nn.ReLU()
+        self.pool = nn.MaxPool2d(kernel_size=2, stride=2)
+
+        # Convolutional Layer for 1st
         self.conv2 = nn.Conv2d(in_channels=16, out_channels=32, kernel_size=3, stride=1, padding=1)
         self.bn2 = nn.BatchNorm2d(32)
         self.relu2 = nn.ReLU()
         self.pool2 = nn.MaxPool2d(kernel_size=2, stride=2)
 
+        # # Convolutional Layer for 2nd
+        # self.conv2 = nn.Conv2d(in_channels=16, out_channels=32, kernel_size=3, stride=1, padding=1)
+        # self.bn2 = nn.BatchNorm2d(32)
+        # self.relu2 = nn.ReLU()
+        # self.pool2 = nn.MaxPool2d(kernel_size=2, stride=2)
+
         # Flatten layer
         self.flatten = nn.Flatten()
 
-        # Fully connected layers
+        # Fully connected layers 1st
         self.fc1 = nn.Linear(8*8*32, 256)
-        self.bn3 = nn.BatchNorm1d(256)
-        self.relu3 = nn.ReLU()
-        
-        self.fc2 = nn.Linear(256, 128)
-        self.bn4 = nn.BatchNorm1d(128)
-        self.relu4 = nn.ReLU()
+        self.bn1 = nn.BatchNorm1d(256)
+        self.relu1 = nn.ReLU()
+        self.dropout1 = nn.Dropout(p=0.8)
+        self.fc2 = nn.Linear(256, 64)
 
-        self.fc3 = nn.Linear(128, 64)
-        self.relu5 = nn.ReLU()
-        self.fc4 = nn.Linear(64, 36)
+        # # Fully connected layers 2nd
+        # self.fc21 = nn.Linear(8*8*32, 256)
+        # self.bn21 = nn.BatchNorm1d(256)
+        # self.relu21 = nn.ReLU()
+        # self.dropout21 = nn.Dropout(p=0.8)
+        # self.fc22 = nn.Linear(256, 64)
 
         # Output layers for two separate fields
-        self.fist = nn.Linear(36, 6)
-        self.second = nn.Linear(36 + 6, 6)
+        # self.fist = nn.Linear(64, 6)
+        # self.second = nn.Linear(64, 6)
+        self.last = nn.Linear(64,12)
 
     def forward(self, x):
         # Convolutional layers with Batch Normalization
-        x = self.conv1(x)
-        x = self.bn1(x)
-        x = self.relu1(x)
-        x = self.pool1(x)
+        x = self.conv(x)
+        x = self.bn(x)
+        x = self.relu(x)
+        x = self.pool(x)
 
         x = self.conv2(x)
         x = self.bn2(x)
@@ -358,24 +399,20 @@ class CNN(nn.Module):
         # Flatten the output of the last convolutional layer
         x = self.flatten(x)
 
-        # Fully connected layers with Batch Normalization
+        # Fully connected layers with Batch Normalization and Dropout
         x = self.fc1(x)
-        x = self.bn3(x)
-        x = self.relu3(x)
-        
+        x = self.bn1(x)
+        x = self.relu1(x)
+        x = self.dropout1(x)
         x = self.fc2(x)
-        x = self.bn4(x)
-        x = self.relu4(x)
-        
-        x = self.fc3(x)
-        x = self.relu5(x)
-        x = self.fc4(x)
 
         # Predictions
-        field1 = self.fist(x)
-        x = torch.cat((field1, x), dim = 1)
-        field2 = self.second(x)
-        
+        # field1 = self.fist(x1)
+        # field2 = self.second(x2)
+        preds = self.last(x)
+        field1 = preds[:,:6]
+        field2 = preds[: , 6:]
+
         return field1, field2
 
 if __name__ ==  '__main__':
@@ -392,7 +429,7 @@ if __name__ ==  '__main__':
     """
 
     # Define global parameters:
-    batch_size = 32
+    batch_size = 64
     wandb.init(project="SocialLandmarks")
     config = wandb.config
     config.epochs = 20
@@ -423,7 +460,7 @@ if __name__ ==  '__main__':
 
     # Model Parameters:
     criterion = nn.CrossEntropyLoss()
-    optimizer = optim.Adam(model.parameters(), lr=0.001)
+    optimizer = optim.Adam(model.parameters(), lr=0.001) #, weight_decay=0.0001) # L2 regularization.
 
     # Train the model
     wandb.watch(model, log_freq=1)
