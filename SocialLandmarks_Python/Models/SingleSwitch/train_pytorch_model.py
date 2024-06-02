@@ -1,32 +1,18 @@
 # IMPORTS
-from importlib.metadata import requires
-import os
-import numpy as np
-from tqdm import tqdm
-from torch.utils.data import Dataset, DataLoader
-from torch.utils.data import random_split
-import torch.utils.data as data
 import torch
 import torch.nn as nn
 import torch.optim as optim
-import cv2
-import matplotlib.pyplot as plt
-import wandb
-from wandb.keras import WandbCallback
-import tensorflow as tf
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Activation, BatchNormalization
-from sklearn.metrics import confusion_matrix
+from torch.utils.data import Dataset, DataLoader, random_split
+import numpy as np
 from sklearn.model_selection import train_test_split
-from keras.layers import Dropout
-from tensorflow.keras.optimizers import Adam
-from keras import backend as K
-from tensorflow.keras import regularizers
+from tqdm import tqdm
+from sklearn.metrics import confusion_matrix
+import matplotlib.pyplot as plt
+import os
+import torch.nn as nn
+import torch.nn.functional as F
 
-os.environ['WANDB_API_KEY']="29162836c3095b286c169bf889de71652ed3201b"
-
-#TODO: go to cd C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data
-# Execute python3 C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Models\SingleSwitch\train_model1.py
+# python3 C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Models\SingleSwitch\train_pytorch_model.py
 
 # HELPER FUNCTIONS
 def visualize_image(array):
@@ -229,85 +215,148 @@ class CustomDataset(Dataset):
     def __getitem__(self, idx):
         image = self.images[idx]
         label = self.labels[idx]
+        image = torch.from_numpy(image).float()
+        return image.unsqueeze(0), label
 
-        image = torch.from_numpy(image)
+class CNN(nn.Module):
+    def __init__(self):
+        super(CNN, self).__init__()
+        self.conv1 = nn.Conv2d(1, 16, kernel_size=3, stride=1, padding=1)
+        self.bn1 = nn.BatchNorm2d(16)
+        self.pool = nn.MaxPool2d(kernel_size=2, stride=2)
+        self.dropout1 = nn.Dropout(p=0.1)
+        
+        self.conv2 = nn.Conv2d(16, 32, kernel_size=3, stride=1, padding=1)
+        self.bn2 = nn.BatchNorm2d(32)
+        self.dropout2 = nn.Dropout(p=0.1)
+        
+        self.fc1 = nn.Linear(32 * 8 * 8, 2048)
+        self.bn3 = nn.BatchNorm1d(2048)
+        self.dropout3 = nn.Dropout(p=0.2)
+        
+        self.fc2 = nn.Linear(2048, 1024)
+        self.bn4 = nn.BatchNorm1d(1024)
+        self.dropout4 = nn.Dropout(p=0.2)
+        
+        self.fc3 = nn.Linear(1024, 128)
+        self.bn5 = nn.BatchNorm1d(128)
+        self.dropout5 = nn.Dropout(p=0.2)
+        
+        self.fc4 = nn.Linear(128, 36)
+    
+    def forward(self, x):
+        x = self.pool(F.relu(self.bn1(self.conv1(x))))
+        x = self.dropout1(x)
+        
+        x = self.pool(F.relu(self.bn2(self.conv2(x))))
+        x = self.dropout2(x)
+        
+        x = x.view(-1, 32 * 8 * 8)
+        
+        x = F.relu(self.bn3(self.fc1(x)))
+        x = self.dropout3(x)
+        
+        x = F.relu(self.bn4(self.fc2(x)))
+        x = self.dropout4(x)
+        
+        x = F.relu(self.bn5(self.fc3(x)))
+        x = self.dropout5(x)
+        
+        x = self.fc4(x)
+        return x
 
-        return image, label
-
-dataset = CustomDataset(x,gt)
+# Hyperparameters
 batch_size = 32
-dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
+learning_rate = 0.001
+num_epochs = 100
 
-x_train, x_val, y_train, y_val = train_test_split(x, gt, test_size=0.2, random_state=42)
+# Dataset and DataLoader
+dataset = CustomDataset(x, gt)
+train_size = int(0.8 * len(dataset))
+val_size = len(dataset) - train_size
+train_dataset, val_dataset = random_split(dataset, [train_size, val_size])
 
-# ############################################################################################# Model:1
-model = Sequential()
-model.add(Conv2D(16, kernel_size=3, strides=1, padding='same', input_shape=(32, 32, 1)))
-model.add(BatchNormalization())  # BatchNormalization after Conv2D
-model.add(Activation('relu'))
-model.add(MaxPooling2D(pool_size=2))
-model.add(Dropout(0.1))
+train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
 
-model.add(Conv2D(32, kernel_size=3, strides=1, padding='same'))
-model.add(BatchNormalization())  # BatchNormalization after Conv2D
-model.add(Activation('relu'))
-model.add(MaxPooling2D(pool_size=2))
-model.add(Dropout(0.1))
+# Model, Loss, and Optimizer
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+model = CNN().to(device)
+criterion = nn.CrossEntropyLoss()
+optimizer = optim.Adam(model.parameters(), lr=learning_rate, weight_decay=0.01)
 
-model.add(Flatten())
-model.add(Dense(2048))
-model.add(BatchNormalization())  # BatchNormalization after Dense
-model.add(Activation('relu'))
-model.add(Dropout(0.2)) 
+# Training Loop
+for epoch in range(num_epochs):
+    model.train()
+    epoch_loss = 0
+    correct = 0
+    total = 0
+    
+    for inputs, labels in train_loader:
+        inputs, labels = inputs.to(device), labels.long().to(device)
+        
+        optimizer.zero_grad()
+        outputs = model(inputs)
+        loss = criterion(outputs, labels)
+        loss.backward()
+        optimizer.step()
+        
+        epoch_loss += loss.item()
+        _, predicted = outputs.max(1)
+        total += labels.size(0)
+        correct += predicted.eq(labels).sum().item()
+    
+    train_loss = epoch_loss / len(train_loader)
+    train_acc = correct / total
+    print(f'Epoch {epoch+1}/{num_epochs}, Train Loss: {train_loss}, Train Accuracy: {train_acc}')
+    
+    # Validation Loop
+    model.eval()
+    val_loss = 0
+    correct = 0
+    total = 0
+    
+    with torch.no_grad():
+        for inputs, labels in val_loader:
+            inputs, labels = inputs.to(device), labels.long().to(device)
+            outputs = model(inputs)
+            loss = criterion(outputs, labels)
+            
+            val_loss += loss.item()
+            _, predicted = outputs.max(1)
+            total += labels.size(0)
+            correct += predicted.eq(labels).sum().item()
+    
+    val_loss = val_loss / len(val_loader)
+    val_acc = correct / total
+    print(f'Epoch {epoch+1}/{num_epochs}, Val Loss: {val_loss}, Val Accuracy: {val_acc}')
 
-model.add(Dense(1024))
-model.add(BatchNormalization())  # BatchNormalization after Dense
-model.add(Activation('relu'))
-model.add(Dropout(0.2))
-
-model.add(Dense(128))
-model.add(BatchNormalization())  # BatchNormalization after Dense
-model.add(Activation('relu'))
-model.add(Dropout(0.2))
-
-model.add(Dense(36))
-model.add(Activation('softmax'))
-
-model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
-#################################################################################################
-
-# #inputs= torch.randn(batch_size, 32, 32,requires_grad=True)
-# inputs = np.random.random((batch_size, 32, 32, 1))
-# outputs =  model(inputs)
-# print(outputs.shape)
-# exit()
-
-# HYPERPARAMETERS
-wandb.init(project="SocialLandmarks")
-config = wandb.config
-config.epochs = 100
-config.batch_size = batch_size
-
-model.fit(x_train, y_train, epochs=config.epochs, batch_size=config.batch_size,
-          validation_data=(x_val, y_val),
-          callbacks=[WandbCallback()])
-# model.save("C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Models\SingleSwitch\model_test.h5")
-# model.save("C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Models\SingleSwitch\model_test.pth")
+# Save Model
+torch.save(model.state_dict(), 'model_test.pth')
 print("MODEL IS SAVED!!")
-wandb.finish()
 
-# CONFUSION MATRICES:
+# Confusion Matrix
+model.eval()
+y_true = []
+y_pred = []
 
-# y_train_pred = model.predict(x_train)
-# y_train_pred_classes = y_train_pred.argmax(axis=-1)
-# confusion = confusion_matrix(y_train, y_train_pred_classes)
-# print("Confusion Matrix for Training Data:")
-# print(confusion)
-# print(np.max(confusion), np.argmax(confusion))
+with torch.no_grad():
+    for inputs, labels in val_loader:
+        inputs, labels = inputs.to(device), labels.to(device)
+        outputs = model(inputs)
+        _, predicted = outputs.max(1)
+        y_true.extend(labels.cpu().numpy())
+        y_pred.extend(predicted.cpu().numpy())
 
-# y_val_pred = model.predict(x_val)
-# y_val_pred_classes = y_val_pred.argmax(axis=-1)
-# confusion = confusion_matrix(y_val, y_val_pred_classes)
-# print("Confusion Matrix for Validation Data:")
-# print(confusion)
-# print(np.max(confusion), np.argmax(confusion))
+confusion = confusion_matrix(y_true, y_pred)
+print("Confusion Matrix for Validation Data:")
+print(confusion)
+
+# Visualization of Confusion Matrix
+plt.figure(figsize=(10, 8))
+plt.imshow(confusion, cmap='Blues')
+plt.title('Confusion Matrix')
+plt.colorbar()
+plt.xlabel('Predicted Labels')
+plt.ylabel('True Labels')
+plt.show()
