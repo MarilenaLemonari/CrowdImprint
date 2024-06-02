@@ -156,22 +156,6 @@ def load_data(check = False):
 
     return images, gt
 
-class CustomDataset(Dataset):
-    def __init__(self, images, labels):
-        self.images = images
-        self.labels = labels
-
-    def __len__(self):
-        return len(self.images)
-
-    def __getitem__(self, idx):
-        image = self.images[idx]
-        label = self.labels[idx]
-
-        image = torch.from_numpy(image)
-
-        return image, label
-
 if __name__ ==  '__main__':
 
     images, gt = load_data()
