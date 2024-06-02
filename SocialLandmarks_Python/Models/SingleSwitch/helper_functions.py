@@ -28,5 +28,15 @@ def accuracy_f(y_true, y_prob, correct, total):
 
 def accuracy_overall(matches1, matches2):
     idx = [i for i in range(len(matches1)) if matches1[i] == matches2[i]]
-    m = (matches1[idx] == True).sum().item()
-    return m
+    m = (matches1[idx] == True)
+
+def make_cm(model, x, y, name):
+    y_pred = model.predict(x)
+    y_pred_classes = y_pred.argmax(axis=-1)
+    confusion = confusion_matrix(y, y_pred_classes)
+    plt.figure(figsize=(8, 6))
+    sns.heatmap(confusion, annot=True, fmt='d', cmap='Blues')
+    plt.xlabel('Predicted')
+    plt.ylabel('True')
+    plt.title(f'{name} Confusion Matrix')
+    plt.savefig(f'{name}_confusion_matrix.png')

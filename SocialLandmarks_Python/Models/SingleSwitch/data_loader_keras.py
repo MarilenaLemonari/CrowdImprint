@@ -1,7 +1,7 @@
 from imports import *
 from helper_functions import *
 
-def load_data():
+def load_data_keras():
     # LOAD DATA
     folder_path = 'PythonFiles\\SingleSwitch\\'  
     file_list = os.listdir(folder_path)

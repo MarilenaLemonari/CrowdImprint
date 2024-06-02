@@ -17,8 +17,24 @@ class CustomDataset(Dataset):
 
         return image, label
 
-def setup_config(wandb_bool, images, gt):
-    batch_size = 64
+def setup_config_keras(images, gt):
+    #dataset = CustomDataset(images,gt)
+
+    batch_size = 32
+    #dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
+    x_train, x_val, y_train, y_val = train_test_split(images, gt, test_size=0.2, random_state=42)
+
+    # HYPERPARAMETERS
+    wandb.init(project="SocialLandmarks")
+    config = wandb.config
+    config.epochs = 2 # TODO
+    config.batch_size = batch_size
+
+    return x_train, y_train, x_val, y_val, config
+
+def setup_config(wandb_bool, images, gt):  
+
+    batch_size = 32
 
     if wandb_bool == True:
         wandb.init(project="SocialLandmarks")
@@ -34,6 +50,8 @@ def setup_config(wandb_bool, images, gt):
 
     return trainloader, valoader, config
 
+
 if __name__ ==  '__main__':
-    images, gt = load_data()
-    setup_config(False, images, gt)
+    print("Keras or Pytorch")
+    # images, gt = load_data()
+    # setup_config(False, images, gt)
