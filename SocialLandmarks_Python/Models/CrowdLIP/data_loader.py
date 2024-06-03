@@ -21,7 +21,7 @@ def load_data_keras():
     label_dict = {}
     images_dict = {}
 
-    for npz_file in tqdm(npz_files[:100]):
+    for npz_file in tqdm(npz_files):
         class_index = npz_file.split("IF_")[1].split("_T")[0]
         class_type = comb_dict[class_index]
         if class_type in label_dict:
@@ -42,7 +42,7 @@ def load_data_keras():
         
     return label_dict, images_dict
 
-def create_pairs(label_dict, images_dict):
+def create_pairs(label_dict, images_dict, n_reps):
 
     label_options = list(range(36))
 
@@ -50,53 +50,45 @@ def create_pairs(label_dict, images_dict):
     images_b = []
     gt = []
 
-    for label, name_list in label_dict.items():
-        # Randomly choose match or mismatch:
-        match_flag = random.choice([0, 1])
-        match_flag = 1
-        if match_flag == 0:
-            # We have a match:
-            gt.append(1)
-            # Choose 2 filenames randomly:
-            sampled_images = random.sample(name_list, 2)
-            image_a = images_dict[sampled_images[0]]
-            image_b = images_dict[sampled_images[1]]
-            images_a.append(images_a)
-            images_b.append(images_b)
-            # visualize_image(image_a)
-            # visualize_image(image_b)
-        else:
-            # Mismatch:
-            gt.append(1)
-            label_options.remove(label)
-            # Randomly choose an image from label:
-            base_image = random.choice(name_list)
-            image_a = images_dict[base_image]
-            images_a.append(image_a)
-            # Randomly choose another label:
-            label_choice = random.choice(label_options)
-            # Random image from the label of choice:
-            sampled_image = random.choice(label_dict[label_choice])
-            image_b = images_dict[sampled_image]
-            images_b.append(image_b)
-            print(sampled_image, label_choice)
-            # visualize_image(image_a)
-            # visualize_image(image_b)
-            exit()
+    for i in tqdm(range(n_reps)):
+        for label, name_list in label_dict.items():
 
-
-
-        
-
-
+            # Randomly choose match or mismatch:
+            match_flag = random.choice([0, 1])
+            if match_flag == 0:
+                # We have a match:
+                gt.append(1)
+                # Choose 2 filenames randomly:
+                sampled_images = random.sample(name_list, 2)
+                image_a = images_dict[sampled_images[0]]
+                image_b = images_dict[sampled_images[1]]
+                images_a.append(image_a)
+                images_b.append(image_b)
+                # visualize_image(image_a)
+                # visualize_image(image_b)
+            else:
+                # Mismatch:
+                gt.append(1)
+                label_options.remove(label)
+                # Randomly choose an image from label:
+                base_image = random.choice(name_list)
+                image_a = images_dict[base_image]
+                images_a.append(image_a)
+                # Randomly choose another label:
+                label_choice = random.choice(label_options)
+                # Random image from the label of choice:
+                sampled_image = random.choice(label_dict[label_choice])
+                image_b = images_dict[sampled_image]
+                images_b.append(image_b)
+                # visualize_image(image_a)
+                # visualize_image(image_b)
+    
     # NORMALIZE DATA
     gt = np.array(gt)
-    #loaded_images = np.array(loaded_images)
-    x = scale_to_standard_normal(loaded_images)
-    # print(gt.shape, x.shape)
-    # exit()
+    images_a = scale_to_standard_normal(images_a)
+    images_b = scale_to_standard_normal(images_b)
 
-    return x, gt 
+    return images_a, images_b, gt
 
 if __name__ ==  '__main__':
     """
@@ -105,8 +97,14 @@ if __name__ ==  '__main__':
         0: otherwise.
     """
     label_dict, images_dict = load_data_keras()
-    create_pairs(label_dict, images_dict)
+    images_a, images_b, gt = create_pairs(label_dict, images_dict, 1)
+    print(images_a.shape, images_b.shape)
+    print(gt.shape)
+    print(gt)
 
-    # index =513
-    # print(images[index].shape)
+    # index = 30
+    # print(images_a[index].shape)
+    # visualize_image(images_a[index])
+    # visualize_image(images_b[index])
+    # print(gt[index])
     # exit()

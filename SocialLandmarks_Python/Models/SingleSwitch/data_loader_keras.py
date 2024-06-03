@@ -163,7 +163,7 @@ def load_data_keras():
     # NORMALIZE DATA
     gt = np.array(gt)
     #loaded_images = np.array(loaded_images)
-    x = scale_to_standard_normal(loaded_images)
+    x = np.array(loaded_images) # TODO scale_to_standard_normal(loaded_images)
     # print(gt.shape, x.shape)
     # exit()
 
