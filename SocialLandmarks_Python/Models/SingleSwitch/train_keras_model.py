@@ -39,12 +39,16 @@ if __name__ ==  '__main__':
     # Saving:
     t_cm = make_cm(model, x_train, y_train, "Training")
     v_cm  = make_cm(model, x_val, y_val, "Validation")
-    cmatrices = {
-    "training_cm": t_cm,
-    "validation_cm": v_cm 
-    }
-    filename = 'cmatrices.json'
-    with open(filename, 'w') as json_file:
-        json.dump(cmatrices, json_file, indent=4)
+    print("Training CM")
+    print(t_cm)
+    print("Validation CM:")
+    print(v_cm)
+    # cmatrices = {
+    # "training_cm": t_cm,
+    # "validation_cm": v_cm 
+    # }
+    # filename = 'cmatrices.json'
+    # with open(filename, 'w') as json_file:
+    #     json.dump(cmatrices, json_file, indent=4)
     model.save("C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Models\SingleSwitch\model_test.h5")
     print("SUCCESS! Model is Saved.")

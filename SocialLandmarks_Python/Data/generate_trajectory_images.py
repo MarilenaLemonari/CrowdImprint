@@ -127,6 +127,61 @@ def create_images(key, value, dataset_name, resolution= 32):
     image[int(source_pos), int(source_pos)] = 1
     tifffile.imwrite(dataset_name + "\\" + key + '.tif', image)
 
+def create_centrered_images(key, value, dataset_name, resolution= 32):
+    # default_int = 0.5
+    # plt.clf()
+    # plt.plot(value["pos_x"], value["pos_z"], c = 'slategrey')
+    # plt.scatter(value["pos_x"][0], value["pos_z"][0], c = 'slategrey')
+    # plt.scatter(value["norm_source"][0], value["norm_source"][0], c = 'firebrick', marker = '*', s = 200)
+    # plt.legend(['Path', 'Spawn', 'Source'])
+    # plt.xlabel("Position X")
+    # plt.ylabel("Position Z")
+    # plt.title("Normalized Path Image")
+    # plt.savefig(dataset_name + "\\" + key)
+    max_diff = max(value["norm_source"][0], 1 - value["norm_source"][0])
+    # transform from [0,1] to range where source pos is 0:
+    source_pos = value["norm_source"][0] - value["norm_source"][0]
+    pixel_pos_x = value["pos_x"] - value["norm_source"][0]
+    pixel_pos_z = value["pos_z"] - value["norm_source"][0]
+    # Zoom
+    source_pos *= ((resolution - 1) / ( 2* max_diff))
+    pixel_pos_x *= ((resolution - 1) / (2 * max_diff))
+    pixel_pos_z *= ((resolution - 1) / (2 * max_diff))
+    source_pos += ((resolution - 1)/2)
+    pixel_pos_x += ((resolution - 1)/2)
+    pixel_pos_z += ((resolution - 1)/2)
+    image = np.zeros((resolution,resolution), np.float32)
+    same_speed_count = 0
+    for i in range(len(pixel_pos_x)):
+        pixel_x = int(pixel_pos_x[i])
+        pixel_z = int(pixel_pos_z[i])
+        if i == 0:
+            pixel_x_init = pixel_x
+            pixel_z_init = pixel_z
+            image[pixel_x,pixel_z] = 1
+        elif (value["speed"][i] == value["speed"][i-1]):
+            same_speed_count += 1
+
+        cur_speed = (1- value["speed"][i])*0.6
+        if same_speed_count >= 5:
+            tol = 1
+            left = int(max(pixel_x-tol,0))
+            right = int(min(pixel_x+tol,resolution))
+            top = int(min(pixel_z+tol,resolution))
+            bottom = int(max(pixel_z-tol,0))
+            image[left:right,bottom:top] = cur_speed
+        else:
+            image[pixel_x,pixel_z] = cur_speed
+
+
+    image[pixel_x_init,pixel_z_init] = 1
+
+    tifffile.imwrite(dataset_name + "\\" + key + '_s' + '.tif', image)
+
+    # Place source 
+    image[int(source_pos), int(source_pos)] = 1
+    tifffile.imwrite(dataset_name + "\\" + key + '.tif', image)
+
 # Execute
 if __name__ ==  '__main__':
     current_file_dir = "C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\Trajectories"
@@ -162,6 +217,6 @@ if __name__ ==  '__main__':
         files = os.listdir(folder_path)
         file_exists = any(file.startswith(prefix) for file in files)
         if file_exists == False:
-            empty_predictions = create_images(prefix, value, folder_path)
+            empty_predictions = create_centrered_images(prefix, value, folder_path)
 
     print("DONE! Preprocessing Successful.")
