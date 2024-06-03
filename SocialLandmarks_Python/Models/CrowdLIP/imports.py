@@ -24,3 +24,7 @@ from tensorflow.keras.optimizers import Adam
 from keras import backend as K
 from tensorflow.keras import regularizers
 
+from tensorflow.keras.layers import Input, Dense, Flatten, Conv2D, GlobalAveragePooling2D, Lambda
+from tensorflow.keras.models import Model
+from tensorflow.keras.optimizers import Adam
+import tensorflow.keras.backend as K

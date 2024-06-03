@@ -42,3 +42,20 @@ def make_cm(model, x, y, name):
     plt.savefig(f'{name}_confusion_matrix.png')
 
     return confusion
+
+def contrastive_loss(y_true, y_pred):
+    margin = 1.0
+    y_true = tf.cast(y_true, y_pred.dtype)
+    square_pred = K.square(y_pred)
+    margin_square = K.square(K.maximum(margin - y_pred, 0))
+    return K.mean(y_true * square_pred + (1 - y_true) * margin_square)
+
+def euclidean_distance(vectors):
+    x, y = vectors
+    sum_square = K.sum(K.square(x - y), axis=1, keepdims=True)
+    return K.sqrt(K.maximum(sum_square, K.epsilon()))
+
+def compute_similarity(img1, img2):
+    img1 = np.expand_dims(img1, axis=0)
+    img2 = np.expand_dims(img2, axis=0)
+    return model.predict([img1, img2])[0]

@@ -52,7 +52,6 @@ def create_pairs(label_dict, images_dict, n_reps):
 
     for i in tqdm(range(n_reps)):
         for label, name_list in label_dict.items():
-
             # Randomly choose match or mismatch:
             match_flag = random.choice([0, 1])
             if match_flag == 0:
@@ -68,7 +67,7 @@ def create_pairs(label_dict, images_dict, n_reps):
                 # visualize_image(image_b)
             else:
                 # Mismatch:
-                gt.append(1)
+                gt.append(0)
                 label_options.remove(label)
                 # Randomly choose an image from label:
                 base_image = random.choice(name_list)
@@ -90,17 +89,24 @@ def create_pairs(label_dict, images_dict, n_reps):
 
     return images_a, images_b, gt
 
+def load_data(n_reps):
+    label_dict, images_dict = load_data_keras()
+    images_a, images_b, gt = create_pairs(label_dict, images_dict, n_reps)
+
+    return images_a, images_b, gt
+
+
 if __name__ ==  '__main__':
     """
     For training, we sample two images and get their label:
         1: If they represent the same behavior i.e., combination of InFs.
         0: otherwise.
     """
-    label_dict, images_dict = load_data_keras()
-    images_a, images_b, gt = create_pairs(label_dict, images_dict, 1)
-    print(images_a.shape, images_b.shape)
-    print(gt.shape)
-    print(gt)
+    
+    images_a, images_b, gt = load_data(1)
+    # print(images_a.shape, images_b.shape)
+    # print(gt.shape)
+    # print(gt)
 
     # index = 30
     # print(images_a[index].shape)
