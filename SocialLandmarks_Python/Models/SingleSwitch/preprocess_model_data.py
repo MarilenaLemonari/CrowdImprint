@@ -11,7 +11,7 @@ import pickle
 import torch.utils.data as data
 import tifffile
 
-# python3 C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Models\SingleSwitch\preprocess_model1_data.py
+# python3 C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Models\SingleSwitch\preprocess_model_data.py
 
 # HELPER FUNCTIONS
 def zoom_image(image):
