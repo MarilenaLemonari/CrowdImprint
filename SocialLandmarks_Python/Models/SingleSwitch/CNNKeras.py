@@ -1,5 +1,6 @@
 from imports import *
 
+
 def instantiate_model():
     model = Sequential()
     model.add(Conv2D(16, kernel_size=3, strides=1, padding='same', input_shape=(32, 32, 1)))

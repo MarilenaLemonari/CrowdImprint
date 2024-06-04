@@ -185,7 +185,7 @@ def create_centrered_images(key, value, dataset_name, resolution= 32):
 # Execute
 if __name__ ==  '__main__':
     current_file_dir = "C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\Trajectories"
-    name = "\SingleSwitch" #TODO
+    name = "\SingleSwitch\TestData" #TODO
     # name = "\\NoSwitch"
     
     csv_directory  = current_file_dir + name + "\\"

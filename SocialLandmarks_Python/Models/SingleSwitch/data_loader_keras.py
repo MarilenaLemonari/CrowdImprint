@@ -1,9 +1,13 @@
 from imports import *
 from helper_functions import *
 
-def load_data_keras():
+def load_data_keras(test = False):
     # LOAD DATA
-    folder_path = 'PythonFiles\\SingleSwitch\\'  
+    if test == True:
+        folder_path = 'PythonFiles\\SingleSwitch\\TestData'
+    else:
+        folder_path = 'PythonFiles\\SingleSwitch\\'  
+        
     file_list = os.listdir(folder_path)
     npz_files = [file for file in file_list if file.endswith('.npz')]
     loaded_images = []
