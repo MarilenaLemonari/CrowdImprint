@@ -5,7 +5,7 @@ from helper_functions import *
 
 def instantiate_model(seq_length):
 
-    num_features = 2  
+    num_features = 3 
     num_classes = 36 
 
     model = Sequential()

@@ -89,7 +89,9 @@ def load_traj_data():
         traj_x = value["pos_x"]
         traj_z = value["pos_z"]
         sample_traj = np.column_stack((traj_x, traj_z))
-        source = value["norm_source"]
+        source_value = value["norm_source"]
+        source_feature = np.ones((traj_x.shape[0],)) * source_value
+        sample_traj = np.column_stack((sample_traj, source_feature))
         trajectories.append(sample_traj)
         seq_len.append(traj_x.shape[0])
 

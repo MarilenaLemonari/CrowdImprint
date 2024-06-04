@@ -41,8 +41,3 @@ if __name__ ==  '__main__':
     print(v_cm)
     model.save("C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Models\Conv1d\model_test.h5")
     print("SUCCESS! Model is Saved.")
-
-
-
-
-
