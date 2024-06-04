@@ -50,5 +50,5 @@ if __name__ ==  '__main__':
     # filename = 'cmatrices.json'
     # with open(filename, 'w') as json_file:
     #     json.dump(cmatrices, json_file, indent=4)
-    model.save("C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Models\SingleSwitch\model_test.h5")
+    model.save("C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Models\SingleSwitch\model_full.h5")
     print("SUCCESS! Model is Saved.")

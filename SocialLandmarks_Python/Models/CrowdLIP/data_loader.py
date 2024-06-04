@@ -44,7 +44,7 @@ def load_data_keras():
 
 def create_pairs(label_dict, images_dict, n_reps):
 
-    label_options = list(range(36))
+    # label_options = list(range(36))
 
     images_a = []
     images_b = []
@@ -66,6 +66,7 @@ def create_pairs(label_dict, images_dict, n_reps):
                 # visualize_image(image_a)
                 # visualize_image(image_b)
             else:
+                label_options = list(range(36))
                 # Mismatch:
                 gt.append(0)
                 label_options.remove(label)

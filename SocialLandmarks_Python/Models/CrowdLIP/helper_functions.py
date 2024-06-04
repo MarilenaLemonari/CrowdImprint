@@ -59,3 +59,7 @@ def compute_similarity(img1, img2):
     img1 = np.expand_dims(img1, axis=0)
     img2 = np.expand_dims(img2, axis=0)
     return model.predict([img1, img2])[0]
+
+def accuracy(y_true, y_pred, threshold=0.5):
+    y_pred_label = K.cast(y_pred < threshold, y_true.dtype)
+    return K.mean(K.equal(y_true, y_pred_label))

@@ -16,13 +16,13 @@ if __name__ ==  '__main__':
     Images should be of shape (32,32,1)
     """
 
-    images_a, images_b, gt = load_data(n_reps  = 1)
+    images_a, images_b, gt = load_data(n_reps  = 5000)
     print("SUCCESS! Data Loaded. Details: ", images_a.shape, images_b.shape, len(gt))
     model = instantiate_model()
     print("SUCCESS! Model is Instantiated.")
 
     x_train_a, x_train_b, y_train, x_val_a, x_val_b,  y_val, config = setup_config_keras(images_a, images_b, gt)  
-    # print( x_train_a.shape, x_train_b.shape, y_train.shape, x_val_a.shape, x_val_b.shape,  y_val.shape)
+    print( x_train_a.shape, x_train_b.shape, y_train.shape, x_val_a.shape, x_val_b.shape,  y_val.shape)
 
     model.fit([x_train_a, x_train_b], y_train, epochs=config.epochs, batch_size=config.batch_size,
             validation_data=([x_val_a, x_val_b], y_val),
@@ -33,7 +33,7 @@ if __name__ ==  '__main__':
     # # Example usage
     # similarity_score = compute_similarity(dummy_images_a[0], dummy_images_b[0])
     # print(f'Similarity score: {similarity_score}')
-    # model.save("C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Models\CrowdLIP\model_test.h5")
+    model.save("C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Models\CrowdLIP\model_CLIP.h5")
     print("SUCCESS! Model is Saved.")
 
 

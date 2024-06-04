@@ -20,7 +20,7 @@ def setup_config_keras(images_a, images_b, gt):
     # HYPERPARAMETERS
     wandb.init(project="SocialLandmarks")
     config = wandb.config
-    config.epochs = 20
+    config.epochs = 100
     config.batch_size = batch_size
 
     return x_train_a, x_train_b, y_train, x_val_a, x_val_b,  y_val, config

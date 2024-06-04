@@ -30,7 +30,7 @@ def instantiate_model():
     distance = Lambda(euclidean_distance)([emb_a, emb_b])
 
     model = Model([img_a, img_b], distance)
-    model.compile(optimizer=Adam(), loss=contrastive_loss)
+    model.compile(optimizer=Adam(), loss=contrastive_loss, metrics = [accuracy])
 
     return model
 
