@@ -216,17 +216,17 @@ if __name__ ==  '__main__':
 
   category = "Training" 
   if category == "Training":
-    repeat = 2000 * (len(behavior_list)-1) # TODO:change
+    repeat = 8000 * (len(behavior_list)-1) # TODO:change
     prefix = 'IF_'
   elif category == "Testing":
     repeat = 100
     prefix = '_test_IF_'
 
   counter = 0
-  mode = "SingleSwitch"
+  mode = "Conv1d"
   # mode = "NoSwitch"
 
-  if mode == "SingleSwitch":
+  if mode == "Conv1d":
     for r in tqdm(range(repeat)):
       end_time = random.randint(5,15)
       radius = end_time/2 # 5 for 10 sec
