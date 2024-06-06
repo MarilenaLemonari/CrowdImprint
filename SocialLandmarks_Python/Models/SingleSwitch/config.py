@@ -55,12 +55,19 @@ def setup_config(wandb_bool, images, gt):
         config = []
 
     x_train, x_val, y_train, y_val = train_test_split(images, gt, test_size=0.2, random_state=42)
+    print(x_train.shape, x_val.shape, len(y_train), len(y_val))
     train_dataset = CustomDataset(x_train, y_train)
     val_dataset = CustomDataset(x_val, y_val)
     trainloader  = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
     valoader  = DataLoader(val_dataset, batch_size=batch_size, shuffle=True)
 
     return trainloader, valoader, config
+
+def setup_config_test(images, gt):
+    batch_size = 32
+    dataset = CustomDataset(images, gt)
+    dataloader  = DataLoader(dataset, batch_size=batch_size, shuffle=True)
+    return dataloader
 
 
 if __name__ ==  '__main__':

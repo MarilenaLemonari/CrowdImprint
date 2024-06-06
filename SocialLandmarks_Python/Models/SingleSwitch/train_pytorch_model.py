@@ -11,7 +11,7 @@ os.environ['WANDB_API_KEY']="29162836c3095b286c169bf889de71652ed3201b"
 # go to cd C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data
 # Execute python3 C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Models\SingleSwitch\train_pytorch_model.py
 
-def validate(model, val_loader, criterion, device, CM = False):
+def validate(model, val_loader, criterion, device, CM = False, name = "Validation"):
     model.eval()
     val_loss = 0.0
     val_total = 0
@@ -45,15 +45,15 @@ def validate(model, val_loader, criterion, device, CM = False):
 
     if CM == True:
         confusion = confusion_matrix(y_val, y_val_pred)
-        print("Validation Confusion Matrix:")
+        print(f"{name} Confusion Matrix:")
         print(confusion)
 
         plt.figure(figsize=(8, 6))
-        sns.heatmap(confusion, annot=True, fmt='d', cmap='Blues')
+        sns.heatmap(confusion, annot=False, fmt='d', cmap='Blues')
         plt.xlabel('Predicted')
         plt.ylabel('True')
-        plt.title('Confusion Matrix')
-        plt.savefig('confusion_matrix.png')
+        plt.title(f'{name} Confusion Matrix')
+        plt.savefig(f'{name}_confusion_matrix.png')
 
     return val_loss_avg, val_acc_overall_avg
 def train(model, train_loader, val_loader, criterion, optimizer, device, epochs):
@@ -84,7 +84,7 @@ def train(model, train_loader, val_loader, criterion, optimizer, device, epochs)
             epoch_total += labels.size(0)
             
 
-            if (i+1) % 100 == 0:
+            if (i+1) % 200 == 0:
                 # Run validation
                 val_loss, val_acc_overall = validate(model, val_loader, criterion, device)
                 print(f'Epoch [{epoch + 1}/{epochs}], Step [{i + 1}/{len(train_loader)}]:: Loss: [{epoch_loss / (i + 1):.4f}], Accuracy: {(correct * 100) /epoch_total:.2f}%, Validation:: Loss: [{val_loss:.4f}], Accuracy: {val_acc_overall*100:.2f}%')
@@ -96,8 +96,8 @@ def train(model, train_loader, val_loader, criterion, optimizer, device, epochs)
         val_loss, val_acc_overall = validate(model, val_loader, criterion, device, CM = True)
         
         # Log metrics to wandb
-        wandb.log({"epoch": epoch+1, "train_loss": epoch_loss / len(train_loader), "train_acc": correct /epoch_total,
-                    "val_loss": val_loss, "val_acc": val_acc_overall})
+        wandb.log({"epoch": epoch+1, "loss": epoch_loss / len(train_loader), "accuracy": correct /epoch_total,
+                    "val_loss": val_loss, "val_accuracy": val_acc_overall})
 
         
         
@@ -130,11 +130,10 @@ if __name__ ==  '__main__':
     model, criterion, optimizer, device = instantiate_model()
     print("SUCCESS! Model is Instantiated.")
     trainloader, valoader, config = setup_config(True, images, gt)
-    exit()
 
     start_time = time.time()
     # Train the model
-    wandb.watch(model, log_freq=1)
+    wandb.watch(model)
     epoch_losses, acc_overall = train(model, trainloader, valoader, criterion, optimizer, device, config.epochs)
     wandb.finish()
     end_time = time.time()
@@ -142,7 +141,7 @@ if __name__ ==  '__main__':
     print(f"Training Time: {elapsed_time:.2f} seconds")
 
     # Saving:
-    results_train = validate(model, trainloader, criterion, device, CM = True)
+    results_train = validate(model, trainloader, criterion, device, CM = True, name = "Training")
     results_val = validate(model, valoader, criterion, device, CM = True)
 
     performance_metrics = {
@@ -153,5 +152,5 @@ if __name__ ==  '__main__':
     filename = 'performance_metrics.json'
     with open(filename, 'w') as json_file:
         json.dump(performance_metrics, json_file, indent=4)
-    torch.save(model.state_dict(), "C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Models\SingleSwitch\\test_model.h5")
-    print("SUCCESS! Model is daved.")
+    torch.save(model.state_dict(), "C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Models\SingleSwitch\\model_test.h5")
+    print("SUCCESS! Model is saved.")
