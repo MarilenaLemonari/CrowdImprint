@@ -49,8 +49,8 @@ def test_keras():
 
 
 if __name__ ==  '__main__':
-    model, criterion, optimizer, device = instantiate_model()
-    trained_model = torch.load("C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Models\SingleSwitch\test_model.h5")
+    trained_model, criterion, optimizer, device = instantiate_model()
+    trained_model.load_state_dict(torch.load("C:\\PROJECTS\\SocialLandmarks\\SocialLandmarks_Python\\Models\\SingleSwitch\\model_test.h5"))
     print("SUCCESS! Trained Model is Loaded.")
 
     # Train & Validation data aka "SEEN" data during training.
@@ -58,17 +58,19 @@ if __name__ ==  '__main__':
     print("SUCCESS! Seen Data is Loaded.")
     seendataloader = setup_config_test(images, gt)
     results_train = validate(trained_model, seendataloader, criterion, device, CM = True, name = "Seen")
+    print(results_train)
 
     # Test data aka "UNSEEN" during training.
     x_test, y_test =  load_data(test =  True)
     print("SUCCESS! Test Data is Loaded.")
-    testloader = setup_config_test(images, gt)
+    testloader = setup_config_test(x_test, y_test)
     results_test = validate(trained_model, testloader, criterion, device, CM = True, name = "Test")
+    print(results_test)
 
     # Performance overall:
     test_metrics = {
     "performance_seen": results_train,
-    "rperformance_test": results_test
+    "performance_test": results_test
     }
     filename = 'performance_metrics.json'
     with open(filename, 'r') as file:

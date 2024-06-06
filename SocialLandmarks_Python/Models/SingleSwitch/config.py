@@ -49,7 +49,7 @@ def setup_config(wandb_bool, images, gt):
     if wandb_bool == True:
         wandb.init(project="SocialLandmarks")
         config = wandb.config
-        config.epochs = 50
+        config.epochs = 30
         config.batch_size = batch_size
     else:
         config = []

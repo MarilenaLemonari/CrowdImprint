@@ -216,12 +216,12 @@ if __name__ ==  '__main__':
   for i in range(len(behavior_list)-1):
     dictionary[i] = behavior_list[i]
 
-  category = "Training" 
+  category = "Testing" 
   if category == "Training":
     repeat = 10000 * (len(behavior_list)-1) # TODO:change
     prefix = 'IF_'
   elif category == "Testing":
-    repeat = 100
+    repeat = 500
     prefix = '_test_IF_'
 
   counter = 0
