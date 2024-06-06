@@ -42,3 +42,4 @@ def make_cm(model, x, y, name):
     plt.savefig(f'{name}_confusion_matrix.png')
 
     return confusion
+

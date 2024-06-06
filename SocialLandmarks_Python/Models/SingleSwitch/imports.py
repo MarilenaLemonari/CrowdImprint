@@ -18,6 +18,8 @@ from sklearn.model_selection import train_test_split
 import torch.nn.functional as F
 import json
 import seaborn as sns
+import time
+
 
 # IMPORTS KERAS
 from importlib.metadata import requires
@@ -42,4 +44,6 @@ from sklearn.model_selection import train_test_split
 from keras.layers import Dropout
 from tensorflow.keras.optimizers import Adam
 from keras import backend as K
-from tensorflow.keras import regularizers
+from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau
+from tensorflow.keras.regularizers import l2
+from tensorflow.keras.preprocessing.image import ImageDataGenerator

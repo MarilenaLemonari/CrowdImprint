@@ -1,20 +1,21 @@
 from imports import *
 from helper_functions import *
 
-def load_data(check = False):
-    folder_path = 'PythonFiles\\SingleSwitch\\'  
+# python3 C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Models\SingleSwitch\data_loader.py
+
+def load_data(check = False, val = False, test = False):
+    # LOAD DATA
+    if test == True:
+        folder_path = 'PythonFiles\\SingleSwitch\\TestData'
+    elif val == True:
+        folder_path = 'PythonFiles\\SingleSwitch\\ValidationData'
+    else:
+        folder_path = 'PythonFiles\\SingleSwitch\\'  
+        
     file_list = os.listdir(folder_path)
     npz_files = [file for file in file_list if file.endswith('.npz')]
     loaded_images = []
     gt = []
-    gt_dict = {"1_1": 0, "1_2": 1, "1_3": 2, "1_4": 3, "1_5": 4, "1_6": 5,
-            "2_1": 6, "2_2": 7, "2_3": 8, "2_4": 9, "2_5": 10, "2_6": 11,
-            "3_1": 12, "3_2": 13,"3_3": 14, "3_4": 15, "3_5": 16, "3_6": 17,
-            "4_1": 18, "4_2": 19, "4_3": 20, "4_4": 21, "4_5": 22, "4_6":23,
-            "5_1": 24, "5_2": 25, "5_3": 26, "5_4": 27, "5_5": 28, "5_6": 29,
-            "6_1": 30, "6_2": 31, "6_3": 32, "6_4": 33, "6_5": 34, "6_6": 35,
-            "0_0": 14, "0_1": 12, "0_2": 13, "0_3": 14, "0_4": 15, "0_5": 16, "0_6": 17,
-            "1_0": 2, "2_0": 8, "3_0": 14, "4_0": 20, "5_0": 26, "6_0": 32}
     class_0 = 0
     class_1 = 0
     class_2 = 0
@@ -51,6 +52,13 @@ def load_data(check = False):
     class_33 = 0
     class_34 = 0
     class_35 = 0
+    gt_dict = {"1_1": 0, "1_2": 1, "1_3": 2, "1_4": 3, "1_5": 4,
+            "2_1": 5, "2_2": 6, "2_3": 7, "2_4": 8, "2_5": 9,
+            "3_1": 10, "3_2": 11,"3_3": 12, "3_4": 13, "3_5": 14,
+            "4_1": 15, "4_2": 16, "4_3": 17, "4_4": 18, "4_5": 19,
+            "5_1": 20, "5_2": 21, "5_3": 22, "5_4": 23, "5_5": 24,
+            "0_0": 12, "0_1": 10, "0_2": 11, "0_3": 12, "0_4": 13, "0_5": 14,
+            "1_0": 2, "2_0": 7, "3_0": 12, "4_0": 17, "5_0": 22}
     for npz_file in tqdm(npz_files): 
         # Read gt fields:
         class_index = npz_file.split("IF_")[1].split("_T")[0]
@@ -149,7 +157,7 @@ def load_data(check = False):
         print(class_0,class_1,class_2,class_3,class_4,class_5,class_6,class_7,class_8,class_9,class_10,class_11,class_12,class_13,class_14,class_15,
         class_16, class_17, class_18, class_19, class_20, class_21, class_22, class_23, class_24, class_25, class_26, class_27, class_28, class_29, class_30,
         class_31, class_32, class_33, class_34, class_35)
-        # 1440 1368 1552 1400 1296 1736 1472 1264 1376 1472 1320 1368 1352 1448 1248 1648 1280 1464 1632 1464 1528 1416 1552 1576 1467 1400 1440 1408 1248 1416 1376 1328 1536 1480 1488 1504
+        # 2043 2059 2014 2084 2102 1921 2023 2014 1959 1935 2106 1991 2023 2051 1970 1925 1965 1953 1953 2008 1942 2049 1991 1916 2003 
 
     images = np.array(loaded_images)
     # images = scale_to_standard_normal(loaded_images) # TODO
@@ -158,7 +166,7 @@ def load_data(check = False):
 
 if __name__ ==  '__main__':
 
-    images, gt = load_data()
+    images, gt = load_data(check=True)
     print("Loaded Data: ", images.shape, len(gt))
 
     # index =  99

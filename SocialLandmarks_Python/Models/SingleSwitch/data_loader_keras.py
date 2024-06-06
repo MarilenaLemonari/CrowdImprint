@@ -1,10 +1,14 @@
 from imports import *
 from helper_functions import *
 
-def load_data_keras(test = False):
+# python3 C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Models\SingleSwitch\data_loader_keras.py
+
+def load_data_keras(test = False, val = False):
     # LOAD DATA
     if test == True:
         folder_path = 'PythonFiles\\SingleSwitch\\TestData'
+    elif val == True:
+        folder_path = 'PythonFiles\\SingleSwitch\\ValidationData'
     else:
         folder_path = 'PythonFiles\\SingleSwitch\\'  
         
@@ -13,14 +17,14 @@ def load_data_keras(test = False):
     loaded_images = []
     field_IDs = []
     gt = []
-    gt_dict = {"1_1": 0, "1_2": 1, "1_3": 2, "1_4": 3, "1_5": 4, "1_6": 5,
-            "2_1": 6, "2_2": 7, "2_3": 8, "2_4": 9, "2_5": 10, "2_6": 11,
-            "3_1": 12, "3_2": 13,"3_3": 14, "3_4": 15, "3_5": 16, "3_6": 17,
-            "4_1": 18, "4_2": 19, "4_3": 20, "4_4": 21, "4_5": 22, "4_6":23,
-            "5_1": 24, "5_2": 25, "5_3": 26, "5_4": 27, "5_5": 28, "5_6": 29,
-            "6_1": 30, "6_2": 31, "6_3": 32, "6_4": 33, "6_5": 34, "6_6": 35,
-            "0_0": 14, "0_1": 12, "0_2": 13, "0_3": 14, "0_4": 15, "0_5": 16, "0_6": 17,
-            "1_0": 2, "2_0": 8, "3_0": 14, "4_0": 20, "5_0": 26, "6_0": 32}
+    # gt_dict = {"1_1": 0, "1_2": 1, "1_3": 2, "1_4": 3, "1_5": 4, "1_6": 5,
+    #         "2_1": 6, "2_2": 7, "2_3": 8, "2_4": 9, "2_5": 10, "2_6": 11,
+    #         "3_1": 12, "3_2": 13,"3_3": 14, "3_4": 15, "3_5": 16, "3_6": 17,
+    #         "4_1": 18, "4_2": 19, "4_3": 20, "4_4": 21, "4_5": 22, "4_6":23,
+    #         "5_1": 24, "5_2": 25, "5_3": 26, "5_4": 27, "5_5": 28, "5_6": 29,
+    #         "6_1": 30, "6_2": 31, "6_3": 32, "6_4": 33, "6_5": 34, "6_6": 35,
+    #         "0_0": 14, "0_1": 12, "0_2": 13, "0_3": 14, "0_4": 15, "0_5": 16, "0_6": 17,
+    #         "1_0": 2, "2_0": 8, "3_0": 14, "4_0": 20, "5_0": 26, "6_0": 32}
     class_0 = 0
     class_1 = 0
     class_2 = 0
@@ -57,17 +61,26 @@ def load_data_keras(test = False):
     class_33 = 0
     class_34 = 0
     class_35 = 0
-    # TODO: 2 predictions of 6.
+    gt_dict = {"1_1": 0, "1_2": 1, "1_3": 2, "1_4": 3, "1_5": 4,
+            "2_1": 5, "2_2": 6, "2_3": 7, "2_4": 8, "2_5": 9,
+            "3_1": 10, "3_2": 11,"3_3": 12, "3_4": 13, "3_5": 14,
+            "4_1": 15, "4_2": 16, "4_3": 17, "4_4": 18, "4_5": 19,
+            "5_1": 20, "5_2": 21, "5_3": 22, "5_4": 23, "5_5": 24,
+            "0_0": 12, "0_1": 10, "0_2": 11, "0_3": 12, "0_4": 13, "0_5": 14,
+            "1_0": 2, "2_0": 7, "3_0": 12, "4_0": 17, "5_0": 22}
     for npz_file in tqdm(npz_files):
         # name_parts = npz_file.split('_')
         # type_index = name_parts.index("type")
         class_index = npz_file.split("IF_")[1].split("_T")[0]
-        field_1 = npz_file.split("IF_")[1].split("_")[0]
-        field_2 = npz_file.split("IF_")[1].split("_")[1]
-        fields = np.array([field_1, field_2],dtype = np.float32)
+        # field_1 = npz_file.split("IF_")[1].split("_")[0]
+        # field_2 = npz_file.split("IF_")[1].split("_")[1]
+        # fields = np.array([field_1, field_2],dtype = np.float32)
         # value_after_type = int(name_parts[type_index + 1])
+        rot_value = npz_file.split("rot_")[1].split(".npz")[0]
+        if int(rot_value) != 0:
+            continue
 
-        # Read image:
+        # Read image from Python files:
         file_path = os.path.join(folder_path, npz_file)
         loaded_data = np.load(file_path)
         array_keys = loaded_data.files
@@ -76,8 +89,10 @@ def load_data_keras(test = False):
         if (array.dtype != 'float32'):
             print(file_path)
             exit()
+        # print(npz_file)
+        # visualize_image(array)
+        # exit()
         loaded_images.append(array)
-        field_IDs.append(fields)
         class_type = gt_dict[class_index]
         gt.append(class_type)
 
@@ -161,7 +176,7 @@ def load_data_keras(test = False):
     # print(class_0,class_1,class_2,class_3,class_4,class_5,class_6,class_7,class_8,class_9,class_10,class_11,class_12,class_13,class_14,class_15,
     #       class_16, class_17, class_18, class_19, class_20, class_21, class_22, class_23, class_24, class_25, class_26, class_27, class_28, class_29, class_30,
     #       class_31, class_32, class_33, class_34, class_35)
-    # # 326 332 312 318 364 308 332 314 350 330 336 316 348 338 340 316 338 360 328 340 358 354 330 348 320 348 342 354 308 338 294 340 328 354 312 326
+    # # 409 385 431 412 389 410 414 425 400 425 416 416 403 389 415 376 398 355 393 391 407 405 424 426 406
     # exit()
 
     # NORMALIZE DATA
@@ -174,7 +189,7 @@ def load_data_keras(test = False):
     return x, gt 
 
 if __name__ ==  '__main__':
-    images, gt = load_data()
+    images, gt = load_data_keras()
     # index =513
     # print(loaded_images[index].shape)
     # exit()

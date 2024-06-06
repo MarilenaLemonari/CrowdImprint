@@ -3,39 +3,43 @@ from imports import *
 
 def instantiate_model():
     model = Sequential()
-    model.add(Conv2D(16, kernel_size=3, strides=1, padding='same', input_shape=(32, 32, 1)))
-    model.add(BatchNormalization())  # BatchNormalization after Conv2D
+    
+    # First Convolutional Block
+    model.add(Conv2D(16, kernel_size=3, strides=1, padding='same', input_shape=(32, 32, 1), kernel_regularizer=l2(0.001)))
+    model.add(BatchNormalization())
     model.add(Activation('relu'))
     model.add(MaxPooling2D(pool_size=2))
-    model.add(Dropout(0.1))
-
-    model.add(Conv2D(32, kernel_size=3, strides=1, padding='same'))
-    model.add(BatchNormalization())  # BatchNormalization after Conv2D
+    model.add(Dropout(0.3))
+    
+    # Second Convolutional Block
+    model.add(Conv2D(32, kernel_size=3, strides=1, padding='same', kernel_regularizer=l2(0.001)))
+    model.add(BatchNormalization())
     model.add(Activation('relu'))
     model.add(MaxPooling2D(pool_size=2))
-    model.add(Dropout(0.1))
-
+    model.add(Dropout(0.3))
+    
+    # Fully Connected Layers
     model.add(Flatten())
-    model.add(Dense(2048))
-    model.add(BatchNormalization())  # BatchNormalization after Dense
+    model.add(Dense(2048, kernel_regularizer=l2(0.001)))
+    model.add(BatchNormalization())
     model.add(Activation('relu'))
-    model.add(Dropout(0.2)) 
-
-    model.add(Dense(1024))
-    model.add(BatchNormalization())  # BatchNormalization after Dense
+    model.add(Dropout(0.5))
+    
+    model.add(Dense(1024, kernel_regularizer=l2(0.001)))
+    model.add(BatchNormalization())
     model.add(Activation('relu'))
-    model.add(Dropout(0.2))
-
-    model.add(Dense(128))
-    model.add(BatchNormalization())  # BatchNormalization after Dense
+    model.add(Dropout(0.5))
+    
+    model.add(Dense(128, kernel_regularizer=l2(0.001)))
+    model.add(BatchNormalization())
     model.add(Activation('relu'))
-    model.add(Dropout(0.2))
-
-    model.add(Dense(36))
+    model.add(Dropout(0.5))
+    
+    # Output Layer
+    model.add(Dense(25))
     model.add(Activation('softmax'))
 
     model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
-
     return model
 
 

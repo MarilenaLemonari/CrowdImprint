@@ -207,8 +207,10 @@ if __name__ ==  '__main__':
 
   # behavior_list = ["Unidirectional_Down","Attractive_Multidirectional","Other_CircleAround", "AvoidNew", "MoveTFv2", "Stop"]
   dir_dict = {0:0, 1:3}
+  # behavior_list = ["AntiCircle", "Unidirectional_Down","Attractive_Multidirectional","Other_CircleAround",
+  #                  "AvoidNew", "MoveTFv2", "Stop"]
   behavior_list = ["AntiCircle", "Unidirectional_Down","Attractive_Multidirectional","Other_CircleAround",
-                   "AvoidNew", "MoveTFv2", "Stop"]
+                   "AvoidNew", "Stop"]
 
   dictionary = {}
   for i in range(len(behavior_list)-1):
@@ -216,19 +218,19 @@ if __name__ ==  '__main__':
 
   category = "Training" 
   if category == "Training":
-    repeat = 8000 * (len(behavior_list)-1) # TODO:change
+    repeat = 10000 * (len(behavior_list)-1) # TODO:change
     prefix = 'IF_'
   elif category == "Testing":
     repeat = 100
     prefix = '_test_IF_'
 
   counter = 0
-  mode = "Conv1d"
+  mode = "SingleSwitch" #"Conv1d"
   # mode = "NoSwitch"
 
-  if mode == "Conv1d":
+  if mode == "SingleSwitch":
     for r in tqdm(range(repeat)):
-      end_time = random.randint(5,15)
+      end_time = random.randint(6,16)
       radius = end_time/2 # 5 for 10 sec
 
       field_1=random.randint(1,len(behavior_list)-1)
@@ -245,9 +247,36 @@ if __name__ ==  '__main__':
       weight=np.zeros((1,len(behavior_list)-1))
       actionTimes=np.ones((1,len(behavior_list)-1))*(-1)
       inactiveTimes=np.ones((1,len(behavior_list)-1))*(-1)
-      T = random.randint(2,int(end_time-2)) # TODO: min switch
+      T = random.randint(3,int(end_time-3)) # TODO: min switch
+ 
+      # if field_1 == 5 and field_2 != 5:
+      #   end_time = random.randint(7,16)
+      #   radius = end_time/2 
+      #   T = random.randint(5,int(end_time-2)) # Min Switch for MoveTF = 5s
+      # if field_2 == 5 and field_1 != 5:
+      #   end_time = random.randint(7,16)
+      #   radius = end_time/2
+      #   T = random.randint(2,int(end_time-5))
 
-      if field_1 != 6 and field_2 != 6:
+      # if field_1 != 6 and field_2 != 6:
+      #   weight[0,field_1] = 1
+      #   weight[0,field_2] = 1
+
+      #   inactiveTimes[0,field_1] = T
+      #   actionTimes[0,field_2] = T
+
+      #   inactiveTimes[0,field_2] = end_time
+      #   actionTimes[0,field_1] = 0
+      # elif field_1 == 6 and field_2 != 6:
+      #   weight[0,field_2] = 1
+      #   inactiveTimes[0,field_2] = end_time
+      #   actionTimes[0,field_2] = T
+      # elif field_1 != 6 and field_2 == 6:
+      #   weight[0,field_1] = 1
+      #   inactiveTimes[0,field_1] = T
+      #   actionTimes[0,field_1] = 0
+
+      if field_1 != 5 and field_2 != 5:
         weight[0,field_1] = 1
         weight[0,field_2] = 1
 
@@ -256,11 +285,11 @@ if __name__ ==  '__main__':
 
         inactiveTimes[0,field_2] = end_time
         actionTimes[0,field_1] = 0
-      elif field_1 == 6 and field_2 != 6:
+      elif field_1 == 5 and field_2 != 5:
         weight[0,field_2] = 1
         inactiveTimes[0,field_2] = end_time
         actionTimes[0,field_2] = T
-      elif field_1 != 6 and field_2 == 6:
+      elif field_1 != 5 and field_2 == 5:
         weight[0,field_1] = 1
         inactiveTimes[0,field_1] = T
         actionTimes[0,field_1] = 0

@@ -1,6 +1,8 @@
 from imports import *
 from data_loader import *
 
+# python3 C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Models\SingleSwitch\config.py
+
 class CustomDataset(Dataset):
     def __init__(self, images, labels):
         self.images = images
@@ -17,20 +19,28 @@ class CustomDataset(Dataset):
 
         return image, label
 
-def setup_config_keras(images, gt):
+def setup_config_keras():
     #dataset = CustomDataset(images,gt)
 
     batch_size = 32
     #dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
-    x_train, x_val, y_train, y_val = train_test_split(images, gt, test_size=0.2, random_state=42)
+    # x_train, x_val, y_train, y_val = train_test_split(images, gt, test_size=0.2, random_state=42)
 
     # HYPERPARAMETERS
     wandb.init(project="SocialLandmarks")
     config = wandb.config
-    config.epochs = 100
+    config.epochs = 50
     config.batch_size = batch_size
 
-    return x_train, y_train, x_val, y_val, config
+    datagen = ImageDataGenerator(
+    rotation_range=10,
+    width_shift_range=0.1,
+    height_shift_range=0.1,
+    horizontal_flip=True
+    )
+    reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.2, patience=5, min_lr=0.0001)
+
+    return config, datagen, reduce_lr
 
 def setup_config(wandb_bool, images, gt):  
 
@@ -41,6 +51,8 @@ def setup_config(wandb_bool, images, gt):
         config = wandb.config
         config.epochs = 50
         config.batch_size = batch_size
+    else:
+        config = []
 
     x_train, x_val, y_train, y_val = train_test_split(images, gt, test_size=0.2, random_state=42)
     train_dataset = CustomDataset(x_train, y_train)
@@ -53,5 +65,5 @@ def setup_config(wandb_bool, images, gt):
 
 if __name__ ==  '__main__':
     print("Keras or Pytorch")
-    # images, gt = load_data()
-    # setup_config(False, images, gt)
+    images, gt = load_data()
+    setup_config(False, images, gt)
