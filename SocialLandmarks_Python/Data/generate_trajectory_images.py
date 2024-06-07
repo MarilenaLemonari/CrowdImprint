@@ -127,19 +127,14 @@ def create_images(key, value, dataset_name, resolution= 32):
         else:
             image[pixel_x,pixel_z] = cur_speed
 
-
     image[pixel_x_init,pixel_z_init] = 1
+    image = fill_pixel(1, pixel_x_init, pixel_z_init, 1, image, resolution)
+    # tifffile.imwrite(dataset_name + "\\" + key + '_s' + '.tif', image)
 
-    random_value = random.choice([0,1])
-    if random_value == 0:
-        tifffile.imwrite(dataset_name + "\\" + key + '_s' + '.tif', image)
-    elif random_value == 1:
     # Place source 
-        image[int(source_pos), int(source_pos)] = 1
-        tifffile.imwrite(dataset_name + "\\" + key + '.tif', image)
-    else:
-        print("ERROR! wWrong random value.")
-        exit()
+    image[int(source_pos), int(source_pos)] = 1
+    image = fill_pixel(1, int(source_pos), int(source_pos), 1, image, resolution)
+    tifffile.imwrite(dataset_name + "\\" + key + '.tif', image)
 
 def create_centrered_images(key, value, dataset_name, resolution= 32):
     # default_int = 0.5
@@ -201,7 +196,7 @@ def create_centrered_images(key, value, dataset_name, resolution= 32):
 # Execute
 if __name__ ==  '__main__':
     current_file_dir = "C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\Trajectories"
-    name = "\SingleSwitch\TestData" #TODO
+    name = "\SingleSwitch" #TODO
     # name = "\\NoSwitch"
     
     csv_directory  = current_file_dir + name + "\\"
@@ -233,6 +228,6 @@ if __name__ ==  '__main__':
         files = os.listdir(folder_path)
         file_exists = any(file.startswith(prefix) for file in files)
         if file_exists == False:
-            empty_predictions = create_centrered_images(prefix, value, folder_path)
+            empty_predictions = create_images(prefix, value, folder_path)
 
     print("DONE! Preprocessing Successful.")

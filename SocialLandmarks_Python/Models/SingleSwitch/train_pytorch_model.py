@@ -56,6 +56,7 @@ def validate(model, val_loader, criterion, device, CM = False, name = "Validatio
         plt.savefig(f'{name}_confusion_matrix.png')
 
     return val_loss_avg, val_acc_overall_avg
+
 def train(model, train_loader, val_loader, criterion, optimizer, device, epochs):
     model.train()
     epoch_losses = []

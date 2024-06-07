@@ -108,7 +108,7 @@ class CNN10class(nn.Module):
         return x
     
 def instantiate_model():
-    model = CNN10class() # TODO: model architecture ablation study
+    model = CNN() # TODO: model architecture ablation study
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model.to(device)
     print("SUCCESS! Model Instantiated.")
@@ -121,9 +121,9 @@ def instantiate_model():
 if __name__ ==  '__main__':
     model, criterion, optimizer, device = instantiate_model()
 
-    batch_size = 10
-    inputs= torch.randn(batch_size, 1, 32, 32, requires_grad=True)
-    print(inputs.shape)
-    preds=  model(inputs)
-    print(preds, preds.shape)
-    exit()
+    # batch_size = 10
+    # inputs= torch.randn(batch_size, 1, 32, 32, requires_grad=True)
+    # print(inputs.shape)
+    # preds=  model(inputs)
+    # print(preds, preds.shape)
+    # exit()
