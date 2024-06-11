@@ -21,7 +21,8 @@ def validate(model, val_loader, criterion, device, CM = False, name = "Validatio
     with torch.no_grad():
         for i, (inputs, labels) in enumerate(val_loader):
             labels = torch.Tensor(labels).long().to(device)
-            inputs = inputs.unsqueeze(1).to(device)
+            # inputs = inputs.unsqueeze(1).to(device)
+            inputs = inputs.permute(0, 2, 1).to(device)
 
             probs = model(inputs)
             loss = criterion(probs, labels)
@@ -70,10 +71,8 @@ def train(model, train_loader, val_loader, criterion, optimizer, device, epochs)
 
         for i, (inputs, labels) in enumerate(train_loader):
             labels = torch.Tensor(labels).long().to(device)
-            inputs = inputs.unsqueeze(1).to(device)
-            print(inputs.shape)
-            print(labels.shape)
-            exit()
+            # inputs = inputs.unsqueeze(1).to(device)
+            inputs = inputs.permute(0, 2, 1).to(device)
 
             optimizer.zero_grad()
 

@@ -70,14 +70,14 @@ def instantiate_model(seq_length):
 if __name__ ==  '__main__':
     model, criterion, optimizer, device = instantiate_model(seq_length=100)
 
-    # # Gnerate dummy data:
-    # seq_length = 100  
-    # num_features = 3  
-    # num_classes = 25 
-    # num_samples = 1000
-    # X = np.random.rand(num_samples, seq_length, num_features)
-    # x = torch.randn(num_samples, num_features, seq_length)
-    # # y = np.random.randint(0, num_classes, size=(num_samples,))
-    # output = model(x)
-    # print(output.shape)
+    # Gnerate dummy data:
+    seq_length = 100  
+    num_features = 3  
+    num_classes = 25 
+    num_samples = 1000
+    X = np.random.rand(num_samples, seq_length, num_features)
+    x = torch.randn(num_samples, num_features, seq_length)
+    # y = np.random.randint(0, num_classes, size=(num_samples,))
+    output = model(x)
+    print(output.shape)
     
