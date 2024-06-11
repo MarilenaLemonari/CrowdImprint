@@ -47,7 +47,7 @@ def read_csv_files(csv_directory):
     column_names = ['timestep','pos_x', 'pos_z']
 
     row_threshold = 3
-    for filename in tqdm(csv_files[:5]):
+    for filename in tqdm(csv_files):
         # Read the CSV file into a pandas DataFrame and assign column names
         df = pd.read_csv(os.path.join(csv_directory, filename), 
             header=None, names=column_names, 
@@ -195,15 +195,15 @@ def create_centrered_images(key, value, dataset_name, resolution= 32):
 
 def create_structured_images(key, value, dataset_name, resolution= 32):
     # default_int = 0.5
-    plt.clf()
-    plt.plot(value["pos_x"], value["pos_z"], c = 'slategrey')
-    plt.scatter(value["pos_x"][0], value["pos_z"][0], c = 'slategrey')
-    plt.scatter(value["norm_source"][0], value["norm_source"][0], c = 'firebrick', marker = '*', s = 200)
+    # plt.clf()
+    # plt.plot(value["pos_x"], value["pos_z"], c = 'slategrey')
+    # plt.scatter(value["pos_x"][0], value["pos_z"][0], c = 'slategrey')
+    # plt.scatter(value["norm_source"][0], value["norm_source"][0], c = 'firebrick', marker = '*', s = 200)
     # plt.legend(['Path', 'Spawn', 'Source'])
     # plt.xlabel("Position X")
     # plt.ylabel("Position Z")
     # plt.title("Normalized Path Image")
-    plt.savefig(dataset_name + "\\" + key)
+    # plt.savefig(dataset_name + "\\" + key)
 
     # Extract key points i.e., spawns and goals.
     init_x = value["pos_x"][0]
@@ -238,10 +238,16 @@ def create_structured_images(key, value, dataset_name, resolution= 32):
     
     x = points[:,0]
     z = points[:,1]
-    pixel_pos_x = x * ((resolution - 1)/2) + (resolution/2)
-    pixel_pos_z = z * ((resolution - 1)/2) + (resolution/2)
-    source_posX =  source_pos_x * ((resolution - 1)/2) + (resolution/2)
-    source_posZ =  source_pos_z * ((resolution - 1)/2) + (resolution/2)
+    max_value_x = max(np.max(abs(x)), abs(source_pos_x))
+    max_value_z = max(np.max(abs(z)), abs(source_pos_z))
+    max_value =  max(max_value_x, max_value_z) + 0.1
+    max_value = min(max_value, 1)
+    
+    pixel_pos_x = x * ((resolution - 1)/(2*max_value)) + ((resolution-1)/2)
+    pixel_pos_z = z * ((resolution - 1)/(2*max_value)) + ((resolution-1)/2)
+    source_posX =  source_pos_x * ((resolution - 1)/(2*max_value)) + ((resolution-1)/2)
+    source_posZ =  source_pos_z * ((resolution - 1)/(2*max_value)) + ((resolution-1)/2)
+
     image = np.zeros((resolution,resolution), np.float32)
     same_speed_count = 0
     for i in range(len(pixel_pos_x)):
