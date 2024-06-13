@@ -3,9 +3,13 @@ from helper_functions import *
 
 # python3 C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Models\CrowdLIP\data_loader.py
 
-def load_data_keras():
+def load_data_keras(val):
     # LOAD DATA
-    folder_path = 'PythonFiles\\SingleSwitch\\'  
+    if val == False:
+        folder_path = 'PythonFiles\\SingleSwitch\\'  
+    else:
+        folder_path = 'PythonFiles\\SingleSwitch\\ValidationData'  
+
     file_list = os.listdir(folder_path)
     npz_files = [file for file in file_list if file.endswith('.npz')]
 
@@ -14,8 +18,10 @@ def load_data_keras():
             "3_1": 10, "3_2": 11,"3_3": 12, "3_4": 13, "3_5": 14,
             "4_1": 15, "4_2": 16, "4_3": 17, "4_4": 18, "4_5": 19,
             "5_1": 20, "5_2": 21, "5_3": 22, "5_4": 23, "5_5": 24,
-            "0_0": 12, "0_1": 10, "0_2": 11, "0_3": 12, "0_4": 13, "0_5": 14,
-            "1_0": 2, "2_0": 7, "3_0": 12, "4_0": 17, "5_0": 22}
+            "0_0": 12, "0_1": 10, "0_2": 11, "0_3": 12, "0_4": 13, "0_5": 14, "0_6": 13,
+            "1_0": 2, "2_0": 7, "3_0": 12, "4_0": 17, "5_0": 22, "6_0":17,
+            "1_6":3, "2_6":8, "3_6":13, "4_6":18, "5_6":23, "6_6":18,
+            "6_1":15, "6_2":16, "6_3":17, "6_4":18, "6_5":19}
 
     label_dict = {}
     images_dict = {}
@@ -89,8 +95,8 @@ def create_pairs(label_dict, images_dict, n_reps):
 
     return images_a, images_b, gt
 
-def load_data(n_reps):
-    label_dict, images_dict = load_data_keras()
+def load_data(n_reps, val = False):
+    label_dict, images_dict = load_data_keras(val)
     images_a, images_b, gt = create_pairs(label_dict, images_dict, n_reps)
 
     return images_a, images_b, gt

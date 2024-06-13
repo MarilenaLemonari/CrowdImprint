@@ -207,18 +207,26 @@ if __name__ ==  '__main__':
 
   # behavior_list = ["Unidirectional_Down","Attractive_Multidirectional","Other_CircleAround", "AvoidNew", "MoveTFv2", "Stop"]
   dir_dict = {0:0, 1:3}
+  avoid_dict = {0:4, 1:6}
   # behavior_list = ["AntiCircle", "Unidirectional_Down","Attractive_Multidirectional","Other_CircleAround",
   #                  "AvoidNew", "MoveTFv2", "Stop"]
-  behavior_list = ["AntiCircle", "Unidirectional_Down","Attractive_Multidirectional","Other_CircleAround",
-                   "AvoidNew", "Stop"]
+  # behavior_list = ["AntiCircle", "Unidirectional_Down","Attractive_Multidirectional","Other_CircleAround",
+  #                  "AvoidNew", "Stop"]
+  behavior_list = ["0_Anticlockwise_final", "1_Unidirectional_final", "2_Attractive_final", "3_Clockwise_final", "4_Avoid_final",
+                  "Stop", "4_AvoidOpp_final"]
+  behavior_list = ["0_Anticlockwise_final", "1_Unidirectional_final", "2_Attractive_final", "3_Clockwise_final", "4_AvoidV2_final",
+                  "Stop", "4_AvoidOppV2_final"]
 
   dictionary = {}
   for i in range(len(behavior_list)-1):
-    dictionary[i] = behavior_list[i]
+    if i == 5:
+      dictionary[i] = behavior_list[i+1]
+    else:
+      dictionary[i] = behavior_list[i]
 
   category = "Testing" 
   if category == "Training":
-    repeat = 10000 * (len(behavior_list)-1) # TODO:change
+    repeat = 10000 * (len(behavior_list)-2) # TODO:change
     prefix = 'IF_'
   elif category == "Testing":
     repeat = 500
@@ -230,11 +238,54 @@ if __name__ ==  '__main__':
 
   if mode == "SingleSwitch":
     for r in tqdm(range(repeat)):
-      end_time = random.randint(6,16)
-      radius = end_time/2 # 5 for 10 sec
+      # Same distinct behaviors (5 in total):
+      field_1 = random.randint(1,len(behavior_list)-2)
+      field_2 = random.randint(1,len(behavior_list)-2)
+      end_time = random.randint(6,15)
+      max_radius = end_time/4 
+      min_radius = 0.5
+      radius = random.uniform(min_radius, max_radius)
+      T = random.randint(3,int(end_time-3)) # TODO: min switch
 
-      field_1=random.randint(1,len(behavior_list)-1)
-      field_2=random.randint(1,len(behavior_list)-1)
+      if field_1 == 2 and field_2 == 2:
+        end_time = random.randint(6,10)
+        radius = end_time + 0.01
+      elif field_1 == 2 and field_2 != 2:
+        if T > 10:
+          T = 10
+        radius = T + 0.1
+      elif field_2 == 2:
+        end_time = random.randint(6,10)
+        radius = end_time/2
+        if field_1 == 4:
+          T = random.randint(int(end_time-4),int(end_time-2))
+
+      # Initialise agent and simulation duration:
+      x0 = 0
+      y0 = 0
+      angle = random.uniform(0, 2 * math.pi)
+      x = x0 + radius * math.cos(angle)
+      y = y0 + radius * math.sin(angle)
+      init_positions=np.array([[x0,y0],[x,y]])
+
+      # Initialise source orientation:
+      random_angle = random.uniform(0, 2 * math.pi)
+      or_x = math.cos(random_angle)
+      or_y = math.sin(random_angle)
+      orientation = np.array([or_x, or_y])
+
+      # Check if agent is behind source:
+      vector_to_initial_agent = init_positions[1,:] - init_positions[0,:]
+      dot_product = np.dot(vector_to_initial_agent, orientation)
+      if field_1 == 4:
+        if dot_product <= 0:
+          # Agent behind the source:
+          field_1 = 4
+        else:
+          # Agent in front of source:
+          field_1 = 6
+      if field_2 == 0:
+        field_2 = avoid_dict[random.randint(0,1)]
 
       # If sampled field is circle around randomly choose clockwise or anticlockwise options
       if field_1 == 3:
@@ -247,64 +298,44 @@ if __name__ ==  '__main__':
       weight=np.zeros((1,len(behavior_list)-1))
       actionTimes=np.ones((1,len(behavior_list)-1))*(-1)
       inactiveTimes=np.ones((1,len(behavior_list)-1))*(-1)
-      T = random.randint(3,int(end_time-3)) # TODO: min switch
- 
-      # if field_1 == 5 and field_2 != 5:
-      #   end_time = random.randint(7,16)
-      #   radius = end_time/2 
-      #   T = random.randint(5,int(end_time-2)) # Min Switch for MoveTF = 5s
-      # if field_2 == 5 and field_1 != 5:
-      #   end_time = random.randint(7,16)
-      #   radius = end_time/2
-      #   T = random.randint(2,int(end_time-5))
-
-      # if field_1 != 6 and field_2 != 6:
-      #   weight[0,field_1] = 1
-      #   weight[0,field_2] = 1
-
-      #   inactiveTimes[0,field_1] = T
-      #   actionTimes[0,field_2] = T
-
-      #   inactiveTimes[0,field_2] = end_time
-      #   actionTimes[0,field_1] = 0
-      # elif field_1 == 6 and field_2 != 6:
-      #   weight[0,field_2] = 1
-      #   inactiveTimes[0,field_2] = end_time
-      #   actionTimes[0,field_2] = T
-      # elif field_1 != 6 and field_2 == 6:
-      #   weight[0,field_1] = 1
-      #   inactiveTimes[0,field_1] = T
-      #   actionTimes[0,field_1] = 0
 
       if field_1 != 5 and field_2 != 5:
-        weight[0,field_1] = 1
-        weight[0,field_2] = 1
+        if field_1 == 6:
+          first_field = 5
+        else:
+          first_field = field_1
+        if field_2 == 6:
+          sec_field = 5
+        else:
+          sec_field = field_2
+        weight[0,first_field] = 1
+        weight[0,sec_field] = 1
 
-        inactiveTimes[0,field_1] = T
-        actionTimes[0,field_2] = T
+        inactiveTimes[0,first_field] = T
+        actionTimes[0,sec_field] = T
 
-        inactiveTimes[0,field_2] = end_time
-        actionTimes[0,field_1] = 0
+        inactiveTimes[0,sec_field] = end_time
+        actionTimes[0,first_field] = 0
+
       elif field_1 == 5 and field_2 != 5:
-        weight[0,field_2] = 1
-        inactiveTimes[0,field_2] = end_time
-        actionTimes[0,field_2] = T
+        if field_2 == 6:
+          sec_field = 5
+        else:
+          sec_field = field_2
+
+        weight[0,sec_field] = 1
+        inactiveTimes[0,sec_field] = end_time
+        actionTimes[0,sec_field] = T
+
       elif field_1 != 5 and field_2 == 5:
-        weight[0,field_1] = 1
-        inactiveTimes[0,field_1] = T
-        actionTimes[0,field_1] = 0
+        if field_1 == 6:
+          first_field = 5
+        else:
+          first_field = field_1
 
-      x0 = 0
-      y0 = 0
-      angle = random.uniform(0, 2 * math.pi)
-      x = x0 + radius * math.cos(angle)
-      y = y0 + radius * math.sin(angle)
-      init_positions=np.array([[x0,y0],[x,y]])
-
-
-      random_angle = random.uniform(0, 2 * math.pi)
-      or_x = math.cos(random_angle)
-      or_y = math.sin(random_angle)
+        weight[0,first_field] = 1
+        inactiveTimes[0,first_field] = T
+        actionTimes[0,first_field] = 0
 
       n=str(counter)+prefix+str(field_1)+"_"+str(field_2)+"_T"+str(T)+"_d"+str(end_time)
       counter += 1

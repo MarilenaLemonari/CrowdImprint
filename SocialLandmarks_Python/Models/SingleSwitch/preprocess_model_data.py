@@ -57,7 +57,7 @@ counter = 0
 # exit()
 
 # DATA PRE-PROCESSING:
-folder_path = 'C:/PROJECTS/SocialLandmarks/SocialLandmarks_Python/Data/Images/SingleSwitch' 
+folder_path = 'C:/PROJECTS/SocialLandmarks/SocialLandmarks_Python/Data/Images/SingleSwitch_nostop' 
 all_files = os.listdir(folder_path)
 
 tif_files = [file for file in all_files if file.lower().endswith('.tif')]

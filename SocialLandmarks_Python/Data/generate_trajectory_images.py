@@ -117,23 +117,33 @@ def create_images(key, value, dataset_name, resolution= 32):
             same_speed_count += 1
 
         cur_speed = (1- value["speed"][i])*0.6
-        if same_speed_count >= 5:
-            tol = 1
-            left = int(max(pixel_x-tol,0))
-            right = int(min(pixel_x+tol,resolution))
-            top = int(min(pixel_z+tol,resolution))
-            bottom = int(max(pixel_z-tol,0))
-            image[left:right,bottom:top] = cur_speed
-        else:
-            image[pixel_x,pixel_z] = cur_speed
+        # if same_speed_count >= 5:
+        #     tol = 2
+        #     left = int(max(pixel_x-tol,0))
+        #     right = int(min(pixel_x+tol,resolution))
+        #     top = int(min(pixel_z+tol,resolution))
+        #     bottom = int(max(pixel_z-tol,0))
+        #     image[left:right,bottom:top] = cur_speed
+        #     same_speed_count = 0
+        # else:
+        #     image[pixel_x,pixel_z] = cur_speed
+        image[pixel_x,pixel_z] = cur_speed
+
+    # choices = [0, 1]
+    # probabilities = [0.2, 0.8]
+    # chosen_number = random.choices(choices, probabilities)[0]
 
     image[pixel_x_init,pixel_z_init] = 1
     image = fill_pixel(1, pixel_x_init, pixel_z_init, 1, image, resolution)
+
+    # if chosen_number == 0:
+    #     tifffile.imwrite(dataset_name + "\\" + key + '_s' + '.tif', image)
     # tifffile.imwrite(dataset_name + "\\" + key + '_s' + '.tif', image)
 
     # Place source 
     image[int(source_pos), int(source_pos)] = 1
     image = fill_pixel(1, int(source_pos), int(source_pos), 1, image, resolution)
+    # if chosen_number == 1:
     tifffile.imwrite(dataset_name + "\\" + key + '.tif', image)
 
 def create_centrered_images(key, value, dataset_name, resolution= 32):
@@ -168,7 +178,7 @@ def create_centrered_images(key, value, dataset_name, resolution= 32):
             pixel_x_init = pixel_x
             pixel_z_init = pixel_z
             image[pixel_x,pixel_z] = 1
-        elif (value["speed"][i] == value["speed"][i-1]):
+        elif (value["speed"][i] <= 0.001): #== value["speed"][i-1]):
             same_speed_count += 1
 
         cur_speed = (1- value["speed"][i])*0.6
@@ -179,7 +189,8 @@ def create_centrered_images(key, value, dataset_name, resolution= 32):
             # top = int(min(pixel_z+tol,resolution))
             # bottom = int(max(pixel_z-tol,0))
             # image[left:right,bottom:top] = cur_speed
-            image = fill_pixel(1, pixel_x, pixel_z, cur_speed, image, resolution)
+            image = fill_pixel(2, pixel_x, pixel_z, cur_speed, image, resolution)
+            same_speed_count = 0
         else:
             image[pixel_x,pixel_z] = cur_speed
 
@@ -216,9 +227,9 @@ def create_structured_images(key, value, dataset_name, resolution= 32):
     end_z = z_s.iloc[-1]
     points = np.column_stack((x_s, z_s))
     
-    # Check if stationary
-    if abs(end_z - init_z) < 0.001:
-      print("Stationary")
+    # # Check if stationary
+    # if abs(end_z - init_z) < 0.001:
+    #   print("Stationary")
 
     # # Rotate
     # tan_value = end_x/end_z
@@ -262,12 +273,13 @@ def create_structured_images(key, value, dataset_name, resolution= 32):
 
         cur_speed = (1- value["speed"][i])*0.6
         if same_speed_count >= 5:
-            tol = 1
+            tol = 2
             left = int(max(pixel_x-tol,0))
             right = int(min(pixel_x+tol,resolution))
             top = int(min(pixel_z+tol,resolution))
             bottom = int(max(pixel_z-tol,0))
             image[left:right,bottom:top] = cur_speed
+            same_speed_count = 0
         else:
             image[pixel_x,pixel_z] = cur_speed
 
@@ -315,6 +327,7 @@ if __name__ ==  '__main__':
         files = os.listdir(folder_path)
         file_exists = any(file.startswith(prefix) for file in files)
         if file_exists == False:
-            empty_predictions = create_structured_images(prefix, value, folder_path)
+            empty_predictions = create_images(prefix, value, folder_path, resolution=32) 
+            # TODO: 64 resolution and have stop tol 3, init tol 2 and source tol 1
 
     print("DONE! Preprocessing Successful.")

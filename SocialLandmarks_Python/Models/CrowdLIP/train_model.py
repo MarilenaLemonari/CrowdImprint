@@ -16,12 +16,15 @@ if __name__ ==  '__main__':
     Images should be of shape (32,32,1)
     """
 
-    images_a, images_b, gt = load_data(n_reps  = 5000)
-    print("SUCCESS! Data Loaded. Details: ", images_a.shape, images_b.shape, len(gt))
+    x_train_a, x_train_b, y_train = load_data(n_reps  = 5000)
+    x_val_a, x_val_b, y_val = load_data(n_reps  = 5000, val=True)
+#     images_a, images_b, gt = load_data(n_reps  = 5000)
+#     print("SUCCESS! Data Loaded. Details: ", images_a.shape, images_b.shape, len(gt))
     model = instantiate_model()
     print("SUCCESS! Model is Instantiated.")
 
-    x_train_a, x_train_b, y_train, x_val_a, x_val_b,  y_val, config = setup_config_keras(images_a, images_b, gt)  
+#     x_train_a, x_train_b, y_train, x_val_a, x_val_b,  y_val, config = setup_config_keras(images_a, images_b, gt)  
+    x_train_a, x_train_b, y_train, x_val_a, x_val_b,  y_val, config = setup_config_keras(x_train_a, x_val_a, x_train_b, x_val_b, y_train, y_val)
     print( x_train_a.shape, x_train_b.shape, y_train.shape, x_val_a.shape, x_val_b.shape,  y_val.shape)
 
     model.fit([x_train_a, x_train_b], y_train, epochs=config.epochs, batch_size=config.batch_size,

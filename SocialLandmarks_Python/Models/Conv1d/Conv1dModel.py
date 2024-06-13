@@ -33,7 +33,7 @@ class Conv1DModel(nn.Module):
         self.conv3 = nn.Conv1d(in_channels=64, out_channels=128, kernel_size=3)
         self.pool3 = nn.MaxPool1d(kernel_size=2)
         self.flatten = nn.Flatten()
-        self.fc1 = nn.Linear(128 * ((seq_length // 2 // 2 // 2) - 2), 128) 
+        self.fc1 = nn.Linear(2176, 128) 
         self.dropout = nn.Dropout(0.5)
         self.fc2 = nn.Linear(128, num_classes)
 
@@ -42,6 +42,8 @@ class Conv1DModel(nn.Module):
         x = self.pool2(F.relu(self.conv2(x)))
         x = self.pool3(F.relu(self.conv3(x)))
         x = self.flatten(x)
+        # print(x.shape)
+        # exit()
         x = F.relu(self.fc1(x))
         x = self.dropout(x)
         x = self.fc2(x)
@@ -71,11 +73,11 @@ if __name__ ==  '__main__':
     model, criterion, optimizer, device = instantiate_model(seq_length=100)
 
     # Gnerate dummy data:
-    seq_length = 100  
+    seq_length = 150  
     num_features = 3  
     num_classes = 25 
-    num_samples = 1000
-    X = np.random.rand(num_samples, seq_length, num_features)
+    num_samples = 40000
+    # X = np.random.rand(num_samples, seq_length, num_features)
     x = torch.randn(num_samples, num_features, seq_length)
     # y = np.random.randint(0, num_classes, size=(num_samples,))
     output = model(x)
