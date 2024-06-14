@@ -28,6 +28,14 @@ import cv2
 
 # cd C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Experiments
 # python3 .\preprocess_existing.py
+
+def fill_pixel(tol, pixel_x, pixel_z, intensity, image, resolution):
+    left = int(max(pixel_x-tol,0))
+    right = int(min(pixel_x+tol,resolution))
+    top = int(min(pixel_z+tol,resolution))
+    bottom = int(max(pixel_z-tol,0))
+    image[left:right,bottom:top] = intensity
+    return image
     
 def read_csv_files(csv_directory):
     csv_files = [f for f in os.listdir(csv_directory) if f.endswith('.csv')]
@@ -59,21 +67,25 @@ def read_csv_files(csv_directory):
             df.loc[i, "speed"] = math.sqrt((df.loc[i, 'pos_x'] - df.loc[i - 1, 'pos_x']) ** 2 + (df.loc[i, 'pos_z'] - df.loc[i - 1, 'pos_z']) ** 2)
 
 
+        df.drop("timestep", axis=1, inplace=True)
         data_dict[filename] = df
         all_dfs.append(df)
     
     for filename, df in data_dict.items():
-        # Normalize to [0, 0.9]
-        bound_min = min(np.min(df["pos_x"]), np.min(df["pos_z"]))
-        bound_max = max(np.max(df["pos_x"]), np.max(df["pos_z"])) 
+        # Normalize to [0, 1]
+        bound_min = min(np.min(df["pos_x"]), np.min(df["pos_z"]), 0)
+        bound_max = max(np.max(df["pos_x"]), np.max(df["pos_z"]), 0)
 
-        df["pos_x"] = (df['pos_x'] - bound_min) / (bound_max - bound_min) * (0.9 - 0) 
-        df["pos_z"] = (df['pos_z'] - bound_min) / (bound_max - bound_min) * (0.9 - 0) 
+        bound_max += 0.5
+        bound_min -= 0.5 
+
+        df["pos_x"] = (df['pos_x'] - bound_min) / (bound_max - bound_min) * (1 - 0) 
+        df["pos_z"] = (df['pos_z'] - bound_min) / (bound_max - bound_min) * (1 - 0) 
 
 
         s = len(df["pos_x"])
-        source_norm = np.zeros((s))
-        source_norm[0] = (0 - bound_min) / (bound_max - bound_min) * (0.9 - 0)
+        source_norm = np.zeros((s)) #TODO not necessarily at 0
+        source_norm[0] = (0 - bound_min) / (bound_max - bound_min) * (1 - 0)
         df["norm_source"] = list(source_norm)
 
         data_dict[filename] = df
@@ -81,12 +93,10 @@ def read_csv_files(csv_directory):
     return data_dict
 
 def create_images(key, value, dataset_name, resolution= 32):
-    # default_int = 0.5
     pixel_pos_x = value["pos_x"] * (resolution - 1)
     pixel_pos_z = value["pos_z"] * (resolution - 1)
     image = np.zeros((resolution,resolution), np.float32)
-    # Place source 
-    image[int(resolution/2), int(resolution/2)] = 1 #TODO
+    source_pos = value["norm_source"][0] * (resolution - 1)
     same_speed_count = 0
     for i in range(len(pixel_pos_x)):
         pixel_x = int(pixel_pos_x[i])
@@ -95,23 +105,36 @@ def create_images(key, value, dataset_name, resolution= 32):
             pixel_x_init = pixel_x
             pixel_z_init = pixel_z
             image[pixel_x,pixel_z] = 1
-        elif (value["speed"][i] == value["speed"][i-1]):
+        elif (value["speed"][i] <= 0.001): # ML1: value["speed"][i-1]
             same_speed_count += 1
 
         cur_speed = (1- value["speed"][i])*0.6
         if same_speed_count >= 5:
-            tol = 1
+            tol = 2
             left = int(max(pixel_x-tol,0))
             right = int(min(pixel_x+tol,resolution))
             top = int(min(pixel_z+tol,resolution))
             bottom = int(max(pixel_z-tol,0))
             image[left:right,bottom:top] = cur_speed
+            same_speed_count = 0
         else:
             image[pixel_x,pixel_z] = cur_speed
 
+    # choices = [0, 1]
+    # probabilities = [0.2, 0.8]
+    # chosen_number = random.choices(choices, probabilities)[0]
 
     image[pixel_x_init,pixel_z_init] = 1
+    image = fill_pixel(1, pixel_x_init, pixel_z_init, 1, image, resolution)
 
+    # if chosen_number == 0:
+    #     tifffile.imwrite(dataset_name + "\\" + key + '_s' + '.tif', image)
+    # tifffile.imwrite(dataset_name + "\\" + key + '_s' + '.tif', image)
+
+    # Place source 
+    image[int(source_pos), int(source_pos)] = 1
+    image = fill_pixel(1, int(source_pos), int(source_pos), 1, image, resolution)
+    # if chosen_number == 1:
     tifffile.imwrite(dataset_name + "\\" + key + '.tif', image)
 
 def generate_python_files(folder_path, name):

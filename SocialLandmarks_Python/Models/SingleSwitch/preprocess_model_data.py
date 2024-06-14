@@ -57,7 +57,7 @@ counter = 0
 # exit()
 
 # DATA PRE-PROCESSING:
-folder_path = 'C:/PROJECTS/SocialLandmarks/SocialLandmarks_Python/Data/Images/SingleSwitch_nostop' 
+folder_path = 'C:/PROJECTS/SocialLandmarks/SocialLandmarks_Python/Data/Images/SingleSwitch_Trial2/TestData' 
 all_files = os.listdir(folder_path)
 
 tif_files = [file for file in all_files if file.lower().endswith('.tif')]
@@ -69,7 +69,7 @@ for tif_file in tqdm(tif_files):
         counter += 1
         image_path = os.path.join(folder_path, tif_file)
         image = cv2.imread(image_path, cv2.IMREAD_UNCHANGED)
-        np.savez(f'C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\PythonFiles\SingleSwitch\{old_name}_{counter}_rot_0.npz', image)
+        np.savez(f'C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\PythonFiles\SingleSwitch\TestData\{old_name}_{counter}_rot_0.npz', image)
         # tifffile.imwrite("C:\\PROJECTS\\SocialLandmarks\\SocialLandmarks_Python\\Data\\PythonFiles\SingleSwitch\\unnormalized.tif", image)
         # np.savez(f'C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\PythonFiles\SingleSwitch\{old_name}_{counter}_norm_type_{class_id}_rot_0.npz', normalize(image))
         # np.savez(f'C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\PythonFiles\SingleSwitch\{old_name}_{counter}_noisy_rot_0.npz', add_gaussian_noise(normalize(image)))

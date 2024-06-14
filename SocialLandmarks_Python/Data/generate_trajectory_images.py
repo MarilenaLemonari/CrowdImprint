@@ -117,17 +117,17 @@ def create_images(key, value, dataset_name, resolution= 32):
             same_speed_count += 1
 
         cur_speed = (1- value["speed"][i])*0.6
-        # if same_speed_count >= 5:
-        #     tol = 2
-        #     left = int(max(pixel_x-tol,0))
-        #     right = int(min(pixel_x+tol,resolution))
-        #     top = int(min(pixel_z+tol,resolution))
-        #     bottom = int(max(pixel_z-tol,0))
-        #     image[left:right,bottom:top] = cur_speed
-        #     same_speed_count = 0
-        # else:
-        #     image[pixel_x,pixel_z] = cur_speed
-        image[pixel_x,pixel_z] = cur_speed
+        if same_speed_count >= 5:
+            tol = 2
+            left = int(max(pixel_x-tol,0))
+            right = int(min(pixel_x+tol,resolution))
+            top = int(min(pixel_z+tol,resolution))
+            bottom = int(max(pixel_z-tol,0))
+            image[left:right,bottom:top] = cur_speed
+            same_speed_count = 0
+        else:
+            image[pixel_x,pixel_z] = cur_speed
+        # image[pixel_x,pixel_z] = cur_speed
 
     # choices = [0, 1]
     # probabilities = [0.2, 0.8]
