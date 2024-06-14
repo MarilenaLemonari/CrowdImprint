@@ -144,13 +144,13 @@ if __name__ ==  '__main__':
 
     x_test = load_python_files(dataset_name)
     c_batch_size = x_test.shape[0]
-    train_batch_size = 32 # TODO: check
-    if c_batch_size >= train_batch_size:
-        batch_size = train_batch_size
-        print("WARNING! Need Test Loader.")
-        exit()
-    else:
-        batch_size = c_batch_size
+    batch_size = 32 # TODO: check
+    # if c_batch_size >= train_batch_size:
+    #     batch_size = train_batch_size
+    #     print("WARNING! Need Test Loader.")
+    #     testloader= prepare_test_data(x_test, batch_size)
+    # else:
+    #     batch_size = c_batch_size
     # x_test = np.random.random((batch_size, 32, 32, 1)) # torch.randn(batch_size, 1, 32, 32)
     # y_test = np.ones(batch_size) # torch.ones(batch_size)
 

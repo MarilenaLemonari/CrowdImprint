@@ -14,7 +14,6 @@ def load_inference_data(folder_path):
     loaded_images = []
 
     for npz_file in tqdm(npz_files): 
-        print(npz_file)
         # Read image:
         file_path = os.path.join(folder_path, npz_file)
         loaded_data = np.load(file_path)

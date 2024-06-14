@@ -37,11 +37,12 @@ def fill_pixel(tol, pixel_x, pixel_z, intensity, image, resolution):
     image[left:right,bottom:top] = intensity
     return image
     
-def read_csv_files(csv_directory):
+def read_csv_files_flock(csv_directory):
     csv_files = [f for f in os.listdir(csv_directory) if f.endswith('.csv')]
 
     data_dict = {}
     all_dfs = []
+
     column_names = ['timestep','pos_x', 'pos_z']
 
     row_threshold = 3
@@ -159,7 +160,7 @@ def create_images(key, value, dataset_name, resolution= 32):
     # tifffile.imwrite(dataset_name + "\\" + key + '_s' + '.tif', image)
 
     # Place source 
-    image[int(source_pos_x), int(source_pos_z)] = 1
+    # image[int(source_pos_x), int(source_pos_z)] = 1 # TODO decide whether to include source in image.
     # image = fill_pixel(1, int(source_pos_x), int(source_pos_z), 1, image, resolution)
     tifffile.imwrite(dataset_name + "\\" + key + '.tif', image)
 
@@ -182,7 +183,7 @@ def generate_python_files(folder_path, name):
 def existing_data_preprocessing(current_file_dir, name):
     csv_directory  = current_file_dir + name + "\\"
 
-    csv_data = read_csv_files(csv_directory)
+    csv_data = read_csv_files_flock(csv_directory) # TODO choose existing data file.
     n_csvs = len(csv_data)
     dict_list = list(csv_data.items())
 
