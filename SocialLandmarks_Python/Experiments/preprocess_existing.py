@@ -257,7 +257,7 @@ def create_images(key, value, dataset_name, resolution= 32):
     # tifffile.imwrite(dataset_name + "\\" + key + '_s' + '.tif', image)
 
     # Place source 
-    image[int(source_pos_x), int(source_pos_z)] = 1 # TODO decide whether to include source in image.
+    # image[int(source_pos_x), int(source_pos_z)] = 1 # TODO decide whether to include source in image.
     # image = fill_pixel(1, int(source_pos_x), int(source_pos_z), 1, image, resolution)
     tifffile.imwrite(dataset_name + "\\" + key + '.tif', image)
 
@@ -306,7 +306,8 @@ def existing_data_preprocessing(current_file_dir, name):
 # Execute
 if __name__ ==  '__main__':
     current_file_dir = "C:\PROJECTS\SocialLandmarks\Data\Trajectories"
-    name = "\Zara\Zara03"
+    # name = "\Zara\Zara03"
     # name = "\Flock"
+    name = "\Students\Students01"
     
     existing_data_preprocessing(current_file_dir, name)

@@ -76,8 +76,9 @@ def read_csv_new(current_file_dir, name):
         key, value = dict_list[i]
         prefix = key.split(".")[0]
         prefix_updated = combo_dict[prefix][2:-2]
-        index = len(color_dict)
-        color_dict[prefix_updated] = color_list[index]
+        if prefix_updated not in color_dict:
+            index = len(color_dict)
+            color_dict[prefix_updated] = color_list[index]
         empty_predictions = plot_trajectories(prefix_updated, value, color_dict)
 
     plt.title(f"{name[1:]} Dataset Generated Paths")
@@ -90,6 +91,8 @@ def read_csv_new(current_file_dir, name):
 if __name__ ==  '__main__':
 
     current_file_dir = "C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\Trajectories\Inference"
-    name = "\Flock"
+    # name = "\Flock"
+    # name = "\Zara"
+    name = "\Students"
 
     read_csv_new(current_file_dir, name)

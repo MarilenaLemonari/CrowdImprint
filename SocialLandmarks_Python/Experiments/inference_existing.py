@@ -11,6 +11,9 @@ import math
 # cd C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Experiments
 # python3 inference_existing.py
 
+def pick_value(prob):
+    return 1 if random.random() < prob else 0
+
 def load_python_files(dataset_name):
     print("load_python_files()")
 
@@ -53,20 +56,40 @@ def create_infered_beh_distr(predicted_labels, dataset_name, visualize = False):
 def generate_trajectories(beh_distr, n_agents, mode):
     print("generate_trajectories()")
 
-    # TODO: do the percentage mean probabilities? If not:
-    # Count how many agents will share which behavior combinations:
+    # TODO: do the percentage mean probabilities? 
     gen_beh = {}
     combs = []
-    for key, value in beh_distr.items():
-        if key == "dataset":
-            continue
-        float_value = float(value.split('%')[0])
-        n_values = int(np.round((float_value * n_agents) / 100))
-        if n_values != 0:
-            gen_beh[key] = n_values
-            for v in range(n_values):
+    while len(combs) < n_agents:
+        for key, value in beh_distr.items():
+            if key == "dataset":
+                continue
+            if len(combs) >= n_agents:
+                continue
+            float_value = float(value.split('%')[0])
+            prob = float_value / 100
+            value = pick_value(prob)
+            if value == 1:
                 combs.append(key)
-            
+                if key in gen_beh:
+                    gen_beh[key] += 1
+                else:
+                    gen_beh[key] = 1
+
+    # If not:
+    # Count how many agents will share which behavior combinations:
+    # gen_beh = {}
+    # combs = []
+    # for key, value in beh_distr.items():
+    #     if key == "dataset":
+    #         continue
+    #     float_value = float(value.split('%')[0])
+    #     n_values = int(np.round((float_value * n_agents) / 100))
+    #     if n_values != 0:
+    #         gen_beh[key] = n_values
+    #         for v in range(n_values):
+    #             combs.append(key)   
+    # n_agents = len(combs)
+
     os.chdir("C:\PROJECTS\DataDrivenInteractionFields\InteractionFieldsUMANS\examples")
     behavior_list = ["0_Anticlockwise_final", "1_Unidirectional_final", "2_Attractive_final", "3_Clockwise_final", "4_AvoidV2_final",
                 "Stop", "4_AvoidOppV2_final"]
@@ -84,7 +107,7 @@ def generate_trajectories(beh_distr, n_agents, mode):
     source_list = list(np.arange(0,n_agents) * 2) 
     build_xml(init_positions, source_list, dictionary, max_end_time)
 
-    combs = ["['0_5']", "['1_2']"]
+    # combs = ["['0_5']", "['1_2']"]
     combs_dict = {}
 
     for r in tqdm(range(len(combs))):
@@ -204,8 +227,9 @@ if __name__ ==  '__main__':
 
     model_name = "trial2.pth"
     model_type = "pytorch"
-    dataset_name = "Flock"
+    # dataset_name = "Flock"
     # dataset_name = "Zara"
+    dataset_name = "Students"
 
     x_test = load_python_files(dataset_name)
     c_batch_size = x_test.shape[0]
@@ -227,6 +251,6 @@ if __name__ ==  '__main__':
     print(beh_distr)
     
     # Generate new trajectories based on inferred behaviours:
-    n_agents = 2
+    n_agents = 3
     mode =  f"Inference\{dataset_name}"
     generate_trajectories(beh_distr, n_agents, mode)
