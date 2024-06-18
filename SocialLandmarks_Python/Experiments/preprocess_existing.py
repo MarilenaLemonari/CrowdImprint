@@ -87,6 +87,7 @@ def read_csv_files(csv_directory):
             df1.drop("timestep", axis=1, inplace=True)
             filename1 = filename.split('.csv')[0] + "_1" + ".csv"
             data_dict[filename1] = df1
+            all_dfs.append(df1)
 
             if (end_time - 15) >= 6:
                 df2 = df[df['timestep'] > thersh].copy()
@@ -134,91 +135,75 @@ def read_csv_files(csv_directory):
     return data_dict
 
 def read_csv_files_other(csv_directory):
-    csv_files = [f for f in os.listdir(csv_directory) if f.endswith('.csv')]
+
+    # 2.5fps => min 6s = 15frames & max 15sec = 37.5
+
+    traj_array = np.loadtxt(csv_directory)
+    column_names = ["Frame_No", "Pedestrian_ID", "pos_x", "pos_z", "pos_y", "v_x", "v_z", "v_y" ]
+    df = pd.DataFrame(traj_array, columns = column_names)
+    df = df.drop("pos_z", axis = 1)
+    df = df.drop("v_z", axis = 1)
+    df = df.drop("v_x", axis = 1)
+    df = df.drop("v_y", axis = 1)
+    num_agents = int(df["Pedestrian_ID"].max())
 
     data_dict = {}
     all_dfs = []
 
-    column_names = ['timestep','pos_x', 'pos_z']
+    for agent_id in range(1,num_agents+1):
+        key = "agent_" + str(agent_id)
 
-    row_threshold = 3
-    max_x = []
-    min_x = []
-    min_z = []
-    max_z = []
-    for filename in tqdm(csv_files):
-        # Read the CSV file into a pandas DataFrame and assign column names
-        # df = pd.read_csv(os.path.join(csv_directory, filename), 
-        #     header=None, names=column_names, 
-        #     skiprows=None,
-        #     #skiprows=lambda index: index == 0 or skip_rows(index, row_step),
-        #     usecols=[0, 1, 2])
-        df = pd.read_csv(os.path.join(csv_directory, filename), header=None)
-        df[column_names] = df[0].str.split(';', expand=True)
-        df[column_names[0]] = df[column_names[0]].astype(float) 
-        df[column_names[1]] = df[column_names[1]].astype(float)
-        df[column_names[2]] = df[column_names[2]].astype(float)
-        df.drop(0, axis=1, inplace=True)
-        if df.shape[0] < row_threshold:
+        agent_traj = df[df["Pedestrian_ID"] == agent_id]
+        agent_traj = agent_traj.drop("Pedestrian_ID", axis = 1)
+        agents_traj_values = agent_traj.values
+        # Remove non existent agent IDs
+        if len(agents_traj_values) == 0:
+          continue
+        frame_cutoff = agents_traj_values[-1,0] 
+        start_frame = agents_traj_values[0,0]
+        if (frame_cutoff - start_frame) < 16:
             continue
-        
-        df["speed"] = 0
-        for i in range(1, len(df)):
-            df.loc[i, "speed"] = math.sqrt((df.loc[i, 'pos_x'] - df.loc[i - 1, 'pos_x']) ** 2 + (df.loc[i, 'pos_z'] - df.loc[i - 1, 'pos_z']) ** 2)
-        
-        min_x.append(min(df["pos_x"]))
-        max_x.append(max(df["pos_x"]))
-        min_z.append(min(df["pos_z"]))
-        max_z.append(max(df["pos_z"]))
+        if (frame_cutoff - start_frame) >= 38:
+            agents_traj_values = agents_traj_values[:4,:]
+        cutoff = 0
+        cutoff_list = []
+        start_list = [0]
+        for i in range(1,agents_traj_values.shape[0]):
+          end_frame = agents_traj_values[i,0]
+          if end_frame-start_frame > frame_cutoff:
+            cutoff += 1
+            cutoff_list.append(i)
+            start_list.append(i)
+            start_frame = end_frame
+        cutoff_list.append(agents_traj_values.shape[0]+1)
 
-        # Maximum supported duration 15secs and minimum 6secs.
-        end_time =  df["timestep"].iloc[-1]
-        if end_time < 6:
-            continue
-        elif end_time > 15:
-            df1 = df[df['timestep'] <= 15].copy()
-            df1.drop("timestep", axis=1, inplace=True)
-            filename1 = filename.split('.csv')[0] + "_1" + ".csv"
-            data_dict[filename1] = df1
+        for c in range(cutoff+1):
+          all_dfs.append(agents_traj_values[start_list[c]:cutoff_list[c],:])
+          key_up = key + "_" +str(c)
+          data_dict[key_up] = agents_traj_values[start_list[c]:cutoff_list[c],:]
 
-            if (end_time - 15) >= 6:
-                df2 = df[df['timestep'] > 15].copy()
-                df2.drop("timestep", axis=1, inplace=True)
-                filename2 = filename.split('.csv')[0] + "_2" + ".csv"
-                data_dict[filename2] = df2
-                all_dfs.append(df2)
-        else:
-            df.drop("timestep", axis=1, inplace=True)
-            data_dict[filename] = df
-            all_dfs.append(df)
-    
-    # Specific source assumption for Arxiepiskopi:
-    maxX = np.max(max_x)
-    minX = np.min(min_x)
-    maxZ = np.max(max_z)
-    minZ = np.min(min_z)
-    source_x = (minX + maxX)/2
-    source_z = minZ - 1
+    source_x = 0
+    source_z = 0
 
-    for filename, df in data_dict.items():
+    for filename, arr in data_dict.items():
         # Normalize to [0, 1]
-        bound_min = min(np.min(df["pos_x"]), np.min(df["pos_z"]), source_x, source_z)
-        bound_max = max(np.max(df["pos_x"]), np.max(df["pos_z"]),  source_x, source_z)
+        bound_min = min(np.min(arr[:,1]), np.min(arr[:,2]), source_x, source_z)
+        bound_max = max(np.max(arr[:,1]), np.max(arr[:,2]),  source_x, source_z)
 
         bound_max += 0.7
         bound_min -= 0.7 
 
-        df["pos_x"] = (df['pos_x'] - bound_min) / (bound_max - bound_min) * (1 - 0) 
-        df["pos_z"] = (df['pos_z'] - bound_min) / (bound_max - bound_min) * (1 - 0) 
+        arr[:,1] = (arr[:,1] - bound_min) / (bound_max - bound_min) * (1 - 0) 
+        arr[:,2] = (arr[:,2] - bound_min) / (bound_max - bound_min) * (1 - 0) 
 
 
-        s = len(df["pos_x"])
+        s = len(arr[:,1])
         source_norm = np.zeros((s)) 
         source_norm[0] = (source_x - bound_min) / (bound_max - bound_min) * (1 - 0)
         source_norm[1] = (source_z - bound_min) / (bound_max - bound_min) * (1 - 0)
-        df["norm_source"] = list(source_norm)
+        # df["norm_source"] = list(source_norm)
 
-        data_dict[filename] = df
+        data_dict[filename] = arr
 
     return data_dict
 
@@ -279,6 +264,7 @@ def generate_python_files(folder_path, name):
 
 def existing_data_preprocessing(current_file_dir, name):
     csv_directory  = current_file_dir + name + "\\"
+    # csv_directory  = current_file_dir + name
 
     csv_data = read_csv_files(csv_directory)
     n_csvs = len(csv_data)
@@ -292,6 +278,7 @@ def existing_data_preprocessing(current_file_dir, name):
         key, value = dict_list[i]
         prefix = key.split(".")[0]
         folder_path = "C:\\PROJECTS\\SocialLandmarks\\SocialLandmarks_Python\\Data\\Images" + name
+        # folder_path = "C:\\PROJECTS\\SocialLandmarks\\SocialLandmarks_Python\\Data\\Images" + "\ETH"
         # dataset_name = name
         files = os.listdir(folder_path)
         file_exists = any(file.startswith(prefix) for file in files)
@@ -309,5 +296,6 @@ if __name__ ==  '__main__':
     # name = "\Zara\Zara03"
     # name = "\Flock"
     name = "\Students\Students01"
+    # name = "\eth_hotel.txt" # TODO
     
     existing_data_preprocessing(current_file_dir, name)
