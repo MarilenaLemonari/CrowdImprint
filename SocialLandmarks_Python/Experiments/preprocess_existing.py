@@ -37,7 +37,103 @@ def fill_pixel(tol, pixel_x, pixel_z, intensity, image, resolution):
     image[left:right,bottom:top] = intensity
     return image
     
-def read_csv_files_flock(csv_directory):
+def read_csv_files(csv_directory):
+    csv_files = [f for f in os.listdir(csv_directory) if f.endswith('.csv')]
+
+    data_dict = {}
+    all_dfs = []
+
+    column_names = ['timestep','pos_x', 'pos_z']
+
+    row_threshold = 3
+    max_x = []
+    min_x = []
+    min_z = []
+    max_z = []
+    for filename in tqdm(csv_files):
+        # Read the CSV file into a pandas DataFrame and assign column names
+        # df = pd.read_csv(os.path.join(csv_directory, filename), 
+        #     header=None, names=column_names, 
+        #     skiprows=None,
+        #     #skiprows=lambda index: index == 0 or skip_rows(index, row_step),
+        #     usecols=[0, 1, 2])
+        df = pd.read_csv(os.path.join(csv_directory, filename), header=None)
+        df[column_names] = df[0].str.split(';', expand=True)
+        df[column_names[0]] = df[column_names[0]].astype(float) 
+        df[column_names[1]] = df[column_names[1]].astype(float)
+        df[column_names[2]] = df[column_names[2]].astype(float)
+        df.drop(0, axis=1, inplace=True)
+        if df.shape[0] < row_threshold:
+            continue
+        
+        df["speed"] = 0
+        for i in range(1, len(df)):
+            df.loc[i, "speed"] = math.sqrt((df.loc[i, 'pos_x'] - df.loc[i - 1, 'pos_x']) ** 2 + (df.loc[i, 'pos_z'] - df.loc[i - 1, 'pos_z']) ** 2)
+        
+        min_x.append(min(df["pos_x"]))
+        max_x.append(max(df["pos_x"]))
+        min_z.append(min(df["pos_z"]))
+        max_z.append(max(df["pos_z"]))
+
+
+        # Maximum supported duration 15secs and minimum 6secs.
+        start_time = df["timestep"].iloc[0]
+        end_time =  df["timestep"].iloc[-1] - start_time
+        if end_time < 6:
+            continue
+        elif end_time > 15:
+            thersh = start_time + 15
+            df1 = df[df['timestep'] <= thersh].copy()
+            df1.drop("timestep", axis=1, inplace=True)
+            filename1 = filename.split('.csv')[0] + "_1" + ".csv"
+            data_dict[filename1] = df1
+
+            if (end_time - 15) >= 6:
+                df2 = df[df['timestep'] > thersh].copy()
+                df2.drop("timestep", axis=1, inplace=True)
+                filename2 = filename.split('.csv')[0] + "_2" + ".csv"
+                data_dict[filename2] = df2
+                all_dfs.append(df2)
+        else:
+            df.drop("timestep", axis=1, inplace=True)
+            data_dict[filename] = df
+            all_dfs.append(df)
+    
+    # Specific source assumption for Arxiepiskopi:
+    # maxX = np.max(max_x)
+    # minX = np.min(min_x)
+    # maxZ = np.max(max_z)
+    # minZ = np.min(min_z)
+    # source_x = (minX + maxX)/2
+    # source_z = minZ - 1
+    # Specific source assumption for Zara03:
+    source_x = 0.6
+    source_z = 0.15
+
+    for filename, df in data_dict.items():
+        # Normalize to [0, 1]
+        bound_min = min(np.min(df["pos_x"]), np.min(df["pos_z"]), source_x, source_z) # Source is no longer at (0,0)
+        bound_max = max(np.max(df["pos_x"]), np.max(df["pos_z"]), source_x, source_z)
+
+        bound_max += 0.5
+        bound_min -= 0.5 
+
+        df["pos_x"] = (df['pos_x'] - bound_min) / (bound_max - bound_min) * (1 - 0) 
+        df["pos_z"] = (df['pos_z'] - bound_min) / (bound_max - bound_min) * (1 - 0) 
+
+
+        s = len(df["pos_x"])
+        # print(filename, s)
+        source_norm = np.zeros((s)) #TODO not necessarily at 0
+        source_norm[0] = (source_x - bound_min) / (bound_max - bound_min) * (1 - 0)
+        source_norm[1] = (source_z - bound_min) / (bound_max - bound_min) * (1 - 0)
+        df["norm_source"] = list(source_norm)
+
+        data_dict[filename] = df
+
+    return data_dict
+
+def read_csv_files_other(csv_directory):
     csv_files = [f for f in os.listdir(csv_directory) if f.endswith('.csv')]
 
     data_dict = {}
@@ -106,18 +202,18 @@ def read_csv_files_flock(csv_directory):
 
     for filename, df in data_dict.items():
         # Normalize to [0, 1]
-        bound_min = min(np.min(df["pos_x"]), np.min(df["pos_z"]), 0)
-        bound_max = max(np.max(df["pos_x"]), np.max(df["pos_z"]), 0)
+        bound_min = min(np.min(df["pos_x"]), np.min(df["pos_z"]), source_x, source_z)
+        bound_max = max(np.max(df["pos_x"]), np.max(df["pos_z"]),  source_x, source_z)
 
-        bound_max += 0.5
-        bound_min -= 0.5 
+        bound_max += 0.7
+        bound_min -= 0.7 
 
         df["pos_x"] = (df['pos_x'] - bound_min) / (bound_max - bound_min) * (1 - 0) 
         df["pos_z"] = (df['pos_z'] - bound_min) / (bound_max - bound_min) * (1 - 0) 
 
 
         s = len(df["pos_x"])
-        source_norm = np.zeros((s)) #TODO not necessarily at 0
+        source_norm = np.zeros((s)) 
         source_norm[0] = (source_x - bound_min) / (bound_max - bound_min) * (1 - 0)
         source_norm[1] = (source_z - bound_min) / (bound_max - bound_min) * (1 - 0)
         df["norm_source"] = list(source_norm)
@@ -127,6 +223,7 @@ def read_csv_files_flock(csv_directory):
     return data_dict
 
 def create_images(key, value, dataset_name, resolution= 32):
+    plt.plot(value["pos_x"].to_numpy(), value["pos_z"].to_numpy(), '.')
     pixel_pos_x = value["pos_x"].to_numpy() * (resolution - 1)
     pixel_pos_z = value["pos_z"].to_numpy() * (resolution - 1)
     image = np.zeros((resolution,resolution), np.float32)
@@ -160,7 +257,7 @@ def create_images(key, value, dataset_name, resolution= 32):
     # tifffile.imwrite(dataset_name + "\\" + key + '_s' + '.tif', image)
 
     # Place source 
-    # image[int(source_pos_x), int(source_pos_z)] = 1 # TODO decide whether to include source in image.
+    image[int(source_pos_x), int(source_pos_z)] = 1 # TODO decide whether to include source in image.
     # image = fill_pixel(1, int(source_pos_x), int(source_pos_z), 1, image, resolution)
     tifffile.imwrite(dataset_name + "\\" + key + '.tif', image)
 
@@ -183,7 +280,7 @@ def generate_python_files(folder_path, name):
 def existing_data_preprocessing(current_file_dir, name):
     csv_directory  = current_file_dir + name + "\\"
 
-    csv_data = read_csv_files_flock(csv_directory) # TODO choose existing data file.
+    csv_data = read_csv_files(csv_directory)
     n_csvs = len(csv_data)
     dict_list = list(csv_data.items())
 
@@ -200,6 +297,8 @@ def existing_data_preprocessing(current_file_dir, name):
         file_exists = any(file.startswith(prefix) for file in files)
         if file_exists == False:
             empty_predictions = create_images(prefix, value, folder_path)
+    
+    plt.show()
 
     generate_python_files(folder_path, name)
     print("DONE! Preprocessing Successful.")
@@ -207,6 +306,7 @@ def existing_data_preprocessing(current_file_dir, name):
 # Execute
 if __name__ ==  '__main__':
     current_file_dir = "C:\PROJECTS\SocialLandmarks\Data\Trajectories"
-    name = "\Flock"
+    name = "\Zara\Zara03"
+    # name = "\Flock"
     
     existing_data_preprocessing(current_file_dir, name)

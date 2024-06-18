@@ -30,10 +30,11 @@ def create_infered_beh_distr(predicted_labels, dataset_name, visualize = False):
         if percentage == 0:
             continue
         else:
+            value, _ = decode_labels([index])
             hist_adj.append(percentage/100)
-            tick_names.append(str(decode_labels([index])))
-            beh_distr[str(decode_labels([index]))] = str(percentage) + "%"
-            # print(percentage, "% ",decode_labels([index]),"behavior.")
+            tick_names.append(str())
+            beh_distr[str(value)] = str(percentage) + "%"
+            # print(percentage, "% ",value,"behavior.")
 
     file_path = f"Inference/{dataset_name}_inferred_behavior_distribution.json"
     with open(file_path, "w") as json_file:
@@ -49,7 +50,7 @@ def create_infered_beh_distr(predicted_labels, dataset_name, visualize = False):
 
     return beh_distr
 
-def generate_trajectories(beh_distr, n_agents):
+def generate_trajectories(beh_distr, n_agents, mode):
     print("generate_trajectories()")
 
     # TODO: do the percentage mean probabilities? If not:
@@ -66,14 +67,16 @@ def generate_trajectories(beh_distr, n_agents):
             for v in range(n_values):
                 combs.append(key)
             
-    print(gen_beh)
-
     os.chdir("C:\PROJECTS\DataDrivenInteractionFields\InteractionFieldsUMANS\examples")
-    behavior_list = ["Unidirectional_Down","Attractive_Multidirectional","Other_CircleAround", "AvoidNew", "MoveTF", "Stop"]
+    behavior_list = ["0_Anticlockwise_final", "1_Unidirectional_final", "2_Attractive_final", "3_Clockwise_final", "4_AvoidV2_final",
+                "Stop", "4_AvoidOppV2_final"]
 
     dictionary = {}
     for i in range(len(behavior_list)-1):
-        dictionary[i] = behavior_list[i]
+        if i == 5:
+            dictionary[i] = behavior_list[i+1]
+        else:
+            dictionary[i] = behavior_list[i]
 
     max_end_time = 15
     # init_positions = np.array([[0,0],[1,2],[0,0]])
@@ -81,42 +84,35 @@ def generate_trajectories(beh_distr, n_agents):
     source_list = list(np.arange(0,n_agents) * 2) 
     build_xml(init_positions, source_list, dictionary, max_end_time)
 
-    #combs = ["['0_0']", "['0_0']"]
+    combs = ["['0_5']", "['1_2']"]
+    combs_dict = {}
 
     for r in tqdm(range(len(combs))):
+        combs_dict[f"agent_{r+1}"] = combs[r]
         beh_combination = combs[r]
         string = beh_combination.strip("[]'")
         InF1, InF2 = map(int, string.split('_'))
+        end_time = random.randint(6,max_end_time)
+        max_radius = end_time/4 
+        min_radius = 0.5
+        radius = random.uniform(min_radius, max_radius)
+        T = random.randint(3,int(end_time-3))
+        
+        # Sample Circle Around Behaviour:
+        if InF1 == 0 or InF1 == 3:
+            flag_ca = random.randint(0,1)
+            if flag_ca == 0:
+                InF1 = 0
+            else:
+                InF1 = 3
+        if InF2 == 0 or InF2 == 3:
+            flag_ca = random.randint(0,1)
+            if flag_ca == 0:
+                InF2 = 0
+            else:
+                InF2 = 3
 
-        field_1 = InF1
-        field_2 = InF2
-
-        end_time = random.randint(5,max_end_time)
-        radius = end_time/2 # 5 for 10 sec
-
-        weight = np.zeros((1,len(behavior_list)-1))
-        actionTimes = np.ones((1,len(behavior_list)-1))*(-1)
-        inactiveTimes = np.ones((1,len(behavior_list)-1))*(-1)
-        T = random.randint(2,int(end_time-2)) # TODO: min switch
-
-        if field_1 != 5 and field_2 != 5:
-            weight[0,field_1] = 1
-            weight[0,field_2] = 1
-
-            inactiveTimes[0,field_1] = T
-            actionTimes[0,field_2] = T
-
-            inactiveTimes[0,field_2] = end_time
-            actionTimes[0,field_1] = 0
-        elif field_1 == 5 and field_2 != 5:
-            weight[0,field_2] = 1
-            inactiveTimes[0,field_2] = end_time
-            actionTimes[0,field_2] = T
-        elif field_1 != 5 and field_2 == 5:
-            weight[0,field_1] = 1
-            inactiveTimes[0,field_1] = T
-            actionTimes[0,field_1] = 0
-
+        # Initialise agent and simulation duration:
         x0 = 0
         y0 = 0
         angle = random.uniform(0, 2 * math.pi)
@@ -124,16 +120,84 @@ def generate_trajectories(beh_distr, n_agents):
         y = y0 + radius * math.sin(angle)
         init_positions=np.array([[x0,y0],[x,y]])
 
-
+        # Initialise source orientation:
         random_angle = random.uniform(0, 2 * math.pi)
         or_x = math.cos(random_angle)
         or_y = math.sin(random_angle)
+        orientation = np.array([or_x, or_y])
 
-        generate_instance(init_positions,weight,actionTimes,inactiveTimes,or_x, or_y,dictionary, groupID = r)
+        # Handle Avoid Behaviour:
+        if InF1 == 4 or InF1 == 6:
+            # check if behind:
+            vector_to_initial_agent = init_positions[1,:] - init_positions[0,:] 
+            dot_product = np.dot(vector_to_initial_agent, orientation)
+            if dot_product <= 0:
+                # Agent behind the source:
+                InF1 = 4
+            else:
+                # Agent in front of source:
+                InF1 = 6
+        if InF2 == 4 or InF2 == 6:
+            flag_av = random.randint(0,1)
+            if flag_av == 0:
+                InF2 = 4
+            else:
+                InF2 = 6
+        field_1 = InF1
+        field_2 = InF2
+
+        weight = np.zeros((1,len(behavior_list)-1))
+        actionTimes = np.ones((1,len(behavior_list)-1))*(-1)
+        inactiveTimes = np.ones((1,len(behavior_list)-1))*(-1)
+
+        if field_1 != 5 and field_2 != 5:
+            if field_1 == 6:
+                first_field = 5
+            else:
+                first_field = field_1
+            if field_2 == 6:
+                sec_field = 5
+            else:
+                sec_field = field_2
+            weight[0,first_field] = 1
+            weight[0,sec_field] = 1
+
+            inactiveTimes[0,first_field] = T
+            actionTimes[0,sec_field] = T
+
+            inactiveTimes[0,sec_field] = end_time
+            actionTimes[0,first_field] = 0
+
+        elif field_1 == 5 and field_2 != 5:
+            if field_2 == 6:
+                sec_field = 5
+            else:
+                sec_field = field_2
+
+            weight[0,sec_field] = 1
+            inactiveTimes[0,sec_field] = end_time
+            actionTimes[0,sec_field] = T
+
+        elif field_1 != 5 and field_2 == 5:
+            if field_1 == 6:
+                first_field = 5
+            else:
+                first_field = field_1
+
+            weight[0,first_field] = 1
+            inactiveTimes[0,first_field] = T
+            actionTimes[0,first_field] = 0
+
     
+        generate_instance(init_positions,weight,actionTimes,inactiveTimes,or_x, or_y,dictionary, groupID = r)
+  
     # Save trajectories
-    mode = "Inference\\Flock"
     S_true=make_trajectory(n_agents,mode)
+
+    # Save combinations:
+    file_path = "C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\Trajectories" + "\\" + mode + "\comb_dict.json"
+    with open(file_path, "w") as json_file:
+        json.dump(combs_dict, json_file)
 
 
 if __name__ ==  '__main__':
@@ -141,6 +205,7 @@ if __name__ ==  '__main__':
     model_name = "trial2.pth"
     model_type = "pytorch"
     dataset_name = "Flock"
+    # dataset_name = "Zara"
 
     x_test = load_python_files(dataset_name)
     c_batch_size = x_test.shape[0]
@@ -155,13 +220,13 @@ if __name__ ==  '__main__':
     # y_test = np.ones(batch_size) # torch.ones(batch_size)
 
     predictions, predicted_labels = model_inference(model_name, model_type, x_test, batch_size)
-    combinations = decode_labels(predicted_labels)
-    print(combinations)
+    combinations, c_dict = decode_labels(predicted_labels)
+    print(c_dict)
 
     beh_distr = create_infered_beh_distr(predicted_labels, dataset_name, True)
     print(beh_distr)
     
-    exit()
     # Generate new trajectories based on inferred behaviours:
     n_agents = 2
-    generate_trajectories(beh_distr, n_agents)
+    mode =  f"Inference\{dataset_name}"
+    generate_trajectories(beh_distr, n_agents, mode)

@@ -212,8 +212,8 @@ if __name__ ==  '__main__':
   #                  "AvoidNew", "MoveTFv2", "Stop"]
   # behavior_list = ["AntiCircle", "Unidirectional_Down","Attractive_Multidirectional","Other_CircleAround",
   #                  "AvoidNew", "Stop"]
-  behavior_list = ["0_Anticlockwise_final", "1_Unidirectional_final", "2_Attractive_final", "3_Clockwise_final", "4_Avoid_final",
-                  "Stop", "4_AvoidOpp_final"]
+  # behavior_list = ["0_Anticlockwise_final", "1_Unidirectional_final", "2_Attractive_final", "3_Clockwise_final", "4_Avoid_final",
+  #                 "Stop", "4_AvoidOpp_final"]
   behavior_list = ["0_Anticlockwise_final", "1_Unidirectional_final", "2_Attractive_final", "3_Clockwise_final", "4_AvoidV2_final",
                   "Stop", "4_AvoidOppV2_final"]
 

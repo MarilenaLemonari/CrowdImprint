@@ -12,9 +12,12 @@ def load_inference_data(folder_path):
     file_list = os.listdir(folder_path)
     npz_files = [file for file in file_list if file.endswith('.npz')]
     loaded_images = []
+    counter = -1
 
     for npz_file in tqdm(npz_files): 
         # Read image:
+        counter += 1
+        print(counter, npz_file)
         file_path = os.path.join(folder_path, npz_file)
         loaded_data = np.load(file_path)
         array_keys = loaded_data.files
@@ -105,11 +108,13 @@ def decode_labels(predicted_labels):
             15: "4_1", 16: "4_2", 17: "4_3", 18: "4_4", 19: "4_5",
             20: "5_1", 21: "5_2", 22: "5_3", 23: "5_4", 24: "5_5"}
     
-    combinations = []
+    combinations_dict = {}
+    combinations  = []
     for i in (range(len(predicted_labels))):
         combo = decoder[int(predicted_labels[i])]
+        combinations_dict[i] = combo
         combinations.append(combo)
-    return combinations
+    return combinations, combinations_dict
 
 if __name__ ==  '__main__':
 
@@ -124,6 +129,6 @@ if __name__ ==  '__main__':
     predictions, predicted_labels = model_inference(model_name, model_type, x_test)
     print(predicted_labels)
 
-    combinations = decode_labels(predicted_labels)
-    print(combinations)
+    combinations, c_dict = decode_labels(predicted_labels)
+    print(c_dict)
     
