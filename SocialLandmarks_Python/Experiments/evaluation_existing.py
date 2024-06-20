@@ -6,6 +6,8 @@ import os
 from tqdm import tqdm
 
 # Instructions:
+# cd C:\PROJECTS\SocialLandmarks
+# .\.venv\Scripts\activate
 # cd C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Experiments
 # python3 evaluation_existing.py
 
@@ -62,58 +64,64 @@ def generate_guided_trajectory(beh_combination, start_pts, or_pts, source_pt, en
 
     return S_true
 
+def metric_unidirectional(trajectory):
+    """
+    A measure correcpodning to the "unidirectional" movement.
+        1. Every 1s take spawn and goal positions.
+        2. Create the straight line between them.
+        3. Measure similarity/deviation from this line.
+    """
+    return trajectory
+
+def metric_attractive(trajectory):
+    """
+    A measure corresponding to the "attract" movement.
+    Basically, this is a combination of the unidirectional metric plus a measure of the distance to the source.
+    So here we calculate the distance to the source over time.
+    """
+    return trajectory
+
+def metric_circle(trajectory):
+    """
+    A measure of the "circling around" movement.
+    This corresponds to the amount of time that the agents maintains a standard distance to the source.
+    """
+    return trajectory
+
+def metric_avoid(trajectory):
+    """
+    A measure of the "avoid" movement. 
+        1. Evey second take the spawn and goal positions.
+        2. Fit a second degree polynomial curve and mesure similarity/deviation.
+    """
+    return trajectory
+
+def metric_stop(trajectory):
+    """
+    A measure of the "stopping" behaviour.
+    This corresponds to the amount of time that speed is 0 (or less than a tolerance).
+    """
+    return trajectory
 
 if __name__ ==  '__main__':
     """
     Evaluation with existing dataset is limited to measuring % success in behavior replication.
     The following code then does the following:
-        i. Inference on existing dataset trajectories.
-        ii. New trajectory generation based on infered behaviors.
+        i. 
         iii. Trajectory comparison with inputs/gts given same initial positions.
-        WE ASSUMME appropriate source placement.
+        WE assume appropriate source placement.
     """
 
-    # Step i: Inference
-    model_name = "model_test.h5"
-    model_type = "keras"
-    x_test = load_python_files("Flock")
+    model_name = "trial2.pth"
+    model_type = "pytorch"
+    dataset_name = "Flock"
+    # dataset_name = "Zara"
+    # dataset_name = "Students"
+
+    folder_path = f'C:\\PROJECTS\\SocialLandmarks\\SocialLandmarks_Python\\Data\\PythonFiles\\{dataset_name}\\'  
+    x_test, pred_dict = load_inference_data(folder_path, return_dict=True)
     c_batch_size = x_test.shape[0]
-    train_batch_size = 32 # TODO: check
-    if c_batch_size >= train_batch_size:
-        batch_size = train_batch_size
-        print("WARNING! Need Test Loader.")
-        exit()
-    else:
-        batch_size = c_batch_size
-    y_test = np.ones(batch_size) # torch.ones(batch_size)
-    predictions, predicted_labels = model_inference(model_name, model_type, x_test, y_test)
-    combinations = decode_predictions(predicted_labels)
-
-    # beh_distr = create_infered_beh_distr(predicted_labels, dataset_name = "Flock", visualize = False)
-    # print(beh_distr)
-
-    # Step ii: Trajectory generation
-    current_file_dir = "C:\PROJECTS\SocialLandmarks\Data\Trajectories"
-    name = "\Flock"
-    csv_directory  = current_file_dir + name + "\\"
-    csv_data = read_csv_files(csv_directory)
-    timestep = 0.04
-    for i, agent_csv in enumerate(csv_data):
-        start_x = csv_data[agent_csv]["pos_x"][0]
-        start_z = csv_data[agent_csv]["pos_z"][0]
-        # plt.plot(csv_data[agent_csv]["pos_x"], csv_data[agent_csv]["pos_z"])
-        # plt.show()
-        # exit()
-        num_steps = len(csv_data[agent_csv]["pos_x"])
-        end_time = (num_steps * timestep) - timestep
-        start_pts = [start_x, start_z]
-        or_pts = [csv_data[agent_csv]["pos_x"][2], csv_data[agent_csv]["pos_z"][2]]
-        source_pt = csv_data[agent_csv]["norm_source"][0]
-        prod_traj = generate_guided_trajectory(combinations[i], start_pts, or_pts, source_pt, end_time, timestep, agent_csv)
-        eval_x = prod_traj[0][:,1]
-        eval_z = prod_traj[0][:,2]
-        plt.plot(eval_x, eval_z)
-        plt.show()
-        exit()
-    
-
+    batch_size = 32
+    predictions, predicted_labels = model_inference(model_name, model_type, x_test, batch_size)
+    combinations, c_dict = decode_labels(predicted_labels, pred_dict)
+    print(c_dict)

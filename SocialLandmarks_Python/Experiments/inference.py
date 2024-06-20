@@ -7,17 +7,19 @@ from CNNPytorch import *
 # cd C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Experiments
 # python3 inference.py
 
-def load_inference_data(folder_path):
+def load_inference_data(folder_path, return_dict = False):
 
     file_list = os.listdir(folder_path)
     npz_files = [file for file in file_list if file.endswith('.npz')]
     loaded_images = []
     counter = -1
 
+    pred_dict = {}
+
     for npz_file in tqdm(npz_files): 
         # Read image:
         counter += 1
-        print(counter, npz_file)
+        # print(counter, npz_file)
         file_path = os.path.join(folder_path, npz_file)
         loaded_data = np.load(file_path)
         array_keys = loaded_data.files
@@ -27,11 +29,15 @@ def load_inference_data(folder_path):
             print("ERROR! Check file path: ",file_path)
             exit()
         loaded_images.append(array)        
+        pred_dict[npz_file] = array
 
     images = np.array(loaded_images)
     images = images[:, np.newaxis, :, :]
 
-    return images
+    if return_dict == False:
+        return images
+    else:
+        return images, pred_dict
 
 def load_trained_model(model_name, model_type):
     print("load_trained_model()")
@@ -100,7 +106,7 @@ def model_inference(model_name, model_type, x_test, batch_size):
 
     return predictions, predicted_labels
 
-def decode_labels(predicted_labels):
+def decode_labels(predicted_labels, pred_dict = None):
 
     decoder = {0:"1_1", 1:"1_2",2: "1_3", 3: "1_4", 4: "1_5",
             5: "2_1", 6: "2_2", 7: "2_3", 8: "2_4", 9: "2_5",
@@ -114,6 +120,14 @@ def decode_labels(predicted_labels):
         combo = decoder[int(predicted_labels[i])]
         combinations_dict[i] = combo
         combinations.append(combo)
+
+    if pred_dict != None:
+        i = 0
+        for key in pred_dict.keys():
+            pred_dict[key] = combinations_dict[i]
+            i += 1
+        combinations_dict = pred_dict
+
     return combinations, combinations_dict
 
 if __name__ ==  '__main__':
