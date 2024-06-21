@@ -176,6 +176,38 @@ if __name__ ==  '__main__':
     combinations, c_dict = decode_labels(predicted_labels, pred_dict)
     # print(c_dict)
 
+    # Load images:
+    search_path = 'C:/PROJECTS/SocialLandmarks/SocialLandmarks_Python/Data/Images/SingleSwitch_Trial2' 
+    all_search_pnts = os.listdir(search_path)
+    tif_s = [file for file in all_search_pnts if file.lower().endswith('.tif')]
+
+    query_path = 'C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\Images\Flock'
+    all_query_pnts = os.listdir(query_path)
+    tif_q = [file for file in all_query_pnts if file.lower().endswith('.tif')]
+    
+    search_dict = {}
+    json_path = "C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Experiments\Evaluation"
+    json_name = json_path + "\search_dict.json"
+    for query in tif_q:
+        image_path = os.path.join(query_path, query)
+        image1 = cv2.imread(image_path, cv2.IMREAD_UNCHANGED)
+        # cv2.imshow('image',image)
+        # cv2.waitKey(0)
+        # cv2.imwrite(os.curdir + "imag.tif", image)
+        query_new = query.split('.tif')[0]
+        dist_dict = {}
+        for search_value in tqdm(tif_s): # TODO
+            image_path = os.path.join(search_path, search_value)
+            image2 = cv2.imread(image_path, cv2.IMREAD_UNCHANGED)
+            (score, diff) = ssim(image1, image2, full=True, data_range=image1.max() - image1.min())
+            dist_dict[search_value] = score
+        found_key = max(dist_dict, key=dist_dict.get)
+        search_dict[query_new] = found_key
+        
+
+    """
+    # METHOD 1:
+
     # Load trajectories:
     query_file_dir = "C:\PROJECTS\SocialLandmarks\Data\Trajectories"
     query_name = "\Flock"
@@ -199,10 +231,6 @@ if __name__ ==  '__main__':
 
         dist_dict = {}
         for search_key, search_value in tqdm(values_dict.items()):
-            """
-            Search values have timestep 0.1s + they start from 0.1s.
-            Query values have timesteps according to their source e.g., Flock = 0.04s, + they start for 0s.
-            """
             curve1 = np.column_stack((rotated_points[:,0], y_stretched))
             curve2 = search_value           
             distance, path = fastdtw(curve1, curve2, dist=euclidean)
@@ -212,6 +240,7 @@ if __name__ ==  '__main__':
         search_dict[query_new] = found_key
         with open(json_name, 'w') as json_file:
             json.dump(search_dict, json_file, indent=4)
+    """
 
     final_dict = {}
     metric = 0
@@ -250,5 +279,4 @@ if __name__ ==  '__main__':
     plt.ylabel('True')
     plt.title(f'Confusion Matrix')
     plt.savefig(f'{json_path}\\confusion_matrix.png')
-
     
