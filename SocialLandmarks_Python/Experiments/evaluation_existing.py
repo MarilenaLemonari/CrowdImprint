@@ -11,66 +11,6 @@ from tqdm import tqdm
 # cd C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Experiments
 # python3 evaluation_existing.py
 
-def generate_guided_trajectory(beh_combination, start_pts, or_pts, source_pt, end_time, timestep, name):
-    start_x, start_z = start_pts
-    or_x = or_pts[0] - start_x
-    or_z = or_pts[1] - start_z
-
-    os.chdir("C:\PROJECTS\DataDrivenInteractionFields\InteractionFieldsUMANS\examples")
-    behavior_list = ["Unidirectional_Down","Attractive_Multidirectional","Other_CircleAround", "AvoidNew", "MoveTF", "Stop"]
-
-    dictionary = {}
-    for i in range(len(behavior_list)-1):
-        dictionary[i] = behavior_list[i]
-
-    
-    init_positions = np.array([[source_pt,source_pt],[start_x,start_z]])
-    build_xml(init_positions, [0], dictionary, end_time, delta_time = timestep)
-
-
-    string = beh_combination.strip("[]'")
-    InF1, InF2 = map(int, string.split('_'))
-    field_1 = InF1
-    field_2 = InF2
-
-    weight = np.zeros((1,len(behavior_list)-1))
-    actionTimes = np.ones((1,len(behavior_list)-1))*(-1)
-    inactiveTimes = np.ones((1,len(behavior_list)-1))*(-1)
-    T = random.randint(2,int(end_time-2)) # TODO: Find most optimal?
-
-    if field_1 != 5 and field_2 != 5:
-        weight[0,field_1] = 1
-        weight[0,field_2] = 1
-
-        inactiveTimes[0,field_1] = T
-        actionTimes[0,field_2] = T
-
-        inactiveTimes[0,field_2] = end_time
-        actionTimes[0,field_1] = 0
-    elif field_1 == 5 and field_2 != 5:
-        weight[0,field_2] = 1
-        inactiveTimes[0,field_2] = end_time
-        actionTimes[0,field_2] = T
-    elif field_1 != 5 and field_2 == 5:
-        weight[0,field_1] = 1
-        inactiveTimes[0,field_1] = T
-        actionTimes[0,field_1] = 0
-
-    generate_instance(init_positions,weight,actionTimes,inactiveTimes,or_x, or_z,dictionary, groupID = 0)
-    
-    # Save trajectories
-    mode = "Evaluation\\Flock"
-    S_true=make_trajectory(1,mode,name = name)
-
-    return S_true
-
-
-    """
-    A measure of the "stopping" behaviour.
-    This corresponds to the amount of time that speed is 0 (or less than a tolerance).
-    """
-    return trajectory
-
 def read_value_csv_files(csv_directory):
     csv_files = [f for f in os.listdir(csv_directory) if f.endswith('.csv')]
 
@@ -79,7 +19,7 @@ def read_value_csv_files(csv_directory):
     column_names = ['timestep','pos_x', 'pos_z']
 
     row_threshold = 3
-    for filename in tqdm(csv_files):
+    for filename in tqdm(csv_files): # TODO
         # Read the CSV file into a pandas DataFrame and assign column names
         df = pd.read_csv(os.path.join(csv_directory, filename), 
             header=None, names=column_names, 
@@ -245,17 +185,20 @@ if __name__ ==  '__main__':
     values_dict = read_value_csv_files(values_traj_directory)    # print(values_dict['0IF_0_1_T5_d8_a1.csv'])
 
     # Prepare search database:
-    data, values_dict, max_value = prepare_search_database(values_dict)        
+    data_v, values_dict, max_value = prepare_search_database(values_dict)   
+
     
     # Search database with query:
     search_dict = {}
-    for query, query_traj in tqdm(queries_dict.items()):
+    json_path = "C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Experiments\Evaluation"
+    json_name = json_path + "\search_dict.json"
+    for query, query_traj in queries_dict.items():
         # Prepare query for searching:
         rotated_points, max_dist_value, max_width_value = centre_and_rotate(query_traj)
         y_stretched = stretch_points(rotated_points, max_value)
 
         dist_dict = {}
-        for search_key, search_value in values_dict.items():
+        for search_key, search_value in tqdm(values_dict.items()):
             """
             Search values have timestep 0.1s + they start from 0.1s.
             Query values have timesteps according to their source e.g., Flock = 0.04s, + they start for 0s.
@@ -267,18 +210,45 @@ if __name__ ==  '__main__':
         found_key = min(dist_dict, key=dist_dict.get)
         query_new = query.split('.csv')[0]
         search_dict[query_new] = found_key
-    # print(search_dict)
+        with open(json_name, 'w') as json_file:
+            json.dump(search_dict, json_file, indent=4)
 
     final_dict = {}
     metric = 0
-    # TODO: confusion matrix
+    gt_dict = {"1_1": 0, "1_2": 1, "1_3": 2, "1_4": 3, "1_5": 4,
+        "2_1": 5, "2_2": 6, "2_3": 7, "2_4": 8, "2_5": 9,
+        "3_1": 10, "3_2": 11,"3_3": 12, "3_4": 13, "3_5": 14,
+        "4_1": 15, "4_2": 16, "4_3": 17, "4_4": 18, "4_5": 19,
+        "5_1": 20, "5_2": 21, "5_3": 22, "5_4": 23, "5_5": 24,
+        "0_0": 12, "0_1": 10, "0_2": 11, "0_3": 12, "0_4": 13, "0_5": 14, "0_6": 13,
+        "1_0": 2, "2_0": 7, "3_0": 12, "4_0": 17, "5_0": 22, "6_0":17,
+        "1_6":3, "2_6":8, "3_6":13, "4_6":18, "5_6":23, "6_6":18,
+        "6_1":15, "6_2":16, "6_3":17, "6_4":18, "6_5":19}
+    eval_pred = []
+    eval_gt = []
     for key in c_dict.keys():
         key_new = key.split('.npz')[0]
         pred = c_dict[key]
         pseudo = search_dict[key_new]
         pseudo_gt = pseudo.split('IF_')[1].split('_T')[0]
-        final_dict[key_new] = [pred,pseudo_gt]
-        if pred == pseudo_gt:
+        final_dict[key_new] = [pred, pseudo_gt]
+        pseudo_gt_class = gt_dict[pseudo_gt]
+        pred_class = gt_dict[pred]
+        # Measure accuracy:
+        if pred_class == pseudo_gt_class:
             metric += 1
+        eval_pred.append(pred_class)
+        eval_gt.append(pseudo_gt_class)
+
     print(final_dict)
     print("Accuracy: ", (metric/len(c_dict.keys())) * 100, " %")
+    # Calculate confusion:
+    confusion = confusion_matrix(eval_gt, eval_pred)
+    plt.figure(figsize=(8, 6))
+    sns.heatmap(confusion, annot=False, fmt='d', cmap='Blues')
+    plt.xlabel('Predicted')
+    plt.ylabel('True')
+    plt.title(f'Confusion Matrix')
+    plt.savefig(f'{json_path}\\confusion_matrix.png')
+
+    
