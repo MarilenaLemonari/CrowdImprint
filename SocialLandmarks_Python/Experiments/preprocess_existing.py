@@ -50,7 +50,7 @@ def read_csv_files(csv_directory):
     min_x = []
     min_z = []
     max_z = []
-    for filename in tqdm(csv_files):
+    for filename in tqdm(csv_files): #TODO
         # Read the CSV file into a pandas DataFrame and assign column names
         # df = pd.read_csv(os.path.join(csv_directory, filename), 
         #     header=None, names=column_names, 

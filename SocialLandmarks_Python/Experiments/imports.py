@@ -19,6 +19,9 @@ import torch.nn.functional as F
 import json
 import seaborn as sns
 import time
+from skimage.metrics import structural_similarity as ssim
+from fastdtw import fastdtw
+from scipy.spatial.distance import euclidean
 
 
 # IMPORTS KERAS
