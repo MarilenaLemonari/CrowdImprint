@@ -36,6 +36,12 @@ def fill_pixel(tol, pixel_x, pixel_z, intensity, image, resolution):
     bottom = int(max(pixel_z-tol,0))
     image[left:right,bottom:top] = intensity
     return image
+
+def skiprows(index):
+    if index < 0:
+        return True
+    else:
+        return (index % 10 != 0)
     
 def read_csv_files(csv_directory):
     csv_files = [f for f in os.listdir(csv_directory) if f.endswith('.csv')]
@@ -57,7 +63,7 @@ def read_csv_files(csv_directory):
         #     skiprows=None,
         #     #skiprows=lambda index: index == 0 or skip_rows(index, row_step),
         #     usecols=[0, 1, 2])
-        df = pd.read_csv(os.path.join(csv_directory, filename), header=None)
+        df = pd.read_csv(os.path.join(csv_directory, filename), header=None, skiprows= skiprows)
         df[column_names] = df[0].str.split(';', expand=True)
         df[column_names[0]] = df[column_names[0]].astype(float) 
         df[column_names[1]] = df[column_names[1]].astype(float)
@@ -65,11 +71,10 @@ def read_csv_files(csv_directory):
         df.drop(0, axis=1, inplace=True)
         if df.shape[0] < row_threshold:
             continue
-        
         df["speed"] = 0
         for i in range(1, len(df)):
             df.loc[i, "speed"] = math.sqrt((df.loc[i, 'pos_x'] - df.loc[i - 1, 'pos_x']) ** 2 + (df.loc[i, 'pos_z'] - df.loc[i - 1, 'pos_z']) ** 2)
-        
+
         min_x.append(min(df["pos_x"]))
         max_x.append(max(df["pos_x"]))
         min_z.append(min(df["pos_z"]))
@@ -101,23 +106,23 @@ def read_csv_files(csv_directory):
             all_dfs.append(df)
     
     # Specific source assumption for Arxiepiskopi:
-    # maxX = np.max(max_x)
-    # minX = np.min(min_x)
-    # maxZ = np.max(max_z)
-    # minZ = np.min(min_z)
-    # source_x = (minX + maxX)/2
-    # source_z = minZ - 1
+    maxX = np.max(max_x)
+    minX = np.min(min_x)
+    maxZ = np.max(max_z)
+    minZ = np.min(min_z)
+    source_x = (minX + maxX)/2
+    source_z = minZ - 1
     # Specific source assumption for Zara03:
-    source_x = 0.6
-    source_z = 0.15
+    # source_x = 0.6
+    # source_z = 0.15
 
     for filename, df in data_dict.items():
         # Normalize to [0, 1]
         bound_min = min(np.min(df["pos_x"]), np.min(df["pos_z"]), source_x, source_z) # Source is no longer at (0,0)
         bound_max = max(np.max(df["pos_x"]), np.max(df["pos_z"]), source_x, source_z)
 
-        bound_max += 0.5
-        bound_min -= 0.5 
+        bound_max += 1.5
+        bound_min -= 1.5
 
         df["pos_x"] = (df['pos_x'] - bound_min) / (bound_max - bound_min) * (1 - 0) 
         df["pos_z"] = (df['pos_z'] - bound_min) / (bound_max - bound_min) * (1 - 0) 
@@ -242,8 +247,8 @@ def create_images(key, value, dataset_name, resolution= 32):
     # tifffile.imwrite(dataset_name + "\\" + key + '_s' + '.tif', image)
 
     # Place source 
-    # image[int(source_pos_x), int(source_pos_z)] = 1 # TODO decide whether to include source in image.
-    # image = fill_pixel(1, int(source_pos_x), int(source_pos_z), 1, image, resolution)
+    image[int(source_pos_x), int(source_pos_z)] = 1 # TODO decide whether to include source in image.
+    image = fill_pixel(1, int(source_pos_x), int(source_pos_z), 1, image, resolution)
     tifffile.imwrite(dataset_name + "\\" + key + '.tif', image)
 
 def generate_python_files(folder_path, name):
@@ -294,8 +299,8 @@ def existing_data_preprocessing(current_file_dir, name):
 if __name__ ==  '__main__':
     current_file_dir = "C:\PROJECTS\SocialLandmarks\Data\Trajectories"
     # name = "\Zara\Zara03"
-    # name = "\Flock"
-    name = "\Students\Students01"
+    name = "\Flock"
+    # name = "\Students\Students01"
     # name = "\eth_hotel.txt" # TODO
     
     existing_data_preprocessing(current_file_dir, name)

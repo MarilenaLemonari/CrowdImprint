@@ -224,7 +224,7 @@ if __name__ ==  '__main__':
     else:
       dictionary[i] = behavior_list[i]
 
-  category = "Testing" 
+  category = "Training" 
   if category == "Training":
     repeat = 10000 * (len(behavior_list)-2) # TODO:change
     prefix = 'IF_'
@@ -243,7 +243,7 @@ if __name__ ==  '__main__':
       field_2 = random.randint(1,len(behavior_list)-2)
       end_time = random.randint(6,15)
       max_radius = end_time/4 
-      min_radius = 0.5
+      min_radius = 1
       radius = random.uniform(min_radius, max_radius)
       T = random.randint(3,int(end_time-3)) # TODO: min switch
 
@@ -259,6 +259,8 @@ if __name__ ==  '__main__':
         radius = end_time/2
         if field_1 == 4:
           T = random.randint(int(end_time-4),int(end_time-2))
+        else:
+          T = random.randint(3,int(end_time-3))
 
       # Initialise agent and simulation duration:
       x0 = 0

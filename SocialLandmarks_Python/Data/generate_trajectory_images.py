@@ -129,9 +129,9 @@ def create_images(key, value, dataset_name, resolution= 32):
             image[pixel_x,pixel_z] = cur_speed
         # image[pixel_x,pixel_z] = cur_speed
 
-    # choices = [0, 1]
-    # probabilities = [0.2, 0.8]
-    # chosen_number = random.choices(choices, probabilities)[0]
+    choices = [0, 1]
+    probabilities = [0.2, 0.8]
+    chosen_number = random.choices(choices, probabilities)[0]
 
     image[pixel_x_init,pixel_z_init] = 1
     image = fill_pixel(1, pixel_x_init, pixel_z_init, 1, image, resolution)
@@ -328,6 +328,5 @@ if __name__ ==  '__main__':
         file_exists = any(file.startswith(prefix) for file in files)
         if file_exists == False:
             empty_predictions = create_images(prefix, value, folder_path, resolution=32) 
-            # TODO: 64 resolution and have stop tol 3, init tol 2 and source tol 1
 
     print("DONE! Preprocessing Successful.")

@@ -153,60 +153,8 @@ def prepare_search_database(values_dict):
 
     return data, values_dict, max_value
 
-
-if __name__ ==  '__main__':
-    """
-    Evaluation with existing dataset is limited to measuring % success in behavior replication.
-    The following code then does the following:
-        i. 
-        iii. Trajectory comparison with inputs/gts given same initial positions.
-        WE assume appropriate source placement.
-    """
-
-    model_name = "trial2.pth"
-    model_type = "pytorch"
-    dataset_name = "Flock"
-    # dataset_name = "Zara"
-    # dataset_name = "Students"
-    folder_path = f'C:\\PROJECTS\\SocialLandmarks\\SocialLandmarks_Python\\Data\\PythonFiles\\{dataset_name}\\'  
-    x_test, pred_dict = load_inference_data(folder_path, return_dict=True)
-    c_batch_size = x_test.shape[0]
-    batch_size = 32
-    predictions, predicted_labels = model_inference(model_name, model_type, x_test, batch_size)
-    combinations, c_dict = decode_labels(predicted_labels, pred_dict)
-    # print(c_dict)
-
-    # Load images:
-    search_path = 'C:/PROJECTS/SocialLandmarks/SocialLandmarks_Python/Data/Images/SingleSwitch_Trial2' 
-    all_search_pnts = os.listdir(search_path)
-    tif_s = [file for file in all_search_pnts if file.lower().endswith('.tif')]
-
-    query_path = 'C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\Images\Flock'
-    all_query_pnts = os.listdir(query_path)
-    tif_q = [file for file in all_query_pnts if file.lower().endswith('.tif')]
-    
-    search_dict = {}
-    json_path = "C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Experiments\Evaluation"
-    json_name = json_path + "\search_dict.json"
-    for query in tif_q:
-        image_path = os.path.join(query_path, query)
-        image1 = cv2.imread(image_path, cv2.IMREAD_UNCHANGED)
-        # cv2.imshow('image',image)
-        # cv2.waitKey(0)
-        # cv2.imwrite(os.curdir + "imag.tif", image)
-        query_new = query.split('.tif')[0]
-        dist_dict = {}
-        for search_value in tqdm(tif_s): # TODO
-            image_path = os.path.join(search_path, search_value)
-            image2 = cv2.imread(image_path, cv2.IMREAD_UNCHANGED)
-            (score, diff) = ssim(image1, image2, full=True, data_range=image1.max() - image1.min())
-            dist_dict[search_value] = score
-        found_key = max(dist_dict, key=dist_dict.get)
-        search_dict[query_new] = found_key
-        
-
-    """
-    # METHOD 1:
+def evaluate_trajectories():
+    # METHOD 1: Compare trajectories
 
     # Load trajectories:
     query_file_dir = "C:\PROJECTS\SocialLandmarks\Data\Trajectories"
@@ -218,7 +166,6 @@ if __name__ ==  '__main__':
 
     # Prepare search database:
     data_v, values_dict, max_value = prepare_search_database(values_dict)   
-
     
     # Search database with query:
     search_dict = {}
@@ -240,7 +187,153 @@ if __name__ ==  '__main__':
         search_dict[query_new] = found_key
         with open(json_name, 'w') as json_file:
             json.dump(search_dict, json_file, indent=4)
+
+    return search_dict, json_path
+
+def evaluate_images():
+    # METHOD 2: Compare Images
+    # Load images:
+    search_path = 'C:/PROJECTS/SocialLandmarks/SocialLandmarks_Python/Data/Images/SingleSwitch_Trial2' 
+    all_search_pnts = os.listdir(search_path)
+    tif_s = [file for file in all_search_pnts if file.lower().endswith('.tif')]
+
+    query_path = 'C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\Images\Flock'
+    all_query_pnts = os.listdir(query_path)
+    tif_q = [file for file in all_query_pnts if file.lower().endswith('.tif')]
+    
+    search_dict = {}
+    json_path = "C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Experiments\Evaluation"
+    json_name = json_path + "\search_dict.json"
+    for query in tqdm(tif_q):
+        image_path = os.path.join(query_path, query)
+        image1 = cv2.imread(image_path, cv2.IMREAD_UNCHANGED)
+        # cv2.imshow('image',image)
+        # cv2.waitKey(0)
+        # cv2.imwrite(os.curdir + "imag.tif", image)
+        query_new = query.split('.tif')[0]
+        dist_dict = {}
+        for search_value in tif_s: 
+            image_path = os.path.join(search_path, search_value)
+            image2 = cv2.imread(image_path, cv2.IMREAD_UNCHANGED)
+            (score, diff) = ssim(image1, image2, full=True, data_range=image1.max() - image1.min())
+            dist_dict[search_value] = score
+        found_key = max(dist_dict, key=dist_dict.get)
+        search_dict[query_new] = found_key
+        with open(json_name, 'w') as json_file:
+            json.dump(search_dict, json_file, indent=4)
+
+    return search_dict, json_path
+
+def evaluate_dedicated_metric():
+    # METHOD 3:
+    print("evaluate_dedicated_metrics()")
+
+    # Load trajectories:
+    file_dir = "C:\PROJECTS\SocialLandmarks\Data\Trajectories"
+    name = "\Flock"
+    traj_directory  = file_dir + name + "\\"
+    traj_dict = read_csv_files(traj_directory)
+    
+    final_dict = {}
+    for agent_id, agent_traj in traj_dict.items():
+        metrics_dict = {}
+        timestep = 0.4 # For flock. TODO
+        tol = 1/timestep
+        frames = len(agent_traj)
+        source_x = agent_traj["norm_source"].iloc[0]
+        source_z = agent_traj["norm_source"].iloc[1]
+        stop_metric = 0 
+        dfs = 0 # distance from source
+        circling_metric = 0
+        afs = 0 # angle from source
+        attract_metric = 0
+        path_x = []
+        path_z = []
+        uni_metric = 0
+        avoid_metric = 0
+        steps = 0
+        for i in range(frames):
+            pos_x = agent_traj["pos_x"].iloc[i]
+            pos_z = agent_traj["pos_z"].iloc[i]
+            speed = agent_traj["speed"].iloc[i]
+            if speed <= 0.001:
+                stop_metric += 1 
+            dfs_new = math.dist((pos_x, pos_z),(source_x, source_z)) 
+            if abs(dfs - dfs_new) <= 0.0005:
+                circling_metric += 1
+            dfs = dfs_new
+            afs_new = math.degrees(math.atan2(source_z - pos_z, source_x - pos_x)) 
+            if abs(afs-afs_new) <= 0.01:
+                attract_metric += 1
+            afs = afs_new
+            if (i % int(tol)) == 0:
+                if i == 0:
+                    spawn = [pos_x, pos_z]
+                else:
+                    goal = [pos_x, pos_z]
+                    m = (goal[1]-spawn[1])/(goal[0]- spawn[0])
+                    b = goal[1] - m * goal[0]
+                    optimal_z = m * np.array(path_x) + b
+                    deviation = np.linalg.norm(optimal_z - np.array(path_z))
+                    uni_metric += deviation
+                    steps += 1
+                    coefficients = np.polyfit(np.array(path_x), np.array(path_z), 2)
+                    polynomial = np.poly1d(coefficients)
+                    y_curve = polynomial(np.array(path_x))
+                    deviation_curve = np.linalg.norm(y_curve - np.array(path_z))
+                    avoid_metric += deviation_curve
+                    spawn = goal
+                    path_x = []
+                    path_z = []
+            else:
+                path_x.append(pos_x)
+                path_z.append(pos_z)
+            # exit()
+        stop_metric /= frames
+        circling_metric /= frames
+        attract_metric /= frames
+        uni_metric /= steps
+        avoid_metric /= steps
+        metrics_dict["stop_metric"] = stop_metric
+        metrics_dict["circling_metric"] = circling_metric
+        metrics_dict["attract_metric"] = attract_metric
+        metrics_dict["uni_metric"] = uni_metric
+        metrics_dict["avoid_metric"] = avoid_metric
+        final_dict[agent_id] = metrics_dict
+  
+    return final_dict
+
+if __name__ ==  '__main__':
     """
+    Evaluation with existing dataset is limited to measuring % success in behavior replication.
+    The following code then does the following:
+        i. 
+        iii. Trajectory comparison with inputs/gts given same initial positions.
+        WE assume appropriate source placement.
+    """
+
+    model_name = "model_final.pth"
+    model_type = "pytorch"
+    dataset_name = "Flock"
+    # dataset_name = "Zara"
+    # dataset_name = "Students"
+    folder_path = f'C:\\PROJECTS\\SocialLandmarks\\SocialLandmarks_Python\\Data\\PythonFiles\\{dataset_name}\\'  
+    x_test, pred_dict = load_inference_data(folder_path, return_dict=True)
+    c_batch_size = x_test.shape[0]
+    batch_size = 32
+    predictions, predicted_labels = model_inference(model_name, model_type, x_test, batch_size)
+    combinations, c_dict = decode_labels(predicted_labels, pred_dict)
+    print(c_dict)
+
+    search_dict, json_path = evaluate_trajectories()
+    # search_dict, json_path = evaluate_images()
+
+    # final_dict = evaluate_dedicated_metric()
+    # json_path = "C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Experiments\Evaluation"
+    # json_name = json_path + "\\final_dict.json"
+    # with open(json_name, 'w') as json_file:
+    #     json.dump(final_dict, json_file, indent=4)
+
 
     final_dict = {}
     metric = 0
@@ -279,4 +372,3 @@ if __name__ ==  '__main__':
     plt.ylabel('True')
     plt.title(f'Confusion Matrix')
     plt.savefig(f'{json_path}\\confusion_matrix.png')
-    
