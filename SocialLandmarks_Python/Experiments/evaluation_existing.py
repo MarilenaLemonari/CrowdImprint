@@ -193,7 +193,7 @@ def evaluate_trajectories():
 def evaluate_images():
     # METHOD 2: Compare Images
     # Load images:
-    search_path = 'C:/PROJECTS/SocialLandmarks/SocialLandmarks_Python/Data/Images/SingleSwitch_Trial2' 
+    search_path = 'C:/PROJECTS/SocialLandmarks/SocialLandmarks_Python/Data/Images/SingleSwitch' 
     all_search_pnts = os.listdir(search_path)
     tif_s = [file for file in all_search_pnts if file.lower().endswith('.tif')]
 
@@ -325,8 +325,8 @@ if __name__ ==  '__main__':
     combinations, c_dict = decode_labels(predicted_labels, pred_dict)
     print(c_dict)
 
-    search_dict, json_path = evaluate_trajectories()
-    # search_dict, json_path = evaluate_images()
+    # search_dict, json_path = evaluate_trajectories()
+    search_dict, json_path = evaluate_images()
 
     # final_dict = evaluate_dedicated_metric()
     # json_path = "C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Experiments\Evaluation"
