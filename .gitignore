@@ -4,6 +4,7 @@
 #
 
 /.venv/
+/Data/Tracking/YOLO/Tracker/myenv/**/
 /**/*.pv
 /**/*.csv
 /**/*.h5

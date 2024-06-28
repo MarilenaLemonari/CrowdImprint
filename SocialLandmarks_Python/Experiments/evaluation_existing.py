@@ -308,7 +308,7 @@ if __name__ ==  '__main__':
     Evaluation with existing dataset is limited to measuring % success in behavior replication.
     The following code then does the following:
         i. 
-        iii. Trajectory comparison with inputs/gts given same initial positions.
+        ii. Trajectory comparison with inputs/gts given same initial positions.
         WE assume appropriate source placement.
     """
 
@@ -333,7 +333,6 @@ if __name__ ==  '__main__':
     # json_name = json_path + "\\final_dict.json"
     # with open(json_name, 'w') as json_file:
     #     json.dump(final_dict, json_file, indent=4)
-
 
     final_dict = {}
     metric = 0
