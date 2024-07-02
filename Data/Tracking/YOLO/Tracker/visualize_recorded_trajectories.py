@@ -11,7 +11,7 @@ import csv
 
 traj_dir = './Trajectories/' 
 traj_files = glob.glob(os.path.join(traj_dir, '*.csv'))
-traj_files = ['./Trajectories/class_4_subject3.csv']
+traj_files = ['./Trajectories/class_1_subject2.csv']
 
 trajectories = []
 plt.figure(figsize=(6, 6))
@@ -24,7 +24,7 @@ for traj_file in traj_files:
     plt.plot(x,y, 'o-', markersize=3)
     plt.plot(traj_array[0,3], traj_array[1,3], '*', markersize = 5)
 
-    # window_size = 5
+    # window_size = 10
     # smoothed_y = np.convolve(y, np.ones(window_size)/window_size, mode='valid')
     # smoothed_x = x[(window_size//2):-(window_size//2)]
     # plt.plot(smoothed_x,smoothed_y, '-', markersize=3)
@@ -34,5 +34,5 @@ plt.ylabel('Y (m)')
 plt.title('Feet Trajectories in World Space')
 plt.grid(True)
 plt.xlim([5, 17])
-plt.ylim([0, 12])
+plt.ylim([0, 15])
 plt.show()

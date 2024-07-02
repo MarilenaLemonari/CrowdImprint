@@ -7,6 +7,7 @@
 /Data/Tracking/YOLO/Tracker/myenv/**/
 /Data/Tracking/YOLO/Tracker/*.pt
 /Data/Tracking/YOLO/Tracker/Images/*.tif
+/Data/Tracking/YOLO/Tracker/Images/**/*.tif
 /**/*.pv
 /**/*.csv
 /**/*.h5

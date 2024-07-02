@@ -303,6 +303,28 @@ def evaluate_dedicated_metric():
   
     return final_dict
 
+def get_gt_instructed(c_dict, gt_dict):
+    folder_path = f'C:\\PROJECTS\\SocialLandmarks\\SocialLandmarks_Python\\Data\\PythonFiles\\Instructed\\'
+    all_gt = os.listdir(folder_path)
+    npz_files = [file for file in all_gt if file.lower().endswith('.npz')]
+    final_dict = {}
+    eval_pred = []
+    eval_gt = []
+    metric = 0
+    for npz_file in npz_files:
+        key = npz_file.split(".npz")[0]
+        value = int(key.split("class_")[1].split("_")[0])
+        pred = gt_dict[c_dict[npz_file]]
+        if value == pred:
+            res = "match"
+            metric += 1
+        else:
+            res = "fail"
+        final_dict[key] = {"pred" : pred, "gt" : value, "success": res}
+        eval_pred.append(pred)
+        eval_gt.append(value)
+    return final_dict, eval_pred, eval_gt, metric
+
 if __name__ ==  '__main__':
     """
     Evaluation with existing dataset is limited to measuring % success in behavior replication.
@@ -314,9 +336,10 @@ if __name__ ==  '__main__':
 
     model_name = "model_final.pth"
     model_type = "pytorch"
-    dataset_name = "Flock"
+    # dataset_name = "Flock"
     # dataset_name = "Zara"
     # dataset_name = "Students"
+    dataset_name = "Instructed"
     folder_path = f'C:\\PROJECTS\\SocialLandmarks\\SocialLandmarks_Python\\Data\\PythonFiles\\{dataset_name}\\'  
     x_test, pred_dict = load_inference_data(folder_path, return_dict=True)
     c_batch_size = x_test.shape[0]
@@ -325,17 +348,6 @@ if __name__ ==  '__main__':
     combinations, c_dict = decode_labels(predicted_labels, pred_dict)
     print(c_dict)
 
-    # search_dict, json_path = evaluate_trajectories()
-    search_dict, json_path = evaluate_images()
-
-    # final_dict = evaluate_dedicated_metric()
-    # json_path = "C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Experiments\Evaluation"
-    # json_name = json_path + "\\final_dict.json"
-    # with open(json_name, 'w') as json_file:
-    #     json.dump(final_dict, json_file, indent=4)
-
-    final_dict = {}
-    metric = 0
     gt_dict = {"1_1": 0, "1_2": 1, "1_3": 2, "1_4": 3, "1_5": 4,
         "2_1": 5, "2_2": 6, "2_3": 7, "2_4": 8, "2_5": 9,
         "3_1": 10, "3_2": 11,"3_3": 12, "3_4": 13, "3_5": 14,
@@ -345,21 +357,35 @@ if __name__ ==  '__main__':
         "1_0": 2, "2_0": 7, "3_0": 12, "4_0": 17, "5_0": 22, "6_0":17,
         "1_6":3, "2_6":8, "3_6":13, "4_6":18, "5_6":23, "6_6":18,
         "6_1":15, "6_2":16, "6_3":17, "6_4":18, "6_5":19}
-    eval_pred = []
-    eval_gt = []
-    for key in c_dict.keys():
-        key_new = key.split('.npz')[0]
-        pred = c_dict[key]
-        pseudo = search_dict[key_new]
-        pseudo_gt = pseudo.split('IF_')[1].split('_T')[0]
-        final_dict[key_new] = [pred, pseudo_gt]
-        pseudo_gt_class = gt_dict[pseudo_gt]
-        pred_class = gt_dict[pred]
-        # Measure accuracy:
-        if pred_class == pseudo_gt_class:
-            metric += 1
-        eval_pred.append(pred_class)
-        eval_gt.append(pseudo_gt_class)
+
+    # search_dict, json_path = evaluate_trajectories()
+    # search_dict, json_path = evaluate_images()
+
+    # final_dict = evaluate_dedicated_metric()
+    final_dict, eval_pred, eval_gt, metric = get_gt_instructed(c_dict, gt_dict)
+    json_path = "C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Experiments\Evaluation"
+    json_name = json_path + "\\final_dict.json"
+    with open(json_name, 'w') as json_file:
+        json.dump(c_dict, json_file, indent=4) # TODO: change c_dict
+    exit()
+
+    # final_dict = {}
+    # metric = 0
+    # eval_pred = []
+    # eval_gt = []
+    # for key in c_dict.keys():
+    #     key_new = key.split('.npz')[0]
+    #     pred = c_dict[key]
+    #     pseudo = search_dict[key_new]
+    #     pseudo_gt = pseudo.split('IF_')[1].split('_T')[0]
+    #     final_dict[key_new] = [pred, pseudo_gt]
+    #     pseudo_gt_class = gt_dict[pseudo_gt]
+    #     pred_class = gt_dict[pred]
+    #     # Measure accuracy:
+    #     if pred_class == pseudo_gt_class:
+    #         metric += 1
+    #     eval_pred.append(pred_class)
+    #     eval_gt.append(pseudo_gt_class)
 
     print(final_dict)
     print("Accuracy: ", (metric/len(c_dict.keys())) * 100, " %")

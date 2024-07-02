@@ -256,7 +256,6 @@ def generate_python_files(folder_path, name):
     all_files = os.listdir(folder_path)
     tif_files = [file for file in all_files if file.lower().endswith('.tif')]
 
-
     for tif_file in tqdm(tif_files):
         old_name = tif_file.split('.')[0]
         try:
@@ -297,10 +296,16 @@ def existing_data_preprocessing(current_file_dir, name):
 
 # Execute
 if __name__ ==  '__main__':
-    current_file_dir = "C:\PROJECTS\SocialLandmarks\Data\Trajectories"
-    # name = "\Zara\Zara03"
-    name = "\Flock"
-    # name = "\Students\Students01"
-    # name = "\eth_hotel.txt" # TODO
+    # if existing:
+    # current_file_dir = "C:\PROJECTS\SocialLandmarks\Data\Trajectories"
+    # # name = "\Zara\Zara03"
+    # name = "\Flock"
+    # # name = "\Students\Students01"
+    # # name = "\eth_hotel.txt" # TODO
     
-    existing_data_preprocessing(current_file_dir, name)
+    # existing_data_preprocessing(current_file_dir, name)
+
+    # if captured:
+    folder_path = 'C:\PROJECTS\SocialLandmarks\Data\Tracking\YOLO\Tracker\Images\Instructed'
+    name = "Instructed"
+    generate_python_files(folder_path, name)

@@ -123,7 +123,7 @@ def create_images(key, value, dataset_name, resolution= 32):
             same_speed_count += 1
 
         cur_speed = (1- value["speed"][i])*0.6
-        if same_speed_count >= 5:
+        if same_speed_count >= 10:
             tol = 2
             left = int(max(pixel_x-tol,0))
             right = int(min(pixel_x+tol,resolution))

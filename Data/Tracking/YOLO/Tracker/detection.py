@@ -6,6 +6,7 @@ from tqdm import tqdm
 import glob
 import os
 import csv
+from scipy.signal import savgol_filter
 
 # python3
 # cd C:\PROJECTS\SocialLandmarks\Data\Tracking\YOLO\Tracker
@@ -26,6 +27,11 @@ video_dir = 'E:\WorkCYENS\DataRecording\Videos_Instructed' #'./Videos/'
 video_files = glob.glob(os.path.join(video_dir, '*.mp4'))
 
 all_feet_trajectories = []
+
+video_files = ["E:\WorkCYENS\DataRecording\Videos_Instructed\class_1_subject2.mp4"]
+            #    ,"E:\WorkCYENS\DataRecording\Videos_Instructed\class_1_subject2.mp4"
+            #    ,"E:\WorkCYENS\DataRecording\Videos_Instructed\class_1_subject3.mp4"
+            #    ,"E:\WorkCYENS\DataRecording\Videos_Instructed\class_1_subject5.mp4"]
 
 for video_file in video_files:
     cap = cv2.VideoCapture(video_file)
@@ -104,14 +110,20 @@ for traj in all_feet_trajectories:
     source = [0] * len(traj)
     source[0] = source_x
     source[1] = source_y
+    # Stretch
     y = (y - source_y) * 2 + source_y
     output_name = "class_" + video_files[c].split("class_")[1].split('.mp4')[0] + ".csv"
     output_file = f'.\Trajectories\{output_name}'
     c += 1
+    # Smoothen
     window_size = 5
-    smoothed_y = np.convolve(y, np.ones(window_size)/window_size, mode='valid')
-    smoothed_x = x[(window_size//2):-(window_size//2)]
-    time = time[(window_size//2):-(window_size//2)]
+    poly_order = 2
+    smoothed_y = savgol_filter(y, window_size, poly_order)
+    # Iterate
+    window_s = 20
+    smoothed_y = smoothed_y[::window_s]
+    smoothed_x = x[::window_s]
+    time = time[::window_s]
     source = source[:len(time)]
 
     with open(output_file, mode='w', newline='') as file:
