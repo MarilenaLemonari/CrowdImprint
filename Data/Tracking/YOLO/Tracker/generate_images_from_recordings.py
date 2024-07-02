@@ -69,9 +69,11 @@ def read_csv_files(csv_directory):
         all_dfs.append(df)
     
     for filename, df in data_dict.items():
+        source_x = df["source"].iloc[0]
+        source_y = df["source"].iloc[1]
         # Normalize to [0, 1]
-        bound_min = min(np.min(df["pos_x"]), np.min(df["pos_z"]), 0)
-        bound_max = max(np.max(df["pos_x"]), np.max(df["pos_z"]), 0)
+        bound_min = min(np.min(df["pos_x"]), np.min(df["pos_z"]), source_x, source_y)
+        bound_max = max(np.max(df["pos_x"]), np.max(df["pos_z"]), source_x, source_y)
 
         bound_max += 0.5
         bound_min -= 0.5 
@@ -82,8 +84,8 @@ def read_csv_files(csv_directory):
 
         s = len(df["pos_x"])
         source_norm = np.zeros((s))
-        source_x = df["source"].iloc[0]
-        source_y = df["source"].iloc[1]
+        # source_x = df["source"].iloc[0]
+        # source_y = df["source"].iloc[1]
         source_norm[0] = (source_x - bound_min) / (bound_max - bound_min) * (1 - 0)
         source_norm[1] = (source_y - bound_min) / (bound_max - bound_min) * (1 - 0)
         df["norm_source"] = list(source_norm)

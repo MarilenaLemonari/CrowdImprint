@@ -9,8 +9,9 @@ import csv
 
 # python .\visualize_recorded_trajectories.py
 
-traj_dir = './Trajectories/'  
+traj_dir = './Trajectories/' 
 traj_files = glob.glob(os.path.join(traj_dir, '*.csv'))
+traj_files = ['./Trajectories/class_4_subject3.csv']
 
 trajectories = []
 plt.figure(figsize=(6, 6))

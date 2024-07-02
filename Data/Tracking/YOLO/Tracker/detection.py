@@ -22,7 +22,7 @@ camera_matrix = np.array([
     [0.00000000e+00, 0.00000000e+00, 1.00000000e+00]
 ])
 dist_coeffs = np.array([1.10624914e-02, -2.59719368e+00, -5.70461677e-03, -1.22012466e-02, 6.42489045e+00])
-video_dir = './Videos/'  
+video_dir = 'E:\WorkCYENS\DataRecording\Videos_Instructed' #'./Videos/'  
 video_files = glob.glob(os.path.join(video_dir, '*.mp4'))
 
 all_feet_trajectories = []
@@ -50,6 +50,7 @@ for video_file in video_files:
 
             # Perform YOLO object detection
             results = model(undistorted_frame)
+            
 
             for result in results:
                 boxes = result.boxes
