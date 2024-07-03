@@ -159,7 +159,7 @@ def load_data(check = False, val = False, test = False):
         print(class_0,class_1,class_2,class_3,class_4,class_5,class_6,class_7,class_8,class_9,class_10,class_11,class_12,class_13,class_14,class_15,
         class_16, class_17, class_18, class_19, class_20, class_21, class_22, class_23, class_24, class_25, class_26, class_27, class_28, class_29, class_30,
         class_31, class_32, class_33, class_34, class_35)
-        # 2043 2059 2014 2084 2102 1921 2023 2014 1959 1935 2106 1991 2023 2051 1970 1925 1965 1953 1953 2008 1942 2049 1991 1916 2003 
+        # 1029 967 997 956 1065 1015 995 1037 1013 963 988 938 1006 967 998 990 1028 996 1002 1025 952 999 1044 1022 1008 
 
     images = np.array(loaded_images)
     # images = scale_to_standard_normal(loaded_images) # TODO

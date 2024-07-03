@@ -11,6 +11,7 @@ import os.path
 import random
 from tqdm import tqdm
 import math
+import pandas as pd
 
 #TODO: go to \examples with cd
 # cd C:\PROJECTS\SocialLandmarks
@@ -186,7 +187,21 @@ def make_trajectory(n,n_agents,mode,category):
   S_true=[]
   for i in range(1,n_agents):
     os.rename(f"C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\Trajectories\{folder}\output_{i}.csv",f"C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\Trajectories\{folder}\{n}_a{i}.csv")
-    S_true.append(load_trajectories(f"C:/PROJECTS/SocialLandmarks/SocialLandmarks_Python/Data/Trajectories/{folder}/{n}_a{i}.csv", 0))
+    # 1_4 inverse
+    if "flagged" in n:
+      df = pd.read_csv(f"C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\Trajectories\{folder}\{n}_a{i}.csv", header = None)
+      df.iloc[:, [1, 2]] = df.iloc[::-1, [1, 2]].values
+      # df_reversed = df.iloc[::-1].reset_index(drop=True)
+      os.remove(f"C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\Trajectories\{folder}\{n}_a{i}.csv")
+      if_old  = n.split("IF_")[1].split("_1")[0]
+      if_new = f"IF_1_{if_old}"
+      n_new_p1 = n.split("flagged")[0] #.replace(if_old,"")
+      # n_new_p2 = n.split("flagged")[1]
+      n_new = n_new_p1.replace("IF_" + if_old + "_1", if_new)
+      df.to_csv(f"C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\Trajectories\{folder}\{n_new}_a{i}.csv", header = False, index=False)
+    else:
+      n_new = n
+    S_true.append(load_trajectories(f"C:/PROJECTS/SocialLandmarks/SocialLandmarks_Python/Data/Trajectories/{folder}/{n_new}_a{i}.csv", 0))
   return S_true
 #---------------------------------------------------------------------------------------------------------------
 
@@ -226,7 +241,7 @@ if __name__ ==  '__main__':
 
   category = "Training" 
   if category == "Training":
-    repeat = 10000 * (len(behavior_list)-2) # TODO:change
+    repeat = 5000 * (len(behavior_list)-2) # TODO:change 10000
     prefix = 'IF_'
   elif category == "Testing":
     repeat = 500
@@ -239,6 +254,7 @@ if __name__ ==  '__main__':
   if mode == "SingleSwitch":
     for r in tqdm(range(repeat)):
       # Same distinct behaviors (5 in total):
+      flag_1_4 = ''
       field_1 = random.randint(1,len(behavior_list)-2)
       field_2 = random.randint(1,len(behavior_list)-2)
       end_time = random.randint(6,15)
@@ -261,6 +277,11 @@ if __name__ ==  '__main__':
           T = random.randint(int(end_time-4),int(end_time-2))
         else:
           T = random.randint(3,int(end_time-3))
+      if field_1 == 1 and field_2 == 4:
+        field_2 = 1
+        field_1 = 4
+        flag_1_4 = "flagged"
+
 
       # Initialise agent and simulation duration:
       x0 = 0
@@ -286,7 +307,7 @@ if __name__ ==  '__main__':
         else:
           # Agent in front of source:
           field_1 = 6
-      if field_2 == 0:
+      if field_2 == 4:
         field_2 = avoid_dict[random.randint(0,1)]
 
       # If sampled field is circle around randomly choose clockwise or anticlockwise options
@@ -339,7 +360,8 @@ if __name__ ==  '__main__':
         inactiveTimes[0,first_field] = T
         actionTimes[0,first_field] = 0
 
-      n=str(counter)+prefix+str(field_1)+"_"+str(field_2)+"_T"+str(T)+"_d"+str(end_time)
+
+      n=str(counter)+prefix+str(field_1)+"_"+str(field_2)+"_T"+str(T)+"_d"+str(end_time)+str(flag_1_4)
       counter += 1
 
       generate_instance(n,init_positions,weight,actionTimes,inactiveTimes,or_x, or_y, category,dictionary,mode)
