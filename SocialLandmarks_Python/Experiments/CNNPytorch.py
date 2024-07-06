@@ -51,8 +51,10 @@ class CNN(nn.Module):
         x = self.dropout5(x)
         
         x = self.fc4(x)
-        
-        return F.log_softmax(x, dim=1)
+        #x = F.softmax(x, dim=1) # TODO retrain
+        x = F.log_softmax(x, dim=1)
+
+        return x 
     
 class CNN10class(nn.Module):
     def __init__(self):

@@ -75,8 +75,8 @@ def read_csv_files(csv_directory):
         bound_min = min(np.min(df["pos_x"]), np.min(df["pos_z"]), source_x, source_y)
         bound_max = max(np.max(df["pos_x"]), np.max(df["pos_z"]), source_x, source_y)
 
-        bound_max += 0.5
-        bound_min -= 0.5 
+        bound_max += 1.5
+        bound_min -= 1.5
 
         df["pos_x"] = (df['pos_x'] - bound_min) / (bound_max - bound_min) * (1 - 0) 
         df["pos_z"] = (df['pos_z'] - bound_min) / (bound_max - bound_min) * (1 - 0) 
@@ -163,16 +163,20 @@ def create_centrered_images(key, value, dataset_name, resolution= 32):
     # plt.ylabel("Position Z")
     # plt.title("Normalized Path Image")
     # plt.savefig(dataset_name + "\\" + key)
-    max_diff = max(value["norm_source"][0], 1 - value["norm_source"][0])
+    max_diff_x = max(value["norm_source"][0], 1 - value["norm_source"][0])
+    max_diff_z = max(value["norm_source"][1], 1 - value["norm_source"][1])
     # transform from [0,1] to range where source pos is 0:
-    source_pos = value["norm_source"][0] - value["norm_source"][0]
+    source_pos_x = value["norm_source"][0] - value["norm_source"][0]
+    source_pos_z = value["norm_source"][1] - value["norm_source"][1]
     pixel_pos_x = value["pos_x"] - value["norm_source"][0]
-    pixel_pos_z = value["pos_z"] - value["norm_source"][0]
+    pixel_pos_z = value["pos_z"] - value["norm_source"][1]
     # Zoom
-    source_pos *= ((resolution - 1) / ( 2* max_diff))
-    pixel_pos_x *= ((resolution - 1) / (2 * max_diff))
-    pixel_pos_z *= ((resolution - 1) / (2 * max_diff))
-    source_pos += ((resolution - 1)/2)
+    source_pos_x *= ((resolution - 1) / ( 2* max_diff_x))
+    source_pos_z *= ((resolution - 1) / ( 2* max_diff_z))
+    pixel_pos_x *= ((resolution - 1) / (2 * max_diff_x))
+    pixel_pos_z *= ((resolution - 1) / (2 * max_diff_z))
+    source_pos_x += ((resolution - 1)/2)
+    source_pos_z += ((resolution - 1)/2)
     pixel_pos_x += ((resolution - 1)/2)
     pixel_pos_z += ((resolution - 1)/2)
     image = np.zeros((resolution,resolution), np.float32)
@@ -188,7 +192,7 @@ def create_centrered_images(key, value, dataset_name, resolution= 32):
             same_speed_count += 1
 
         cur_speed = (1- value["speed"][i])*0.6
-        if same_speed_count >= 5:
+        if same_speed_count >= 10:
             # tol = 1
             # left = int(max(pixel_x-tol,0))
             # right = int(min(pixel_x+tol,resolution))
@@ -206,8 +210,8 @@ def create_centrered_images(key, value, dataset_name, resolution= 32):
     # tifffile.imwrite(dataset_name + "\\" + key + '_s' + '.tif', image)
 
     # Place source 
-    image[int(source_pos), int(source_pos)] = 1
-    image = fill_pixel(1, int(source_pos), int(source_pos), 1, image, resolution)
+    image[int(source_pos_x), int(source_pos_z)] = 1
+    image = fill_pixel(1, int(source_pos_x), int(source_pos_z), 1, image, resolution)
     tifffile.imwrite(dataset_name + "\\" + key + '.tif', image)
 
 def create_structured_images(key, value, dataset_name, resolution= 32):
@@ -331,6 +335,6 @@ if __name__ ==  '__main__':
         files = os.listdir(folder_path)
         file_exists = any(file.startswith(prefix) for file in files)
         if file_exists == False:
-            empty_predictions = create_images(prefix, value, folder_path, resolution=32) 
+            empty_predictions = create_centrered_images(prefix, value, folder_path, resolution=32) 
 
     print("DONE! Preprocessing Successful.")

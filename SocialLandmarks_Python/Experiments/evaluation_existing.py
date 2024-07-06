@@ -334,7 +334,7 @@ if __name__ ==  '__main__':
         WE assume appropriate source placement.
     """
 
-    model_name = "model_final.pth"
+    model_name = "new_model_centered.pth"
     model_type = "pytorch"
     # dataset_name = "Flock"
     # dataset_name = "Zara"
@@ -347,6 +347,12 @@ if __name__ ==  '__main__':
     predictions, predicted_labels = model_inference(model_name, model_type, x_test, batch_size)
     combinations, c_dict = decode_labels(predicted_labels, pred_dict)
     print(c_dict)
+    json_path = "C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Experiments\Evaluation"
+    json_name = json_path + "\\c_dict.json"
+    with open(json_name, 'w') as json_file:
+        json.dump(c_dict, json_file, indent=4)
+    
+    exit()
 
     gt_dict = {"1_1": 0, "1_2": 1, "1_3": 2, "1_4": 3, "1_5": 4,
         "2_1": 5, "2_2": 6, "2_3": 7, "2_4": 8, "2_5": 9,
@@ -366,8 +372,8 @@ if __name__ ==  '__main__':
     json_path = "C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Experiments\Evaluation"
     json_name = json_path + "\\final_dict.json"
     with open(json_name, 'w') as json_file:
-        json.dump(c_dict, json_file, indent=4) # TODO: change c_dict
-    exit()
+        json.dump(final_dict, json_file, indent=4) # TODO: change c_dict
+    # exit()
 
     # final_dict = {}
     # metric = 0

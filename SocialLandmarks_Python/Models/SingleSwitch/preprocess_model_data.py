@@ -10,6 +10,7 @@ from tqdm import tqdm
 import pickle
 import torch.utils.data as data
 import tifffile
+import random
 
 # python3 C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Models\SingleSwitch\preprocess_model_data.py
 
@@ -69,7 +70,7 @@ for tif_file in tqdm(tif_files):
         counter += 1
         image_path = os.path.join(folder_path, tif_file)
         image = cv2.imread(image_path, cv2.IMREAD_UNCHANGED)
-        np.savez(f'C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\PythonFiles\SingleSwitch\{old_name}_{counter}_rot_0.npz', image)
+        # np.savez(f'C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\PythonFiles\SingleSwitch\{old_name}_{counter}_rot_0.npz', image)
         # tifffile.imwrite("C:\\PROJECTS\\SocialLandmarks\\SocialLandmarks_Python\\Data\\PythonFiles\SingleSwitch\\unnormalized.tif", image)
         # np.savez(f'C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\PythonFiles\SingleSwitch\{old_name}_{counter}_norm_type_{class_id}_rot_0.npz', normalize(image))
         # np.savez(f'C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\PythonFiles\SingleSwitch\{old_name}_{counter}_noisy_rot_0.npz', add_gaussian_noise(normalize(image)))
@@ -79,12 +80,17 @@ for tif_file in tqdm(tif_files):
         min_angle = -179
         max_angle = 179
         # random_angles = np.random.uniform(min_angle, max_angle, size=5) #size was 10
-        random_angles = [90,180,270]
+        random_angles = [0,90,180,270,360]
+        chosen_rotation = random.choice(random_angles)
+        center = (width // 2, height // 2)
+        rotation_matrix = cv2.getRotationMatrix2D(center, chosen_rotation, 1.0)
+        image_rotated = cv2.warpAffine(image, rotation_matrix, (width, height), flags=cv2.INTER_LINEAR)
+        np.savez(f'C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\PythonFiles\SingleSwitch\{old_name}_{counter}_rot_{int(chosen_rotation)}.npz', image_rotated)
         for i, angle in enumerate(random_angles):
             center = (width // 2, height // 2)
-            rotation_matrix = cv2.getRotationMatrix2D(center, angle, 1.0)
-            image_rotated = cv2.warpAffine(image, rotation_matrix, (width, height), flags=cv2.INTER_LINEAR)
-            # TODO np.savez(f'C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\PythonFiles\SingleSwitch\{old_name}_{counter}_rot_{int(angle)}.npz', image_rotated)
+            # rotation_matrix = cv2.getRotationMatrix2D(center, angle, 1.0)
+            # image_rotated = cv2.warpAffine(image, rotation_matrix, (width, height), flags=cv2.INTER_LINEAR)
+            # np.savez(f'C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\PythonFiles\SingleSwitch\{old_name}_{counter}_rot_{int(angle)}.npz', image_rotated)
             # tifffile.imwrite(f"C:\\PROJECTS\\SocialLandmarks\\SocialLandmarks_Python\\Data\\PythonFiles\SingleSwitch\\imgrot_{angle}.tif", image_rotated)
             # np.savez(f'C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\PythonFiles\SingleSwitch\{old_name}_{counter}_norm_type_2_rot_{int(angle)}.npz', normalize(image_rotated))
             # np.savez(f'C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\PythonFiles\SingleSwitch\{old_name}_{counter}_rot_{int(angle)}.npz', add_gaussian_noise(normalize(image_rotated)))

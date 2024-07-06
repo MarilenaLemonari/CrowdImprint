@@ -51,8 +51,9 @@ class CNN(nn.Module):
         x = self.dropout5(x)
         
         x = self.fc4(x)
+        x = F.log_softmax(x, dim=1) # TODO
         
-        return F.log_softmax(x, dim=1)
+        return x
     
 class CNN10class(nn.Module):
     def __init__(self):
@@ -122,8 +123,8 @@ if __name__ ==  '__main__':
     model, criterion, optimizer, device = instantiate_model()
 
     # batch_size = 10
-    # inputs= torch.randn(batch_size, 1, 32, 32, requires_grad=True)
-    # print(inputs.shape)
+    # inputs = torch.randn(batch_size, 1, 32, 32, requires_grad=True)
+    # model  = CNN()
     # preds=  model(inputs)
     # print(preds, preds.shape)
     # exit()

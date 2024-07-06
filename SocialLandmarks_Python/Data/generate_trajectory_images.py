@@ -192,7 +192,22 @@ def create_centrered_images(key, value, dataset_name, resolution= 32):
             image = fill_pixel(2, pixel_x, pixel_z, cur_speed, image, resolution)
             same_speed_count = 0
         else:
-            image[pixel_x,pixel_z] = cur_speed
+            # Randomly remove pixel:
+            random_remove = random.random()
+            random_add = random.random()
+            if random_remove >= 0.1:
+                image[pixel_x,pixel_z] = cur_speed
+
+            if random_add < 0.1:
+                extra_x_options = [pixel_x + 1, pixel_x - 1, pixel_x]
+                extra_z_options = [pixel_z + 1, pixel_z - 1, pixel_z]
+                extra_x = random.choice(extra_x_options)
+                extra_z = random.choice(extra_z_options)
+                if extra_x == pixel_x and extra_z == pixel_z:
+                    extra_x = pixel_x
+                else:
+                    image[extra_x,extra_z] = cur_speed
+
 
 
     image[pixel_x_init,pixel_z_init] = 1
@@ -202,6 +217,7 @@ def create_centrered_images(key, value, dataset_name, resolution= 32):
     # Place source 
     image[int(source_pos), int(source_pos)] = 1
     image = fill_pixel(1, int(source_pos), int(source_pos), 1, image, resolution)
+
     tifffile.imwrite(dataset_name + "\\" + key + '.tif', image)
 
 def create_structured_images(key, value, dataset_name, resolution= 32):
@@ -327,6 +343,6 @@ if __name__ ==  '__main__':
         files = os.listdir(folder_path)
         file_exists = any(file.startswith(prefix) for file in files)
         if file_exists == False:
-            empty_predictions = create_images(prefix, value, folder_path, resolution=32) 
+            empty_predictions = create_centrered_images(prefix, value, folder_path, resolution=32) 
 
     print("DONE! Preprocessing Successful.")
