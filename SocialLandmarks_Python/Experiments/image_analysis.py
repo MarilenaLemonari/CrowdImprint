@@ -24,7 +24,7 @@ images_array =  images_array[:,np.newaxis, :,:]
 # tifffile.imwrite('img.tif', img)
 
 model = CNN()
-model.load_state_dict(torch.load('C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Models\SingleSwitch\\new_model_2.pth'))
+model.load_state_dict(torch.load('C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Models\SingleSwitch\\new_model_4.pth'))
 
 model.eval()
 
@@ -37,10 +37,7 @@ with torch.no_grad():
 
 print(np.argmax(output[0,:]), np.argmax(output[1,:]), np.argmax(output[2,:]), np.argmax(output[3,:]), np.argmax(output[4,:]))
 
-index = 4
-sorted_indices_0 = sorted(range(len(output[index,:])), key=lambda i: output[index,i], reverse=True)
-print(sorted_indices_0)
-exit()
-print("===============")
-sorted_indices_1 = sorted(range(len(output[1,:])), key=lambda i: output[1,i], reverse=True)
-print(sorted_indices_1)
+index_list = [0,1,2,3,4]
+for index in index_list:
+    sorted_indices = sorted(range(len(output[index,:])), key=lambda i: output[index,i], reverse=True)
+    print("Index ", index, ": ",sorted_indices)

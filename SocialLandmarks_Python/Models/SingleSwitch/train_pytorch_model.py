@@ -153,5 +153,5 @@ if __name__ ==  '__main__':
     filename = 'performance_metrics.json'
     with open(filename, 'w') as json_file:
         json.dump(performance_metrics, json_file, indent=4)
-    torch.save(model.state_dict(), "C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Models\SingleSwitch\\new_model_2.pth")
+    torch.save(model.state_dict(), "C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Models\SingleSwitch\\new_model_4.pth")
     print("SUCCESS! Model is saved.")

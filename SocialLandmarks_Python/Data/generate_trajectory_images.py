@@ -31,12 +31,23 @@ import random
 # cd C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data
 # python3 .\generate_trajectory_images.py
 
-def fill_pixel(tol, pixel_x, pixel_z, intensity, image, resolution):
+def fill_pixel(tol, pixel_x, pixel_z, intensity, image, resolution, add = False):
     left = int(max(pixel_x-tol,0))
     right = int(min(pixel_x+tol,resolution))
     top = int(min(pixel_z+tol,resolution))
     bottom = int(max(pixel_z-tol,0))
     image[left:right,bottom:top] = intensity
+
+    if add == True:
+        random_add = random.random()
+        if random_add < 0.1:
+            extra_x_options = [right + 1, left - 1, pixel_x]
+            extra_z_options = [top + 1, bottom - 1, pixel_z]
+            extra_x = random.choice(extra_x_options)
+            extra_z = random.choice(extra_z_options)
+            if extra_x >= 0 and extra_x < 32 and extra_z >= 0 and extra_z < 32:
+                image[extra_x,extra_z] = 0.6
+
     return image
 
 def read_csv_files(csv_directory):
@@ -182,6 +193,11 @@ def create_centrered_images(key, value, dataset_name, resolution= 32):
             same_speed_count += 1
 
         cur_speed = (1- value["speed"][i])*0.6
+        if cur_speed > 0.2:
+            # Introduce noise in speed:
+            random_noise = random.uniform(-0.15, 0.15)
+            cur_speed += random_noise # from 0.0 up to 0.6
+
         if same_speed_count >= 5:
             # tol = 1
             # left = int(max(pixel_x-tol,0))
@@ -189,16 +205,16 @@ def create_centrered_images(key, value, dataset_name, resolution= 32):
             # top = int(min(pixel_z+tol,resolution))
             # bottom = int(max(pixel_z-tol,0))
             # image[left:right,bottom:top] = cur_speed
-            image = fill_pixel(2, pixel_x, pixel_z, cur_speed, image, resolution)
+            image = fill_pixel(2, pixel_x, pixel_z, cur_speed, image, resolution, True)
             same_speed_count = 0
         else:
-            # Randomly remove pixel:
+            # Randomly remove and add pixel:
             random_remove = random.random()
             random_add = random.random()
             if random_remove >= 0.1:
                 image[pixel_x,pixel_z] = cur_speed
 
-            if random_add < 0.1:
+            if random_add < 0.05:
                 extra_x_options = [pixel_x + 1, pixel_x - 1, pixel_x]
                 extra_z_options = [pixel_z + 1, pixel_z - 1, pixel_z]
                 extra_x = random.choice(extra_x_options)

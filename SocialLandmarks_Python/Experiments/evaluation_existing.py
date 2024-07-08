@@ -334,7 +334,7 @@ if __name__ ==  '__main__':
         WE assume appropriate source placement.
     """
 
-    model_name = "new_model_centered.pth"
+    model_name = "new_model_4.pth"
     model_type = "pytorch"
     # dataset_name = "Flock"
     # dataset_name = "Zara"
@@ -352,7 +352,7 @@ if __name__ ==  '__main__':
     with open(json_name, 'w') as json_file:
         json.dump(c_dict, json_file, indent=4)
     
-    exit()
+    # exit()
 
     gt_dict = {"1_1": 0, "1_2": 1, "1_3": 2, "1_4": 3, "1_5": 4,
         "2_1": 5, "2_2": 6, "2_3": 7, "2_4": 8, "2_5": 9,

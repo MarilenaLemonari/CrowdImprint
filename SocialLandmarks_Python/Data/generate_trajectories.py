@@ -229,8 +229,8 @@ if __name__ ==  '__main__':
   #                  "AvoidNew", "Stop"]
   # behavior_list = ["0_Anticlockwise_final", "1_Unidirectional_final", "2_Attractive_final", "3_Clockwise_final", "4_Avoid_final",
   #                 "Stop", "4_AvoidOpp_final"]
-  behavior_list = ["0_Anticlockwise_final", "1_Unidirectional_final", "2_Attractive_final", "3_Clockwise_final", "4_AvoidV2_final",
-                  "Stop", "4_AvoidOppV2_final"]
+  behavior_list = ["0_Anticlockwise_final", "1_Unidirectional_final", "2_Attractive_final", "3_Clockwise_final", "lastAvoid",
+                  "Stop", "lastAvoid2"]
 
   dictionary = {}
   for i in range(len(behavior_list)-1):
@@ -264,7 +264,7 @@ if __name__ ==  '__main__':
       T = random.randint(3,int(end_time-3)) # TODO: min switch
 
       if field_1 == 2 and field_2 == 2:
-        end_time = random.randint(6,10)
+        end_time = random.randint(3,6)
         radius = end_time + 0.01
       elif field_1 == 2 and field_2 != 2:
         if T > 10:
@@ -281,6 +281,12 @@ if __name__ ==  '__main__':
         field_2 = 1
         field_1 = 4
         flag_1_4 = "flagged"
+      if field_1 == 1 and field_2 == 1:
+        end_time = 6
+        radius = random.uniform(1, 5)
+      if field_1 == 4:
+        radius = random.uniform(1, T-2)
+
 
 
       # Initialise agent and simulation duration:
