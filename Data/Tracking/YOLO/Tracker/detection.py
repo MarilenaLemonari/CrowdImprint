@@ -28,7 +28,7 @@ video_files = glob.glob(os.path.join(video_dir, '*.mp4'))
 
 all_feet_trajectories = []
 
-video_files = ["E:\WorkCYENS\DataRecording\Videos_Instructed\class_1_subject2.mp4"]
+# video_files = ["E:\WorkCYENS\DataRecording\Videos_Instructed\class_12_subject1.mp4"]
             #    ,"E:\WorkCYENS\DataRecording\Videos_Instructed\class_1_subject2.mp4"
             #    ,"E:\WorkCYENS\DataRecording\Videos_Instructed\class_1_subject3.mp4"
             #    ,"E:\WorkCYENS\DataRecording\Videos_Instructed\class_1_subject5.mp4"]
@@ -111,7 +111,13 @@ for traj in all_feet_trajectories:
     source[0] = source_x
     source[1] = source_y
     # Stretch
-    y = (y - source_y) * 2 + source_y
+    for i in range(len(y)):
+        y_i = y[i]
+        if y_i >= source_y:
+            y_i = (y_i - source_y) * (1+abs(y_i-source_y)) + source_y
+        else:
+            y_i = (y_i - source_y) * (2) + source_y
+        y[i] = y_i
     output_name = "class_" + video_files[c].split("class_")[1].split('.mp4')[0] + ".csv"
     output_file = f'.\Trajectories\{output_name}'
     c += 1
@@ -120,7 +126,7 @@ for traj in all_feet_trajectories:
     poly_order = 2
     smoothed_y = savgol_filter(y, window_size, poly_order)
     # Iterate
-    window_s = 20
+    window_s = 3
     smoothed_y = smoothed_y[::window_s]
     smoothed_x = x[::window_s]
     time = time[::window_s]

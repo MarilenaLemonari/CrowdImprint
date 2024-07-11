@@ -61,22 +61,29 @@ def read_csv_files(csv_directory):
         df["speed"] = 0.0
         for i in range(1, len(df)):
             if i == 1 :
-                df.loc[i, "speed"] = math.sqrt((df.loc[i, 'pos_x'] - df.loc[i - 1, 'pos_x']) ** 2 + (df.loc[i, 'pos_z'] - df.loc[i - 1, 'pos_z']) ** 2)
+                df.loc[i, "speed"] = (math.sqrt((df.loc[i, 'pos_x'] - df.loc[i - 1, 'pos_x']) ** 2 + (df.loc[i, 'pos_z'] - df.loc[i - 1, 'pos_z']) ** 2))
             else:
-                df.loc[i, "speed"] = math.sqrt((df.loc[i, 'pos_x'] - df.loc[i - 2, 'pos_x']) ** 2 + (df.loc[i, 'pos_z'] - df.loc[i - 2, 'pos_z']) ** 2)
+                df.loc[i, "speed"] = (math.sqrt((df.loc[i, 'pos_x'] - df.loc[i - 2, 'pos_x']) ** 2 + (df.loc[i, 'pos_z'] - df.loc[i - 2, 'pos_z']) ** 2))
         df.drop("timestep", axis=1, inplace=True)
         data_dict[filename] = df
         all_dfs.append(df)
     
     for filename, df in data_dict.items():
+        if filename == "marilena":
+            print(filename)
+            plt.plot(df["pos_x"], df["pos_z"])
+            plt.plot(df["pos_x"].iloc[0], df["pos_z"].iloc[0], "*")
+            plt.plot(df["source"][0],df["source"][1],'.')
+            plt.show()
+            exit()
         source_x = df["source"].iloc[0]
         source_y = df["source"].iloc[1]
         # Normalize to [0, 1]
         bound_min = min(np.min(df["pos_x"]), np.min(df["pos_z"]), source_x, source_y)
         bound_max = max(np.max(df["pos_x"]), np.max(df["pos_z"]), source_x, source_y)
 
-        bound_max += 1.5
-        bound_min -= 1.5
+        bound_max += 0.1
+        bound_min -= 0.1
 
         df["pos_x"] = (df['pos_x'] - bound_min) / (bound_max - bound_min) * (1 - 0) 
         df["pos_z"] = (df['pos_z'] - bound_min) / (bound_max - bound_min) * (1 - 0) 
@@ -91,6 +98,10 @@ def read_csv_files(csv_directory):
         df["norm_source"] = list(source_norm)
         df.drop("source", axis=1, inplace=True)
 
+        speed_min = np.min(df['speed'])
+        speed_max = np.max(df['speed'])
+        df["speed"] = (df["speed"] - speed_min) / (speed_max - speed_min) * (1-0)
+   
         data_dict[filename] = df
 
     return data_dict

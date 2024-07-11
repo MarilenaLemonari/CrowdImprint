@@ -334,7 +334,7 @@ if __name__ ==  '__main__':
         WE assume appropriate source placement.
     """
 
-    model_name = "new_model_4.pth"
+    model_name = "model_dropout.pth"
     model_type = "pytorch"
     # dataset_name = "Flock"
     # dataset_name = "Zara"

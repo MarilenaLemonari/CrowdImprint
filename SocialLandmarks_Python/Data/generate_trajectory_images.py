@@ -41,8 +41,8 @@ def fill_pixel(tol, pixel_x, pixel_z, intensity, image, resolution, add = False)
     if add == True:
         random_add = random.random()
         if random_add < 0.1:
-            extra_x_options = [right + 1, left - 1, pixel_x]
-            extra_z_options = [top + 1, bottom - 1, pixel_z]
+            extra_x_options = [right, left - 1, pixel_x]
+            extra_z_options = [top, bottom - 1, pixel_z]
             extra_x = random.choice(extra_x_options)
             extra_z = random.choice(extra_z_options)
             if extra_x >= 0 and extra_x < 32 and extra_z >= 0 and extra_z < 32:
@@ -85,12 +85,13 @@ def read_csv_files(csv_directory):
         bound_min = min(np.min(df["pos_x"]), np.min(df["pos_z"]), 0)
         bound_max = max(np.max(df["pos_x"]), np.max(df["pos_z"]), 0)
 
-        bound_max += 0.5
-        bound_min -= 0.5 
+        tol_choices = [0.5, 1, 1.5]
+        tol = tol_choices[random.randint(0,2)]
+        bound_max += tol
+        bound_min -= tol 
 
         df["pos_x"] = (df['pos_x'] - bound_min) / (bound_max - bound_min) * (1 - 0) 
         df["pos_z"] = (df['pos_z'] - bound_min) / (bound_max - bound_min) * (1 - 0) 
-
 
         s = len(df["pos_x"])
         source_norm = np.zeros((s))
@@ -211,10 +212,12 @@ def create_centrered_images(key, value, dataset_name, resolution= 32):
             # Randomly remove and add pixel:
             random_remove = random.random()
             random_add = random.random()
-            if random_remove >= 0.1:
+            
+            # image[pixel_x,pixel_z] = cur_speed
+            if random_remove >= 0.05:
                 image[pixel_x,pixel_z] = cur_speed
 
-            if random_add < 0.05:
+            if random_add < 0.02:
                 extra_x_options = [pixel_x + 1, pixel_x - 1, pixel_x]
                 extra_z_options = [pixel_z + 1, pixel_z - 1, pixel_z]
                 extra_x = random.choice(extra_x_options)
@@ -222,9 +225,21 @@ def create_centrered_images(key, value, dataset_name, resolution= 32):
                 if extra_x == pixel_x and extra_z == pixel_z:
                     extra_x = pixel_x
                 else:
-                    image[extra_x,extra_z] = cur_speed
+                    image[extra_x,extra_z] = cur_speed # TODO
 
-
+    direction = random.randint(0,1)
+    key_p1 =  key.split('IF_')[0] + 'IF_'
+    key_p2 = '_T' + key.split('_T')[1]
+    ifs =key.split('IF_')[1].split('_T')[0]
+    f1 = ifs.split('_')[0]
+    f2 = ifs.split('_')[1]
+    if direction == 0 and int(f1) != 2 and int(f2) != 2:
+        pixel_x_last = int(pixel_pos_x[len(pixel_pos_x)-1])
+        pixel_z_last = int(pixel_pos_z[len(pixel_pos_z)-1])
+        pixel_x_init = pixel_x_last
+        pixel_z_init = pixel_z_last
+        key = key_p1 + f2 + '_' + f1 + key_p2
+        key += "op_dir"
 
     image[pixel_x_init,pixel_z_init] = 1
     image = fill_pixel(1, pixel_x_init, pixel_z_init, 1, image, resolution)

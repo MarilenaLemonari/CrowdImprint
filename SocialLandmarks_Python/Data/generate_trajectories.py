@@ -220,17 +220,12 @@ if __name__ ==  '__main__':
   Constant timestep of 0.1s
   """
 
-  # behavior_list = ["Unidirectional_Down","Attractive_Multidirectional","Other_CircleAround", "AvoidNew", "MoveTFv2", "Stop"]
   dir_dict = {0:0, 1:3}
   avoid_dict = {0:4, 1:6}
-  # behavior_list = ["AntiCircle", "Unidirectional_Down","Attractive_Multidirectional","Other_CircleAround",
-  #                  "AvoidNew", "MoveTFv2", "Stop"]
-  # behavior_list = ["AntiCircle", "Unidirectional_Down","Attractive_Multidirectional","Other_CircleAround",
-  #                  "AvoidNew", "Stop"]
-  # behavior_list = ["0_Anticlockwise_final", "1_Unidirectional_final", "2_Attractive_final", "3_Clockwise_final", "4_Avoid_final",
-  #                 "Stop", "4_AvoidOpp_final"]
-  behavior_list = ["0_Anticlockwise_final", "1_Unidirectional_final", "2_Attractive_final", "3_Clockwise_final", "lastAvoid",
-                  "Stop", "lastAvoid2"]
+  # behavior_list = ["0_Anticlockwise_final", "1_Unidirectional_final", "2_Attractive_final", "3_Clockwise_final", "4_Avoidd",
+  #                 "Stop", "6_AvoidOppp"]
+  behavior_list = ["0_Anticlockwise_final", "1_Unidirectional_final", "2_Attractive_final", "3_Clockwise_final", "4_Avoidd",
+                "Stop", "7_AvoidRight"]
 
   dictionary = {}
   for i in range(len(behavior_list)-1):
@@ -259,7 +254,7 @@ if __name__ ==  '__main__':
       field_2 = random.randint(1,len(behavior_list)-2)
       end_time = random.randint(6,15)
       max_radius = end_time/4 
-      min_radius = 1
+      min_radius = 2
       radius = random.uniform(min_radius, max_radius)
       T = random.randint(3,int(end_time-3)) # TODO: min switch
 
@@ -269,7 +264,7 @@ if __name__ ==  '__main__':
       elif field_1 == 2 and field_2 != 2:
         if T > 10:
           T = 10
-        radius = T + 0.1
+        radius = T - 0.1
       elif field_2 == 2:
         end_time = random.randint(6,10)
         radius = end_time/2
@@ -285,9 +280,12 @@ if __name__ ==  '__main__':
         end_time = 6
         radius = random.uniform(1, 5)
       if field_1 == 4:
-        radius = random.uniform(1, T-2)
-
-
+        radius = random.uniform(3, T)
+      if field_2 == 4 and field_1 == 5:
+        end_time = random.randint(8,15)
+        T = random.randint(2,int(end_time-4))
+      if field_1 == 5 and field_2 == 3:
+        T = 2
 
       # Initialise agent and simulation duration:
       x0 = 0
@@ -306,6 +304,12 @@ if __name__ ==  '__main__':
       # Check if agent is behind source:
       vector_to_initial_agent = init_positions[1,:] - init_positions[0,:]
       dot_product = np.dot(vector_to_initial_agent, orientation)
+
+      if field_2 == 4:
+        field_2 = avoid_dict[random.randint(0,1)]
+        if field_1 == 1:
+          field_2 = 6
+
       if field_1 == 4:
         if dot_product <= 0:
           # Agent behind the source:
@@ -313,8 +317,16 @@ if __name__ ==  '__main__':
         else:
           # Agent in front of source:
           field_1 = 6
-      if field_2 == 4:
-        field_2 = avoid_dict[random.randint(0,1)]
+        if field_2 == 4 or field_2 == 6:
+          field_2 == field_1
+      if field_2 == 5 and field_1 == 4:
+        if dot_product <= 0:
+          # Agent behind the source:
+          field_2 = 4
+        else:
+          # Agent in front of source:
+          field_2 = 6
+      
 
       # If sampled field is circle around randomly choose clockwise or anticlockwise options
       if field_1 == 3:
@@ -399,7 +411,6 @@ if __name__ ==  '__main__':
       x = x0 + radius * math.cos(angle)
       y = y0 + radius * math.sin(angle)
       init_positions=np.array([[x0,y0],[x,y]])
-
 
       random_angle = random.uniform(0, 2 * math.pi)
       or_x = math.cos(random_angle)

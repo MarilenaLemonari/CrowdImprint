@@ -9,26 +9,30 @@ class CNN(nn.Module):
         self.conv1 = nn.Conv2d(in_channels=1, out_channels=16, kernel_size=3, stride=1, padding=1)
         self.bn1 = nn.BatchNorm2d(16)
         self.pool = nn.MaxPool2d(kernel_size=2, stride=2, padding=0)
-        self.dropout1 = nn.Dropout(0.3)
+        self.dropout1 = nn.Dropout(0.4)
         
         # Second Convolutional Block
         self.conv2 = nn.Conv2d(in_channels=16, out_channels=32, kernel_size=3, stride=1, padding=1)
         self.bn2 = nn.BatchNorm2d(32)
-        self.dropout2 = nn.Dropout(0.3)
+        self.dropout2 = nn.Dropout(0.4)
+
+        self.conv3 = nn.Conv2d(in_channels=32, out_channels=64, kernel_size=3, stride=1, padding=1)
+        self.bn6 = nn.BatchNorm2d(64)
+        self.dropout6 = nn.Dropout(0.4)
         
         # Fully Connected Layers
-        self.fc1 = nn.Linear(32 * 8 * 8, 2048)
-        self.bn3 = nn.BatchNorm1d(2048)
+        self.fc1 = nn.Linear(64 * 4 * 4, 1024)
+        self.bn3 = nn.BatchNorm1d(1024)
         self.dropout3 = nn.Dropout(0.5)
         
-        self.fc2 = nn.Linear(2048, 1024)
-        self.bn4 = nn.BatchNorm1d(1024)
-        self.dropout4 = nn.Dropout(0.5)
+        self.fc2 = nn.Linear(1024, 512)
+        self.bn4 = nn.BatchNorm1d(512)
+        self.dropout4 = nn.Dropout(0.6)
         
-        self.fc3 = nn.Linear(1024, 128)
+        self.fc3 = nn.Linear(512, 128)
         self.bn5 = nn.BatchNorm1d(128)
-        self.dropout5 = nn.Dropout(0.5)
-        
+        self.dropout5 = nn.Dropout(0.6)
+
         # Output Layer
         self.fc4 = nn.Linear(128, 25)
 
@@ -38,8 +42,11 @@ class CNN(nn.Module):
         
         x = self.pool(F.relu(self.bn2(self.conv2(x))))
         x = self.dropout2(x)
-        
-        x = x.view(-1, 32 * 8 * 8)
+
+        x = self.pool(F.relu(self.bn6(self.conv3(x))))
+        x = self.dropout6(x)
+
+        x = x.view(-1, 64 * 4 * 4)
         
         x = F.relu(self.bn3(self.fc1(x)))
         x = self.dropout3(x)
@@ -51,10 +58,9 @@ class CNN(nn.Module):
         x = self.dropout5(x)
         
         x = self.fc4(x)
-        #x = F.softmax(x, dim=1) # TODO retrain
         x = F.log_softmax(x, dim=1)
-
-        return x 
+        
+        return x
     
 class CNN10class(nn.Module):
     def __init__(self):
@@ -116,16 +122,16 @@ def instantiate_model():
     print("SUCCESS! Model Instantiated.")
 
     criterion = nn.CrossEntropyLoss()
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.001, weight_decay=0.001)
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.001, weight_decay=0.003)
 
     return model, criterion, optimizer, device
     
 if __name__ ==  '__main__':
     model, criterion, optimizer, device = instantiate_model()
 
-    # batch_size = 10
-    # inputs= torch.randn(batch_size, 1, 32, 32, requires_grad=True)
-    # print(inputs.shape)
-    # preds=  model(inputs)
-    # print(preds, preds.shape)
-    # exit()
+    batch_size = 10
+    inputs = torch.randn(batch_size, 1, 32, 32, requires_grad=True)
+    model  = CNN()
+    preds=  model(inputs)
+    print(preds, preds.shape)
+    exit()

@@ -11,7 +11,7 @@ import csv
 
 traj_dir = './Trajectories/' 
 traj_files = glob.glob(os.path.join(traj_dir, '*.csv'))
-traj_files = ['./Trajectories/class_1_subject2.csv']
+traj_files = ['./Trajectories/class_12_subject1.csv']
 
 trajectories = []
 plt.figure(figsize=(6, 6))
@@ -33,6 +33,6 @@ plt.xlabel('X (m)')
 plt.ylabel('Y (m)')
 plt.title('Feet Trajectories in World Space')
 plt.grid(True)
-plt.xlim([5, 17])
+plt.xlim([3, 17])
 plt.ylim([0, 15])
 plt.show()
