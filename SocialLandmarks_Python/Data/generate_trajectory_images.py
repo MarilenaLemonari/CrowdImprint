@@ -227,19 +227,19 @@ def create_centrered_images(key, value, dataset_name, resolution= 32):
                 else:
                     image[extra_x,extra_z] = cur_speed # TODO
 
-    direction = random.randint(0,1)
-    key_p1 =  key.split('IF_')[0] + 'IF_'
-    key_p2 = '_T' + key.split('_T')[1]
-    ifs =key.split('IF_')[1].split('_T')[0]
-    f1 = ifs.split('_')[0]
-    f2 = ifs.split('_')[1]
-    if direction == 0 and int(f1) != 2 and int(f2) != 2:
-        pixel_x_last = int(pixel_pos_x[len(pixel_pos_x)-1])
-        pixel_z_last = int(pixel_pos_z[len(pixel_pos_z)-1])
-        pixel_x_init = pixel_x_last
-        pixel_z_init = pixel_z_last
-        key = key_p1 + f2 + '_' + f1 + key_p2
-        key += "op_dir"
+    # direction = random.randint(0,1)
+    # key_p1 =  key.split('IF_')[0] + 'IF_'
+    # key_p2 = '_T' + key.split('_T')[1]
+    # ifs =key.split('IF_')[1].split('_T')[0]
+    # f1 = ifs.split('_')[0]
+    # f2 = ifs.split('_')[1]
+    # if direction == 0 and int(f1) != 2 and int(f2) != 2:
+    #     pixel_x_last = int(pixel_pos_x[len(pixel_pos_x)-1])
+    #     pixel_z_last = int(pixel_pos_z[len(pixel_pos_z)-1])
+    #     pixel_x_init = pixel_x_last
+    #     pixel_z_init = pixel_z_last
+    #     key = key_p1 + f2 + '_' + f1 + key_p2
+    #     key += "op_dir"
 
     image[pixel_x_init,pixel_z_init] = 1
     image = fill_pixel(1, pixel_x_init, pixel_z_init, 1, image, resolution)

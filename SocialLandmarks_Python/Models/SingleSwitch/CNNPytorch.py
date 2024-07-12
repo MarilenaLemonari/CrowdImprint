@@ -21,7 +21,8 @@ class CNN(nn.Module):
         self.dropout6 = nn.Dropout(0.4)
         
         # Fully Connected Layers
-        self.fc1 = nn.Linear(64 * 4 * 4, 1024)
+        # self.fc1 = nn.Linear(64 * 4 * 4, 1024)
+        self.fc1 = nn.Linear(64 * 8 * 8, 1024)
         self.bn3 = nn.BatchNorm1d(1024)
         self.dropout3 = nn.Dropout(0.5)
         
@@ -46,7 +47,8 @@ class CNN(nn.Module):
         x = self.pool(F.relu(self.bn6(self.conv3(x))))
         x = self.dropout6(x)
 
-        x = x.view(-1, 64 * 4 * 4)
+        # x = x.view(-1, 64 * 4 * 4)
+        x = x.view(-1, 64 * 8 * 8)
         
         x = F.relu(self.bn3(self.fc1(x)))
         x = self.dropout3(x)
