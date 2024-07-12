@@ -252,8 +252,8 @@ if __name__ ==  '__main__':
     for r in tqdm(range(repeat)):
       # Same distinct behaviors (5 in total):
       flag_1_4 = ''
-      field_1 = random.randint(1,len(behavior_list)-2)
-      field_2 = random.randint(1,len(behavior_list)-2)
+      field_1 = 2 #random.randint(1,len(behavior_list)-2)
+      field_2 = 4 #random.randint(1,len(behavior_list)-2)
       end_time = random.randint(6,15)
       max_radius = end_time/4 
       min_radius = 2
@@ -267,6 +267,9 @@ if __name__ ==  '__main__':
         if T > 10:
           T = 10
         radius = T - 0.1
+        if field_2 == 4:
+          end_time = random.randint(8, 10)
+          T = random.randint(3, int(end_time)-4)
       elif field_2 == 2:
         end_time = random.randint(6,10)
         radius = end_time/2
