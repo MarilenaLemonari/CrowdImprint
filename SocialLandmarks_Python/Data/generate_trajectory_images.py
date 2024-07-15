@@ -207,7 +207,7 @@ def create_centrered_images(key, value, dataset_name, resolution= 32):
             # top = int(min(pixel_z+tol,resolution))
             # bottom = int(max(pixel_z-tol,0))
             # image[left:right,bottom:top] = cur_speed
-            image = fill_pixel(2, pixel_x, pixel_z, cur_speed, image, resolution, True)
+            image = fill_pixel(3, pixel_x, pixel_z, cur_speed, image, resolution, True)
             same_speed_count = 0
         else:
             # Randomly remove and add pixel:
@@ -248,7 +248,7 @@ def create_centrered_images(key, value, dataset_name, resolution= 32):
     #     key += "op_dir"
 
     image[pixel_x_init,pixel_z_init] = 1
-    image = fill_pixel(1, pixel_x_init, pixel_z_init, 1, image, resolution)
+    image = fill_pixel(2, pixel_x_init, pixel_z_init, 1, image, resolution)
     # tifffile.imwrite(dataset_name + "\\" + key + '_s' + '.tif', image)
 
     # Place source 
@@ -380,6 +380,6 @@ if __name__ ==  '__main__':
         files = os.listdir(folder_path)
         file_exists = any(file.startswith(prefix) for file in files)
         if file_exists == False:
-            empty_predictions = create_centrered_images(prefix, value, folder_path, resolution=32) 
+            empty_predictions = create_centrered_images(prefix, value, folder_path, resolution=64) 
 
     print("DONE! Preprocessing Successful.")

@@ -244,7 +244,7 @@ if __name__ ==  '__main__':
     repeat = 500
     prefix = '_test_IF_'
 
-  counter = 0
+  counter = 25000
   mode = "SingleSwitch" #"Conv1d"
   # mode = "NoSwitch"
 
@@ -252,8 +252,8 @@ if __name__ ==  '__main__':
     for r in tqdm(range(repeat)):
       # Same distinct behaviors (5 in total):
       flag_1_4 = ''
-      field_1 = 2 #random.randint(1,len(behavior_list)-2)
-      field_2 = 4 #random.randint(1,len(behavior_list)-2)
+      field_1 = random.randint(1,len(behavior_list)-2)
+      field_2 = random.randint(1,len(behavior_list)-2)
       end_time = random.randint(6,15)
       max_radius = end_time/4 
       min_radius = 2

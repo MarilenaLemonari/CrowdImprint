@@ -82,8 +82,8 @@ def read_csv_files(csv_directory):
         bound_min = min(np.min(df["pos_x"]), np.min(df["pos_z"]), source_x, source_y)
         bound_max = max(np.max(df["pos_x"]), np.max(df["pos_z"]), source_x, source_y)
 
-        bound_max += 0.1
-        bound_min -= 0.1
+        bound_max += 0.5
+        bound_min -= 0.5
 
         df["pos_x"] = (df['pos_x'] - bound_min) / (bound_max - bound_min) * (1 - 0) 
         df["pos_z"] = (df['pos_z'] - bound_min) / (bound_max - bound_min) * (1 - 0) 
@@ -211,7 +211,7 @@ def create_centrered_images(key, value, dataset_name, resolution= 32):
             # top = int(min(pixel_z+tol,resolution))
             # bottom = int(max(pixel_z-tol,0))
             # image[left:right,bottom:top] = cur_speed
-            image = fill_pixel(2, pixel_x, pixel_z, cur_speed, image, resolution)
+            image = fill_pixel(3, pixel_x, pixel_z, cur_speed, image, resolution)
             same_speed_count = 0
         else:
             # image[pixel_x,pixel_z] = cur_speed
@@ -223,7 +223,7 @@ def create_centrered_images(key, value, dataset_name, resolution= 32):
 
 
     image[pixel_x_init,pixel_z_init] = 1
-    image = fill_pixel(1, pixel_x_init, pixel_z_init, 1, image, resolution)
+    image = fill_pixel(2, pixel_x_init, pixel_z_init, 1, image, resolution)
     # tifffile.imwrite(dataset_name + "\\" + key + '_s' + '.tif', image)
 
     # Place source 
@@ -311,7 +311,7 @@ def create_structured_images(key, value, dataset_name, resolution= 32):
             image[pixel_x,pixel_z] = cur_speed
 
     image[pixel_x_init,pixel_z_init] = 1
-    image = fill_pixel(1, pixel_x_init, pixel_z_init, 1, image, resolution)
+    image = fill_pixel(2, pixel_x_init, pixel_z_init, 1, image, resolution)
     # tifffile.imwrite(dataset_name + "\\" + key + '_s' + '.tif', image)
 
     # Place source 
