@@ -87,6 +87,7 @@ def read_csv_files(csv_directory):
 
         tol_choices = [0.5, 1, 1.5]
         tol = tol_choices[random.randint(0,2)]
+        # tol = random.uniform(0.5, 1.5) # TODO
         bound_max += tol
         bound_min -= tol 
 
@@ -118,6 +119,8 @@ def create_images(key, value, dataset_name, resolution= 32):
     image = np.zeros((resolution,resolution), np.float32)
     source_pos = value["norm_source"][0] * (resolution - 1)
     same_speed_count = 0
+
+    image_dict = {}
     for i in range(len(pixel_pos_x)):
         pixel_x = int(pixel_pos_x[i])
         pixel_z = int(pixel_pos_z[i])
@@ -125,36 +128,70 @@ def create_images(key, value, dataset_name, resolution= 32):
             pixel_x_init = pixel_x
             pixel_z_init = pixel_z
             image[pixel_x,pixel_z] = 1
-        elif (value["speed"][i] <= 0.001): # ML1: value["speed"][i-1]
+        elif (value["speed"][i] <= 0.001): #== value["speed"][i-1]):
             same_speed_count += 1
 
         cur_speed = (1- value["speed"][i])*0.6
+        # if cur_speed > 0.2:
+        #     # Introduce noise in speed:
+        #     random_noise = random.uniform(-0.15, 0.15)
+        #     cur_speed += random_noise # from 0.0 up to 0.6
+
         if same_speed_count >= 5:
-            tol = 2
-            left = int(max(pixel_x-tol,0))
-            right = int(min(pixel_x+tol,resolution))
-            top = int(min(pixel_z+tol,resolution))
-            bottom = int(max(pixel_z-tol,0))
-            image[left:right,bottom:top] = cur_speed
+            # tol = 1
+            # left = int(max(pixel_x-tol,0))
+            # right = int(min(pixel_x+tol,resolution))
+            # top = int(min(pixel_z+tol,resolution))
+            # bottom = int(max(pixel_z-tol,0))
+            # image[left:right,bottom:top] = cur_speed
+            image = fill_pixel(3, pixel_x, pixel_z, cur_speed, image, resolution, True)
             same_speed_count = 0
         else:
-            image[pixel_x,pixel_z] = cur_speed
-        # image[pixel_x,pixel_z] = cur_speed
+            # Randomly remove and add pixel:
+            random_remove = random.random()
+            random_add = random.random()
+            tol_remove = 0.05
+            tol_add = 0.02
+            # indication = key.split('IF_')[1].split('_T')[0]
+            # if ('0' in indication) or ('3' in indication):
+            #     tol_remove = 0.1
+            #     tol_add = 0.05
+
+            if f"{pixel_x}_{pixel_z}" in image_dict.keys():
+                cur_speed = 0.85 
+            else:
+                cur_speed = 0.6
+                image_dict[f"{pixel_x}_{pixel_z}"] = 1
+            
+            # image[pixel_x,pixel_z] = cur_speed
+            if random_remove >= tol_remove:
+                image[pixel_x,pixel_z] = cur_speed
+
+            if random_add < tol_add:
+                extra_x_options = [pixel_x + 1, pixel_x - 1, pixel_x]
+                extra_z_options = [pixel_z + 1, pixel_z - 1, pixel_z]
+                extra_x = random.choice(extra_x_options)
+                extra_z = random.choice(extra_z_options)
+                if extra_x == pixel_x and extra_z == pixel_z:
+                    extra_x = pixel_x
+                else:
+                    image[extra_x,extra_z] = cur_speed # TODO
 
     choices = [0, 1]
     probabilities = [0.2, 0.8]
     chosen_number = random.choices(choices, probabilities)[0]
+    indication = key.split('IF_')[1].split('_T')[0]
 
     image[pixel_x_init,pixel_z_init] = 1
-    image = fill_pixel(1, pixel_x_init, pixel_z_init, 1, image, resolution)
-
+    image = fill_pixel(2, pixel_x_init, pixel_z_init, 1, image, resolution)
     # if chosen_number == 0:
-    #     tifffile.imwrite(dataset_name + "\\" + key + '_s' + '.tif', image)
-    # tifffile.imwrite(dataset_name + "\\" + key + '_s' + '.tif', image)
+    #     if ('3' in indication) or ('0' in indication):
+    #         tifffile.imwrite(dataset_name + "\\" + key + '_s' + '.tif', image)
 
     # Place source 
     image[int(source_pos), int(source_pos)] = 1
     image = fill_pixel(1, int(source_pos), int(source_pos), 1, image, resolution)
+
     # if chosen_number == 1:
     tifffile.imwrite(dataset_name + "\\" + key + '.tif', image)
 
@@ -213,6 +250,13 @@ def create_centrered_images(key, value, dataset_name, resolution= 32):
             # Randomly remove and add pixel:
             random_remove = random.random()
             random_add = random.random()
+            tol_remove = 0.05
+            tol_add = 0.02
+            indication = key.split('IF_')[1].split('_T')[0]
+            if ('0_0' in indication) or ('3_3' in indication) or ('0_3' in indication) or ('3_0' in indication):
+                tol_remove = 0.05
+                tol_add = 0.1 #TODO
+
             if f"{pixel_x}_{pixel_z}" in image_dict.keys():
                 cur_speed = 0.85 
             else:
@@ -220,10 +264,10 @@ def create_centrered_images(key, value, dataset_name, resolution= 32):
                 image_dict[f"{pixel_x}_{pixel_z}"] = 1
             
             # image[pixel_x,pixel_z] = cur_speed
-            if random_remove >= 0.05:
+            if random_remove >= tol_remove:
                 image[pixel_x,pixel_z] = cur_speed
 
-            if random_add < 0.02:
+            if random_add < tol_add:
                 extra_x_options = [pixel_x + 1, pixel_x - 1, pixel_x]
                 extra_z_options = [pixel_z + 1, pixel_z - 1, pixel_z]
                 extra_x = random.choice(extra_x_options)
@@ -247,15 +291,23 @@ def create_centrered_images(key, value, dataset_name, resolution= 32):
     #     key = key_p1 + f2 + '_' + f1 + key_p2
     #     key += "op_dir"
 
+    choices = [0, 1]
+    probabilities = [0.2, 0.8]
+    chosen_number = random.choices(choices, probabilities)[0]
+    indication = key.split('IF_')[1].split('_T')[0]
+
     image[pixel_x_init,pixel_z_init] = 1
     image = fill_pixel(2, pixel_x_init, pixel_z_init, 1, image, resolution)
-    # tifffile.imwrite(dataset_name + "\\" + key + '_s' + '.tif', image)
+    if chosen_number == 0:
+        if ('3' in indication) or ('0' in indication):
+            tifffile.imwrite(dataset_name + "\\" + key + '_s' + '.tif', image)
 
     # Place source 
     image[int(source_pos), int(source_pos)] = 1
     image = fill_pixel(1, int(source_pos), int(source_pos), 1, image, resolution)
 
-    tifffile.imwrite(dataset_name + "\\" + key + '.tif', image)
+    if chosen_number == 1:
+        tifffile.imwrite(dataset_name + "\\" + key + '.tif', image)
 
 def create_structured_images(key, value, dataset_name, resolution= 32):
     # default_int = 0.5
@@ -380,6 +432,6 @@ if __name__ ==  '__main__':
         files = os.listdir(folder_path)
         file_exists = any(file.startswith(prefix) for file in files)
         if file_exists == False:
-            empty_predictions = create_centrered_images(prefix, value, folder_path, resolution=64) 
+            empty_predictions = create_images(prefix, value, folder_path, resolution=64) 
 
     print("DONE! Preprocessing Successful.")

@@ -121,7 +121,9 @@ def create_images(key, value, dataset_name, resolution= 32):
     pixel_pos_z = value["pos_z"] * (resolution - 1)
     image = np.zeros((resolution,resolution), np.float32)
     source_pos_x = value["norm_source"][0] * (resolution - 1)
-    source_pos_y = value["norm_source"][1] * (resolution - 1)
+    source_pos_z = value["norm_source"][1] * (resolution - 1)
+
+    image_dict = {}
     same_speed_count = 0
     for i in range(len(pixel_pos_x)):
         pixel_x = int(pixel_pos_x[i])
@@ -130,37 +132,35 @@ def create_images(key, value, dataset_name, resolution= 32):
             pixel_x_init = pixel_x
             pixel_z_init = pixel_z
             image[pixel_x,pixel_z] = 1
-        elif (value["speed"][i] <= 0.001): # ML1: value["speed"][i-1]
+        elif (value["speed"][i] <= 0.001): #== value["speed"][i-1]):
             same_speed_count += 1
 
         cur_speed = (1- value["speed"][i])*0.6
         if same_speed_count >= 10:
-            tol = 2
-            left = int(max(pixel_x-tol,0))
-            right = int(min(pixel_x+tol,resolution))
-            top = int(min(pixel_z+tol,resolution))
-            bottom = int(max(pixel_z-tol,0))
-            image[left:right,bottom:top] = cur_speed
+            # tol = 1
+            # left = int(max(pixel_x-tol,0))
+            # right = int(min(pixel_x+tol,resolution))
+            # top = int(min(pixel_z+tol,resolution))
+            # bottom = int(max(pixel_z-tol,0))
+            # image[left:right,bottom:top] = cur_speed
+            image = fill_pixel(3, pixel_x, pixel_z, cur_speed, image, resolution)
             same_speed_count = 0
         else:
-            image[pixel_x,pixel_z] = cur_speed
-        # image[pixel_x,pixel_z] = cur_speed
+            # image[pixel_x,pixel_z] = cur_speed
+            if f"{pixel_x}_{pixel_z}" in image_dict.keys():
+                image[pixel_x,pixel_z] = 0.85 # TODO: ML change1 cur_speed
+            else:
+                image[pixel_x,pixel_z] = 0.6
+                image_dict[f"{pixel_x}_{pixel_z}"] = 1
 
-    choices = [0, 1]
-    probabilities = [0.2, 0.8]
-    chosen_number = random.choices(choices, probabilities)[0]
 
     image[pixel_x_init,pixel_z_init] = 1
-    image = fill_pixel(1, pixel_x_init, pixel_z_init, 1, image, resolution)
-
-    # if chosen_number == 0:
-    #     tifffile.imwrite(dataset_name + "\\" + key + '_s' + '.tif', image)
+    image = fill_pixel(2, pixel_x_init, pixel_z_init, 1, image, resolution)
     # tifffile.imwrite(dataset_name + "\\" + key + '_s' + '.tif', image)
 
     # Place source 
-    image[int(source_pos_x), int(source_pos_y)] = 1
-    image = fill_pixel(1, int(source_pos_x), int(source_pos_y), 1, image, resolution)
-    # if chosen_number == 1:
+    image[int(source_pos_x), int(source_pos_z)] = 1
+    image = fill_pixel(1, int(source_pos_x), int(source_pos_z), 1, image, resolution)
     tifffile.imwrite(dataset_name + "\\" + key + '.tif', image)
 
 def create_centrered_images(key, value, dataset_name, resolution= 32):
@@ -352,6 +352,6 @@ if __name__ ==  '__main__':
         files = os.listdir(folder_path)
         file_exists = any(file.startswith(prefix) for file in files)
         if file_exists == False:
-            empty_predictions = create_centrered_images(prefix, value, folder_path, resolution=64) 
+            empty_predictions = create_images(prefix, value, folder_path, resolution=64) 
 
     print("DONE! Preprocessing Successful.")

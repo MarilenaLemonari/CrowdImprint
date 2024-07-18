@@ -334,7 +334,7 @@ if __name__ ==  '__main__':
         WE assume appropriate source placement.
     """
 
-    model_name = "model_64.pth"
+    model_name = "model_64_canoisy.pth"
     model_type = "pytorch"
     # dataset_name = "Flock"
     # dataset_name = "Zara"
