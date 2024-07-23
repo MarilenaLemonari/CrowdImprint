@@ -226,7 +226,9 @@ if __name__ ==  '__main__':
   #                 "Stop", "6_AvoidOppp"]
   # behavior_list = ["0_Anticlockwise_final", "1_Unidirectional_final", "2_Attractive_final", "3_Clockwise_final", "4_Avoidd",
   #               "Stop", "7_AvoidRight"]
-  behavior_list = ["0_Anticlockwise_final", "1_Unidirectional_final", "2_Attractive_final", "3_Clockwise_final", "7_AvoidRight",
+  # behavior_list = ["0_Anticlockwise_final", "1_Unidirectional_final", "2_Attractive_final", "3_Clockwise_final", "7_AvoidRight",
+  #               "Stop", "6_AvoidOppp"]
+  behavior_list = ["CAoval", "1_Unidirectional_final", "2_Attractive_final", "3_Clockwise_final", "7_AvoidRight",
                 "Stop", "6_AvoidOppp"]
 
   dictionary = {}
@@ -238,13 +240,13 @@ if __name__ ==  '__main__':
 
   category = "Training" 
   if category == "Training":
-    repeat = 5000 * (len(behavior_list)-2) # TODO:change 10000
+    repeat = 10000 * (len(behavior_list)-2) # TODO:change 10000
     prefix = 'IF_'
   elif category == "Testing":
     repeat = 500
     prefix = '_test_IF_'
 
-  counter = 25000
+  counter = 0
   mode = "SingleSwitch" #"Conv1d"
   # mode = "NoSwitch"
 

@@ -85,7 +85,7 @@ for tif_file in tqdm(tif_files):
         center = (width // 2, height // 2)
         rotation_matrix = cv2.getRotationMatrix2D(center, chosen_rotation, 1.0)
         image_rotated = cv2.warpAffine(image, rotation_matrix, (width, height), flags=cv2.INTER_LINEAR)
-        np.savez(f'C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\PythonFiles\SingleSwitch_NoisyCircle\{old_name}_{counter}_rot_{int(chosen_rotation)}.npz', image_rotated)
+        np.savez(f'C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\PythonFiles\SingleSwitch\{old_name}_{counter}_rot_{int(chosen_rotation)}.npz', image_rotated)
         for i, angle in enumerate(random_angles):
             center = (width // 2, height // 2)
             # rotation_matrix = cv2.getRotationMatrix2D(center, angle, 1.0)

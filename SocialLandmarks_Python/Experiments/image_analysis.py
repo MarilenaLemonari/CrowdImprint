@@ -24,7 +24,7 @@ images_array =  images_array[:,np.newaxis, :,:]
 # tifffile.imwrite('img.tif', img)
 
 model = CNN()
-model.load_state_dict(torch.load('C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Models\SingleSwitch\\model_64_large.pth'))
+model.load_state_dict(torch.load('C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Models\SingleSwitch\\model_dropout.pth'))
 
 model.eval()
 

@@ -88,6 +88,8 @@ def read_csv_files(csv_directory):
         tol_choices = [0.5, 1, 1.5]
         tol = tol_choices[random.randint(0,2)]
         # tol = random.uniform(0.5, 1.5) # TODO
+        # tol = 0.5
+        
         bound_max += tol
         bound_min -= tol 
 
@@ -252,10 +254,10 @@ def create_centrered_images(key, value, dataset_name, resolution= 32):
             random_add = random.random()
             tol_remove = 0.05
             tol_add = 0.02
-            indication = key.split('IF_')[1].split('_T')[0]
-            if ('0_0' in indication) or ('3_3' in indication) or ('0_3' in indication) or ('3_0' in indication):
-                tol_remove = 0.05
-                tol_add = 0.1 #TODO
+            # indication = key.split('IF_')[1].split('_T')[0]
+            # if ('0_0' in indication) or ('3_3' in indication) or ('0_3' in indication) or ('3_0' in indication):
+            #     tol_remove = 0.05
+            #     tol_add = 0.1 #TODO
 
             if f"{pixel_x}_{pixel_z}" in image_dict.keys():
                 cur_speed = 0.85 
@@ -432,6 +434,6 @@ if __name__ ==  '__main__':
         files = os.listdir(folder_path)
         file_exists = any(file.startswith(prefix) for file in files)
         if file_exists == False:
-            empty_predictions = create_images(prefix, value, folder_path, resolution=64) 
+            empty_predictions = create_centrered_images(prefix, value, folder_path, resolution=64) 
 
     print("DONE! Preprocessing Successful.")
