@@ -300,16 +300,17 @@ def create_centrered_images(key, value, dataset_name, resolution= 32):
 
     image[pixel_x_init,pixel_z_init] = 1
     image = fill_pixel(2, pixel_x_init, pixel_z_init, 1, image, resolution)
-    if chosen_number == 0:
-        if ('3' in indication) or ('0' in indication):
-            tifffile.imwrite(dataset_name + "\\" + key + '_s' + '.tif', image)
+    # if chosen_number == 0:
+    #     if ('3' in indication) or ('0' in indication):
+    #         tifffile.imwrite(dataset_name + "\\" + key + '_s' + '.tif', image)
 
     # Place source 
     image[int(source_pos), int(source_pos)] = 1
     image = fill_pixel(1, int(source_pos), int(source_pos), 1, image, resolution)
 
-    if chosen_number == 1:
-        tifffile.imwrite(dataset_name + "\\" + key + '.tif', image)
+    # if chosen_number == 1:
+    #     tifffile.imwrite(dataset_name + "\\" + key + '.tif', image)
+    tifffile.imwrite(dataset_name + "\\" + key + '.tif', image)
 
 def create_structured_images(key, value, dataset_name, resolution= 32):
     # default_int = 0.5

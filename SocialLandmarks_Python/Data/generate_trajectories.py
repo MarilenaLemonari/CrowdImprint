@@ -228,7 +228,7 @@ if __name__ ==  '__main__':
   #               "Stop", "7_AvoidRight"]
   # behavior_list = ["0_Anticlockwise_final", "1_Unidirectional_final", "2_Attractive_final", "3_Clockwise_final", "7_AvoidRight",
   #               "Stop", "6_AvoidOppp"]
-  behavior_list = ["CAoval", "1_Unidirectional_final", "2_Attractive_final", "3_Clockwise_final", "7_AvoidRight",
+  behavior_list = ["0_Anticlockwise_final", "1_Unidirectional_final", "2_Attractive_final", "CAoval", "7_AvoidRight",
                 "Stop", "6_AvoidOppp"]
 
   dictionary = {}

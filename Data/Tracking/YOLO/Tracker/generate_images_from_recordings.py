@@ -82,8 +82,8 @@ def read_csv_files(csv_directory):
         bound_min = min(np.min(df["pos_x"]), np.min(df["pos_z"]), source_x, source_y)
         bound_max = max(np.max(df["pos_x"]), np.max(df["pos_z"]), source_x, source_y)
 
-        bound_max += 0.5
-        bound_min -= 0.5
+        bound_max += 2
+        bound_min -= 2
 
         df["pos_x"] = (df['pos_x'] - bound_min) / (bound_max - bound_min) * (1 - 0) 
         df["pos_z"] = (df['pos_z'] - bound_min) / (bound_max - bound_min) * (1 - 0) 
@@ -352,6 +352,6 @@ if __name__ ==  '__main__':
         files = os.listdir(folder_path)
         file_exists = any(file.startswith(prefix) for file in files)
         if file_exists == False:
-            empty_predictions = create_images(prefix, value, folder_path, resolution=64) 
+            empty_predictions = create_centrered_images(prefix, value, folder_path, resolution=64) 
 
     print("DONE! Preprocessing Successful.")
