@@ -29,7 +29,7 @@ def setup_config_keras():
     # HYPERPARAMETERS
     wandb.init(project="SocialLandmarks")
     config = wandb.config
-    config.epochs = 30
+    config.epochs = 20
     config.batch_size = batch_size
 
     datagen = ImageDataGenerator(
@@ -49,7 +49,7 @@ def setup_config(wandb_bool, images, gt):
     if wandb_bool == True:
         wandb.init(project="SocialLandmarks")
         config = wandb.config
-        config.epochs = 30
+        config.epochs = 20
         config.batch_size = batch_size
     else:
         config = []
