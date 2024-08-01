@@ -82,8 +82,8 @@ def read_csv_files(csv_directory):
         bound_min = min(np.min(df["pos_x"]), np.min(df["pos_z"]), source_x, source_y)
         bound_max = max(np.max(df["pos_x"]), np.max(df["pos_z"]), source_x, source_y)
 
-        bound_max += 0.5
-        bound_min -= 0.5
+        bound_max += 1.5
+        bound_min -= 1.5
 
         df["pos_x"] = (df['pos_x'] - bound_min) / (bound_max - bound_min) * (1 - 0) 
         df["pos_z"] = (df['pos_z'] - bound_min) / (bound_max - bound_min) * (1 - 0) 
