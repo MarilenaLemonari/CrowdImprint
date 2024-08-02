@@ -190,14 +190,14 @@ def evaluate_trajectories():
 
     return search_dict, json_path
 
-def evaluate_images():
+def evaluate_images(query_path):
     # METHOD 2: Compare Images
     # Load images:
     search_path = 'C:/PROJECTS/SocialLandmarks/SocialLandmarks_Python/Data/Images/SingleSwitch' 
     all_search_pnts = os.listdir(search_path)
     tif_s = [file for file in all_search_pnts if file.lower().endswith('.tif')]
 
-    query_path = 'C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\Images\Flock'
+    # query_path = 'C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\Images\Flock'
     all_query_pnts = os.listdir(query_path)
     tif_q = [file for file in all_query_pnts if file.lower().endswith('.tif')]
     
@@ -364,15 +364,17 @@ if __name__ ==  '__main__':
         "1_6":3, "2_6":8, "3_6":13, "4_6":18, "5_6":23, "6_6":18,
         "6_1":15, "6_2":16, "6_3":17, "6_4":18, "6_5":19}
 
-    # search_dict, json_path = evaluate_trajectories()
-    # search_dict, json_path = evaluate_images()
+    search_dict, json_path = evaluate_trajectories()
+    # search_dict, json_path = evaluate_images(query_path = "C:\PROJECTS\SocialLandmarks\Data\Tracking\YOLO\Tracker\Images\Instructed") # TODO og images
+    print(search_dict)
+    exit()
 
     # final_dict = evaluate_dedicated_metric()
     final_dict, eval_pred, eval_gt, metric = get_gt_instructed(c_dict, gt_dict)
     json_path = "C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Experiments\Evaluation"
     json_name = json_path + "\\final_dict.json"
     with open(json_name, 'w') as json_file:
-        json.dump(final_dict, json_file, indent=4) # TODO: change c_dict
+        json.dump(final_dict, json_file, indent=4)
     # exit()
 
     # final_dict = {}

@@ -13,7 +13,7 @@ from config import *
 # python3 C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Models\SingleSwitch\model_testing.py
 
 def test_keras():
-    trained_model = load_model("C:\\PROJECTS\\SocialLandmarks\\SocialLandmarks_Python\\Models\\SingleSwitch\\trial2.pth")
+    trained_model = load_model("C:\\PROJECTS\\SocialLandmarks\\SocialLandmarks_Python\\Models\\SingleSwitch\\model_final.pth")
     print("SUCCESS! Trained Model is Loaded.")
 
     # Train & Validation data aka "SEEN" data during training.
@@ -50,7 +50,7 @@ def test_keras():
 
 if __name__ ==  '__main__':
     trained_model, criterion, optimizer, device = instantiate_model()
-    trained_model.load_state_dict(torch.load("C:\\PROJECTS\\SocialLandmarks\\SocialLandmarks_Python\\Models\\SingleSwitch\\trial2.pth"))
+    trained_model.load_state_dict(torch.load("C:\\PROJECTS\\SocialLandmarks\\SocialLandmarks_Python\\Models\\SingleSwitch\\model_final.pth"))
     print("SUCCESS! Trained Model is Loaded.")
 
     # Train & Validation data aka "SEEN" data during training.

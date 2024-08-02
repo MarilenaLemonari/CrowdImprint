@@ -231,7 +231,7 @@ def create_centrered_images(key, value, dataset_name, resolution= 32):
             pixel_z_init = pixel_z
             image[pixel_x,pixel_z] = 1
         elif (value["speed"][i] <= 0.001): #== value["speed"][i-1]):
-            same_speed_count += 1
+            same_speed_count += 1 
 
         cur_speed = (1- value["speed"][i])*0.6
         # if cur_speed > 0.2:
@@ -298,8 +298,8 @@ def create_centrered_images(key, value, dataset_name, resolution= 32):
     chosen_number = random.choices(choices, probabilities)[0]
     indication = key.split('IF_')[1].split('_T')[0]
 
-    # image[pixel_x_init,pixel_z_init] = 1
-    # image = fill_pixel(2, pixel_x_init, pixel_z_init, 1, image, resolution)
+    image[pixel_x_init,pixel_z_init] = 1
+    image = fill_pixel(2, pixel_x_init, pixel_z_init, 1, image, resolution)
     # if chosen_number == 0:
     #     if ('3' in indication) or ('0' in indication):
     #         tifffile.imwrite(dataset_name + "\\" + key + '_s' + '.tif', image)
@@ -403,7 +403,7 @@ def create_structured_images(key, value, dataset_name, resolution= 32):
 # Execute
 if __name__ ==  '__main__':
     current_file_dir = "C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\Trajectories"
-    name = "\SingleSwitch" #TODO
+    name = "\SingleSwitchTesting" #TODO
     # name = "\\NoSwitch"
     
     csv_directory  = current_file_dir + name + "\\"

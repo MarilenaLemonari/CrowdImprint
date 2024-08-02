@@ -238,7 +238,7 @@ if __name__ ==  '__main__':
     else:
       dictionary[i] = behavior_list[i]
 
-  category = "Training" 
+  category = "Testing" 
   if category == "Training":
     repeat = 10000 * (len(behavior_list)-2) # TODO:change 10000
     prefix = 'IF_'
