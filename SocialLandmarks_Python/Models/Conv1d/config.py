@@ -46,7 +46,7 @@ def setup_config_conv1d(X, labels):
     # HYPERPARAMETERS
     wandb.init(project="SocialLandmarks")
     config = wandb.config
-    config.epochs = 30
+    config.epochs = 20
     config.batch_size = batch_size
 
     return X_train, X_val, y_train, y_val, config
