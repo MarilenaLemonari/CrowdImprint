@@ -158,11 +158,10 @@ def evaluate_trajectories():
 
     # Load trajectories:
     query_file_dir = "C:\PROJECTS\SocialLandmarks\Data\Trajectories"
-    # query_name = "\Flock"
-    # query_traj_directory  = query_file_dir + query_name + "\\"
-    query_traj_directory  =  "C:\PROJECTS\SocialLandmarks\Data\Tracking\YOLO\Tracker\Trajectories"
+    query_name = "\Flock"
+    query_traj_directory  = query_file_dir + query_name + "\\"
     values_traj_directory  = "C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\Trajectories\SingleSwitch"
-    queries_dict = read_value_csv_files(query_traj_directory) #TODO: was read_csv_files(query_traj_directory)
+    queries_dict = read_csv_files(query_traj_directory)
     values_dict = read_value_csv_files(values_traj_directory)    # print(values_dict['0IF_0_1_T5_d8_a1.csv'])
 
     # Prepare search database:
@@ -171,7 +170,7 @@ def evaluate_trajectories():
     # Search database with query:
     search_dict = {}
     json_path = "C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Experiments\Evaluation"
-    json_name = json_path + "\search_dict_traj.json"
+    json_name = json_path + "\search_dict.json"
     for query, query_traj in queries_dict.items():
         # Prepare query for searching:
         rotated_points, max_dist_value, max_width_value = centre_and_rotate(query_traj)
@@ -199,13 +198,14 @@ def evaluate_images(query_path):
     tif_s = [file for file in all_search_pnts if file.lower().endswith('.tif')]
 
     # query_path = 'C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\Images\Flock'
+    # query_path = "C:\PROJECTS\SocialLandmarks\Data\Tracking\YOLO\Tracker\Images\Instructed"
     all_query_pnts = os.listdir(query_path)
     tif_q = [file for file in all_query_pnts if file.lower().endswith('.tif')]
-    
+
     search_dict = {}
     json_path = "C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Experiments\Evaluation"
-    json_name = json_path + "\search_dict.json"
-    for query in tqdm(tif_q):
+    json_name = json_path + "\search_dict_img.json"
+    for query in tqdm(tif_q): # TODO
         image_path = os.path.join(query_path, query)
         image1 = cv2.imread(image_path, cv2.IMREAD_UNCHANGED)
         # cv2.imshow('image',image)
@@ -365,8 +365,8 @@ if __name__ ==  '__main__':
         "1_6":3, "2_6":8, "3_6":13, "4_6":18, "5_6":23, "6_6":18,
         "6_1":15, "6_2":16, "6_3":17, "6_4":18, "6_5":19}
 
-    search_dict, json_path = evaluate_trajectories()
-    # search_dict, json_path = evaluate_images(query_path = "C:\PROJECTS\SocialLandmarks\Data\Tracking\YOLO\Tracker\Images\Instructed")
+    # search_dict, json_path = evaluate_trajectories()
+    search_dict, json_path = evaluate_images(query_path = "C:\PROJECTS\SocialLandmarks\Data\Tracking\YOLO\Tracker\Images\Instructed")
     print(search_dict)
     exit()
 

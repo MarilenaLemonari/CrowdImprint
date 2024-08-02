@@ -403,7 +403,7 @@ def create_structured_images(key, value, dataset_name, resolution= 32):
 # Execute
 if __name__ ==  '__main__':
     current_file_dir = "C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\Trajectories"
-    name = "\SingleSwitchTesting" #TODO
+    name = "\SingleSwitch" #TODO
     # name = "\\NoSwitch"
     
     csv_directory  = current_file_dir + name + "\\"
@@ -435,6 +435,6 @@ if __name__ ==  '__main__':
         files = os.listdir(folder_path)
         file_exists = any(file.startswith(prefix) for file in files)
         if file_exists == False:
-            empty_predictions = create_centrered_images(prefix, value, folder_path, resolution=64) 
+            empty_predictions = create_images(prefix, value, folder_path, resolution=64) 
 
     print("DONE! Preprocessing Successful.")
