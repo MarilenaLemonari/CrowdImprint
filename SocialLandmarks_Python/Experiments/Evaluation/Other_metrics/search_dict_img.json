@@ -123,5 +123,6 @@
     "class_9_subject2": "10430IF_5_1_T2_d7_a1.tif",
     "class_9_subject3": "17327IF_6_5_T3_d12_a1.tif",
     "class_9_subject4": "3232IF_5_1_T2_d6_a1.tif",
-    "class_9_subject5": "3046IF_2_5_T4_d15_a1.tif"
+    "class_9_subject5": "3046IF_2_5_T4_d15_a1.tif",
+    "result": "Accuracy: 10.4 %"
 }

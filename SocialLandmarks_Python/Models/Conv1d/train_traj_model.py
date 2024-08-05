@@ -136,6 +136,7 @@ if __name__ ==  '__main__':
     end_time = time.time()
     elapsed_time = end_time - start_time
     print(f"Training Time: {elapsed_time:.2f} seconds")  
+    torch.save(model.state_dict(), "C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Models\Conv1d\\model_conv1d2.pth")
 #     model.fit(X_train, y_train, epochs=config.epochs, batch_size=config.batch_size, validation_data=(X_val, y_val),
 #           callbacks=[WandbCallback()])
 #     wandb.finish()

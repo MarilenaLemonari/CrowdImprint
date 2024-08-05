@@ -60,13 +60,12 @@ def instantiate_model(seq_length):
     print("SUCCESS! Model Instantiated.")
 
     criterion = nn.CrossEntropyLoss()
-    optimizer = optim.Adam(model.parameters(), lr=0.001)
+    optimizer = optim.Adam(model.parameters(), lr=0.001, weight_decay=0.003)
     
     # model = keras_model(seq_length)
     # return model
 
     return model, criterion, optimizer, device
-
 
 
 if __name__ ==  '__main__':
@@ -82,4 +81,5 @@ if __name__ ==  '__main__':
     # y = np.random.randint(0, num_classes, size=(num_samples,))
     output = model(x)
     print(output.shape)
+    print(output[0,:])
     
