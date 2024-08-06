@@ -3,12 +3,14 @@ from helper_functions import *
 
 # python3 C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Models\CrowdLIP\data_loader.py
 
-def load_data_keras(val):
+def load_data_keras(val, test):
     # LOAD DATA
-    if val == False:
-        folder_path = 'PythonFiles\\SingleSwitch\\'  
-    else:
+    if val == True:
         folder_path = 'PythonFiles\\SingleSwitch\\ValidationData'  
+    elif test == True:
+        folder_path = 'PythonFiles\\SingleSwitchTesting'
+    else:
+        folder_path = 'PythonFiles\\SingleSwitch\\'  
 
     file_list = os.listdir(folder_path)
     npz_files = [file for file in file_list if file.endswith('.npz')]
@@ -26,7 +28,7 @@ def load_data_keras(val):
     label_dict = {}
     images_dict = {}
 
-    for npz_file in tqdm(npz_files):
+    for npz_file in tqdm(npz_files[:1000]): #TODO
         class_index = npz_file.split("IF_")[1].split("_T")[0]
         class_type = comb_dict[class_index]
         if class_type in label_dict:
@@ -95,8 +97,9 @@ def create_pairs(label_dict, images_dict, n_reps):
 
     return images_a, images_b, gt
 
-def load_data(n_reps, val = False):
-    label_dict, images_dict = load_data_keras(val)
+def load_data(n_reps, val = False, test = False):
+    label_dict, images_dict = load_data_keras(val, test)
+    # print(len(label_dict.keys()))
     images_a, images_b, gt = create_pairs(label_dict, images_dict, n_reps)
 
     return images_a, images_b, gt

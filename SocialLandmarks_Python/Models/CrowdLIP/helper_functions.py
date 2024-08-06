@@ -63,3 +63,6 @@ def compute_similarity(img1, img2):
 def accuracy(y_true, y_pred, threshold=0.5):
     y_pred_label = K.cast(y_pred < threshold, y_true.dtype)
     return K.mean(K.equal(y_true, y_pred_label))
+
+def normalize(x):
+    return tf.math.l2_normalize(x, axis=-1)

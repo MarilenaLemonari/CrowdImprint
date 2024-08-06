@@ -18,12 +18,12 @@ def setup_config_keras(x_train_a, x_val_a, x_train_b, x_val_b, y_train, y_val):
     # x_val_b = np.transpose(x_val_b, (1, 2, 0))
 
     # HYPERPARAMETERS
-    wandb.init(project="SocialLandmarks")
-    config = wandb.config
-    config.epochs = 30
-    config.batch_size = batch_size
+    # wandb.init(project="SocialLandmarks")
+    # config = wandb.config
+    epochs = 1 #TODO
+    batch_size = batch_size
 
-    return x_train_a, x_train_b, y_train, x_val_a, x_val_b,  y_val, config
+    return x_train_a, x_train_b, y_train, x_val_a, x_val_b,  y_val, epochs, batch_size
 
 
 if __name__ ==  '__main__':

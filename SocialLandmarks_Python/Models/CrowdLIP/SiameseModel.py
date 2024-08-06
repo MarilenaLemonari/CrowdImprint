@@ -5,15 +5,15 @@ from helper_functions import *
 
 def build_image_encoder(IMG_SHAPE, EMBED_DIM):
     img_input = Input(shape=IMG_SHAPE)
-    x = Conv2D(32, (3, 3), activation='relu')(img_input)
-    x = Conv2D(64, (3, 3), activation='relu')(x)
+    x = Conv2D(64, (3, 3), activation='relu')(img_input)
+    x = Conv2D(128, (3, 3), activation='relu')(x)
     x = GlobalAveragePooling2D()(x)
     x = Dense(EMBED_DIM, activation='relu')(x)
     model = Model(img_input, x)
     return model
 
 def instantiate_model():
-    IMG_SHAPE = (32, 32, 1)  # Image input shape
+    IMG_SHAPE = (64, 64, 1)  # Image input shape
     EMBED_DIM = 128            # Embedding dimension for images
     
     image_encoder = build_image_encoder(IMG_SHAPE, EMBED_DIM)
@@ -26,8 +26,12 @@ def instantiate_model():
     emb_a = image_encoder(img_a)
     emb_b = image_encoder(img_b)
 
+    # Normalize embeddings:
+    emb_a_norm = Lambda(normalize)(emb_a)
+    emb_b_norm = Lambda(normalize)(emb_b)
+
     # Calculate the Euclidean distance between the embeddings
-    distance = Lambda(euclidean_distance)([emb_a, emb_b])
+    distance = Lambda(euclidean_distance)([emb_a_norm, emb_b_norm])
 
     model = Model([img_a, img_b], distance)
     model.compile(optimizer=Adam(), loss=contrastive_loss, metrics = [accuracy])

@@ -24,19 +24,26 @@ if __name__ ==  '__main__':
     print("SUCCESS! Model is Instantiated.")
 
 #     x_train_a, x_train_b, y_train, x_val_a, x_val_b,  y_val, config = setup_config_keras(images_a, images_b, gt)  
-    x_train_a, x_train_b, y_train, x_val_a, x_val_b,  y_val, config = setup_config_keras(x_train_a, x_val_a, x_train_b, x_val_b, y_train, y_val)
+    x_train_a, x_train_b, y_train, x_val_a, x_val_b,  y_val, epochs, batch_size = setup_config_keras(x_train_a, x_val_a, x_train_b, x_val_b, y_train, y_val)
     print( x_train_a.shape, x_train_b.shape, y_train.shape, x_val_a.shape, x_val_b.shape,  y_val.shape)
 
-    model.fit([x_train_a, x_train_b], y_train, epochs=config.epochs, batch_size=config.batch_size,
-            validation_data=([x_val_a, x_val_b], y_val),
-            callbacks=[WandbCallback()])
-    wandb.finish()
+    model.fit([x_train_a, x_train_b], y_train, epochs=epochs, batch_size=batch_size,
+            validation_data=([x_val_a, x_val_b], y_val))
+    # model.fit([x_train_a, x_train_b], y_train, epochs=config.epochs, batch_size=config.batch_size,
+    #     validation_data=([x_val_a, x_val_b], y_val),
+    #     callbacks=[WandbCallback()])
+    # wandb.finish()
 
     # Saving:
     # # Example usage
     # similarity_score = compute_similarity(dummy_images_a[0], dummy_images_b[0])
     # print(f'Similarity score: {similarity_score}')
-    model.save("C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Models\CrowdLIP\model_CLIP.h5")
+    
+    encoder = model.layers[2]  # Extracting the image encoder
+    encoder.save("C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Models\CrowdLIP\image_encoder_model.h5")
+    # loaded_encoder = tf.keras.models.load_model('image_encoder_model.h5')
+    # loaded_encoder.summary()
+    # model.save("C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Models\CrowdLIP\model_CLIP.h5")
     print("SUCCESS! Model is Saved.")
 
 
