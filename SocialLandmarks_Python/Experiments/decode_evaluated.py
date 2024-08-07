@@ -2,7 +2,7 @@ from imports import *
 
 if __name__ ==  '__main__':
     decoded_dict_folder = "C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Experiments\Evaluation\Other_metrics"
-    name = "\search_dict_traj.json"
+    name = "\search_dict_traj_old.json"
     decoded_dict_path = decoded_dict_folder + name
     with open(decoded_dict_path, 'r') as file:
         image_dict = json.load(file)

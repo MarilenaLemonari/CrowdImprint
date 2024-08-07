@@ -368,8 +368,8 @@ if __name__ ==  '__main__':
         "1_6":3, "2_6":8, "3_6":13, "4_6":18, "5_6":23, "6_6":18,
         "6_1":15, "6_2":16, "6_3":17, "6_4":18, "6_5":19}
 
-    # search_dict, json_path = evaluate_trajectories()
-    search_dict, json_path = evaluate_images(query_path = "C:\PROJECTS\SocialLandmarks\Data\Tracking\YOLO\Tracker\Images\Instructed")
+    search_dict, json_path = evaluate_trajectories()
+    # search_dict, json_path = evaluate_images(query_path = "C:\PROJECTS\SocialLandmarks\Data\Tracking\YOLO\Tracker\Images\Instructed")
     # (search_dict)
     exit()
 
