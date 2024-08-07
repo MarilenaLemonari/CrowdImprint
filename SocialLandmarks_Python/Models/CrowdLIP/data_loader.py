@@ -28,7 +28,7 @@ def load_data_keras(val, test):
     label_dict = {}
     images_dict = {}
 
-    for npz_file in tqdm(npz_files[:1000]): #TODO
+    for npz_file in tqdm(npz_files): #TODO
         class_index = npz_file.split("IF_")[1].split("_T")[0]
         class_type = comb_dict[class_index]
         if class_type in label_dict:

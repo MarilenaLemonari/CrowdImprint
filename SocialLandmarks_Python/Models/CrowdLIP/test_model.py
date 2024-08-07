@@ -21,7 +21,7 @@ if __name__ == "__main__":
     print("SUCCESS! Encoder is loaded.")
 
     # Load data:
-    images_a, images_b, gt = load_data(4, val= True) # test = True
+    images_a, images_b, gt = load_data(40, test = True) # test = True
     gt_dict = {1: "MATCH", 0: "NO MATCH"}
     print(images_a.shape, images_b.shape, gt.shape)
     print("SUCCESS! Data is loaded.")
@@ -37,7 +37,7 @@ if __name__ == "__main__":
     print(distance_norm.shape)
     accuracy_v = 0
     total = 0
-    for i in range(gt.shape[0]):
+    for i in tqdm(range(gt.shape[0])):
         gt_pnt = gt_dict[gt[i]]
         distance_pnt = distance_norm[i,0]
         if distance_pnt.numpy() > 0.5:
@@ -50,7 +50,7 @@ if __name__ == "__main__":
         if int(pred_value) == int(gt[i]):
             accuracy_v += 1
         loss = contrastive_loss(gt[i], distance_pnt)
-        print("Distance for point ",i," is ", distance_pnt.numpy()," and gt is ", gt_pnt, " and LOSS: ", loss.numpy())
+        # print("Distance for point ",i," is ", distance_pnt.numpy()," and gt is ", gt_pnt, " and LOSS: ", loss.numpy())
         #print("Prediction for point ",i," is ", pred," and gt is ", gt_pnt, " and LOSS: ", loss.numpy())
 
     print(accuracy_v, " of ", total, " correct => ", (accuracy_v/total) * 100, "%")

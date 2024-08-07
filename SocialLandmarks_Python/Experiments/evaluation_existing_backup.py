@@ -9,7 +9,7 @@ from tqdm import tqdm
 # cd C:\PROJECTS\SocialLandmarks
 # .\.venv\Scripts\activate
 # cd C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Experiments
-# python3 evaluation_existing.py
+# python3 evaluation_existing_backup.py
 
 def read_value_csv_files(csv_directory):
     csv_files = [f for f in os.listdir(csv_directory) if f.endswith('.csv')]
@@ -158,10 +158,11 @@ def evaluate_trajectories():
 
     # Load trajectories:
     query_file_dir = "C:\PROJECTS\SocialLandmarks\Data\Trajectories"
-    query_name = "\Flock"
-    query_traj_directory  = query_file_dir + query_name + "\\"
+    # query_name = "\Flock"
+    # query_traj_directory  = query_file_dir + query_name + "\\"
+    query_traj_directory  =  "C:\PROJECTS\SocialLandmarks\Data\Tracking\YOLO\Tracker\Trajectories"
     values_traj_directory  = "C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\Trajectories\SingleSwitch"
-    queries_dict = read_csv_files(query_traj_directory)
+    queries_dict = read_value_csv_files(query_traj_directory) #TODO: was read_csv_files(query_traj_directory)
     values_dict = read_value_csv_files(values_traj_directory)    # print(values_dict['0IF_0_1_T5_d8_a1.csv'])
 
     # Prepare search database:
@@ -170,7 +171,7 @@ def evaluate_trajectories():
     # Search database with query:
     search_dict = {}
     json_path = "C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Experiments\Evaluation"
-    json_name = json_path + "\search_dict.json"
+    json_name = json_path + "\search_dict_traj.json"
     for query, query_traj in queries_dict.items():
         # Prepare query for searching:
         rotated_points, max_dist_value, max_width_value = centre_and_rotate(query_traj)
@@ -198,14 +199,13 @@ def evaluate_images(query_path):
     tif_s = [file for file in all_search_pnts if file.lower().endswith('.tif')]
 
     # query_path = 'C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\Images\Flock'
-    # query_path = "C:\PROJECTS\SocialLandmarks\Data\Tracking\YOLO\Tracker\Images\Instructed"
     all_query_pnts = os.listdir(query_path)
     tif_q = [file for file in all_query_pnts if file.lower().endswith('.tif')]
-
+    
     search_dict = {}
     json_path = "C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Experiments\Evaluation"
-    json_name = json_path + "\search_dict_img.json"
-    for query in tqdm(tif_q): # TODO
+    json_name = json_path + "\search_dict.json"
+    for query in tqdm(tif_q):
         image_path = os.path.join(query_path, query)
         image1 = cv2.imread(image_path, cv2.IMREAD_UNCHANGED)
         # cv2.imshow('image',image)
@@ -225,22 +225,24 @@ def evaluate_images(query_path):
 
     return search_dict, json_path
 
-def evaluate_dedicated_metric():
+def evaluate_dedicated_metric(traj_directory):
     # METHOD 3:
     print("evaluate_dedicated_metrics()")
 
     # Load trajectories:
-    file_dir = "C:\PROJECTS\SocialLandmarks\Data\Trajectories"
-    name = "\Flock"
-    traj_directory  = file_dir + name + "\\"
-    traj_dict = read_csv_files(traj_directory)
+    # file_dir = "C:\PROJECTS\SocialLandmarks\Data\Trajectories"
+    # name = "\Flock"
+    # traj_directory  = file_dir + name + "\\"
+    traj_dict = read_value_csv_files(traj_directory)
     
     final_dict = {}
     for agent_id, agent_traj in traj_dict.items():
         metrics_dict = {}
-        timestep = 0.4 # For flock. TODO
+        timestep = 0.0333333 # For flock. TODO
         tol = 1/timestep
         frames = len(agent_traj)
+        print(agent_traj.head(5))
+        exit()
         source_x = agent_traj["norm_source"].iloc[0]
         source_z = agent_traj["norm_source"].iloc[1]
         stop_metric = 0 
@@ -301,7 +303,8 @@ def evaluate_dedicated_metric():
         metrics_dict["uni_metric"] = uni_metric
         metrics_dict["avoid_metric"] = avoid_metric
         final_dict[agent_id] = metrics_dict
-  
+    exit()
+
     return final_dict
 
 def get_gt_instructed(c_dict, gt_dict):
@@ -367,16 +370,16 @@ if __name__ ==  '__main__':
 
     # search_dict, json_path = evaluate_trajectories()
     search_dict, json_path = evaluate_images(query_path = "C:\PROJECTS\SocialLandmarks\Data\Tracking\YOLO\Tracker\Images\Instructed")
-    print(search_dict)
+    # (search_dict)
     exit()
 
-    # final_dict = evaluate_dedicated_metric()
-    final_dict, eval_pred, eval_gt, metric = get_gt_instructed(c_dict, gt_dict)
+    final_dict = evaluate_dedicated_metric(traj_directory="C:\PROJECTS\SocialLandmarks\Data\Tracking\YOLO\Tracker\Trajectories\\")
+    # final_dict, eval_pred, eval_gt, metric = get_gt_instructed(c_dict, gt_dict)
     json_path = "C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Experiments\Evaluation"
     json_name = json_path + "\\final_dict.json"
     with open(json_name, 'w') as json_file:
         json.dump(final_dict, json_file, indent=4)
-    # exit()
+    exit()
 
     # final_dict = {}
     # metric = 0

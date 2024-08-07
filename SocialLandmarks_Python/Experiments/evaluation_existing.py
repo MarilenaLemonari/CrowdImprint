@@ -225,20 +225,20 @@ def evaluate_images(query_path):
 
     return search_dict, json_path
 
-def evaluate_dedicated_metric():
+def evaluate_dedicated_metric(traj_directory):
     # METHOD 3:
     print("evaluate_dedicated_metrics()")
 
     # Load trajectories:
-    file_dir = "C:\PROJECTS\SocialLandmarks\Data\Trajectories"
-    name = "\Flock"
-    traj_directory  = file_dir + name + "\\"
-    traj_dict = read_csv_files(traj_directory)
-    
+    # file_dir = "C:\PROJECTS\SocialLandmarks\Data\Trajectories"
+    # name = "\Flock"
+    # traj_directory  = file_dir + name + "\\"
+    traj_dict = read_value_csv_files(traj_directory)
+
     final_dict = {}
     for agent_id, agent_traj in traj_dict.items():
         metrics_dict = {}
-        timestep = 0.4 # For flock. TODO
+        timestep = 0.0333333 # For flock. TODO
         tol = 1/timestep
         frames = len(agent_traj)
         source_x = agent_traj["norm_source"].iloc[0]
@@ -272,6 +272,8 @@ def evaluate_dedicated_metric():
                     spawn = [pos_x, pos_z]
                 else:
                     goal = [pos_x, pos_z]
+                    if (goal[0]-spawn[0]) == 0:
+                        goal[0] += 0.001
                     m = (goal[1]-spawn[1])/(goal[0]- spawn[0])
                     b = goal[1] - m * goal[0]
                     optimal_z = m * np.array(path_x) + b
@@ -301,7 +303,8 @@ def evaluate_dedicated_metric():
         metrics_dict["uni_metric"] = uni_metric
         metrics_dict["avoid_metric"] = avoid_metric
         final_dict[agent_id] = metrics_dict
-  
+    # exit()
+
     return final_dict
 
 def get_gt_instructed(c_dict, gt_dict):
@@ -365,18 +368,18 @@ if __name__ ==  '__main__':
         "1_6":3, "2_6":8, "3_6":13, "4_6":18, "5_6":23, "6_6":18,
         "6_1":15, "6_2":16, "6_3":17, "6_4":18, "6_5":19}
 
-    search_dict, json_path = evaluate_trajectories()
+    # search_dict, json_path = evaluate_trajectories()
     # search_dict, json_path = evaluate_images(query_path = "C:\PROJECTS\SocialLandmarks\Data\Tracking\YOLO\Tracker\Images\Instructed")
-    print(search_dict)
-    exit()
+    # (search_dict)
+    # exit()
 
-    # final_dict = evaluate_dedicated_metric()
-    final_dict, eval_pred, eval_gt, metric = get_gt_instructed(c_dict, gt_dict)
+    final_dict = evaluate_dedicated_metric(traj_directory="C:\PROJECTS\SocialLandmarks\Data\Tracking\YOLO\Tracker\Trajectories\\")
+    # final_dict, eval_pred, eval_gt, metric = get_gt_instructed(c_dict, gt_dict)
     json_path = "C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Experiments\Evaluation"
     json_name = json_path + "\\final_dict.json"
     with open(json_name, 'w') as json_file:
         json.dump(final_dict, json_file, indent=4)
-    # exit()
+    exit()
 
     # final_dict = {}
     # metric = 0
