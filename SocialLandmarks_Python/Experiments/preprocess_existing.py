@@ -306,6 +306,6 @@ if __name__ ==  '__main__':
     # existing_data_preprocessing(current_file_dir, name)
 
     # if captured:
-    folder_path = 'C:\PROJECTS\SocialLandmarks\Data\Tracking\YOLO\Tracker\Images\Instructed'
-    name = "Instructed"
+    folder_path = 'C:\PROJECTS\SocialLandmarks\Data\Tracking\YOLO\Tracker\Images\PersonTrajectories'
+    name = "ActedScenarios"
     generate_python_files(folder_path, name)

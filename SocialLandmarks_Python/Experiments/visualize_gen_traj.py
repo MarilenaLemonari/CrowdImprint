@@ -70,7 +70,7 @@ def read_csv_new(current_file_dir, name):
     # exit()
 
     color_dict ={}
-    color_list = ["slategrey", "firebrick"]
+    color_list = ["slategrey", "firebrick", "firebrick"]
     index = 0
     for i in tqdm(range(n_csvs)):
         key, value = dict_list[i]
@@ -93,6 +93,7 @@ if __name__ ==  '__main__':
     current_file_dir = "C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\Trajectories\Inference"
     # name = "\Flock"
     # name = "\Zara"
-    name = "\Students"
+    # name = "\Students"
+    name = "\ActedScenarios\Scenario1_friends"
 
     read_csv_new(current_file_dir, name)

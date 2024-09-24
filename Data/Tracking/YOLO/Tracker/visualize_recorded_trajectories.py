@@ -11,7 +11,7 @@ import csv
 
 traj_dir = './Trajectories/' 
 traj_files = glob.glob(os.path.join(traj_dir, '*.csv'))
-traj_files = ['./Trajectories/class_12_subject1.csv']
+traj_files = ['./Trajectories/PersonTrajectories/scenario1_friends_subject1.csv']
 
 trajectories = []
 plt.figure(figsize=(6, 6))

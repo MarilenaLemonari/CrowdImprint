@@ -321,7 +321,7 @@ def create_structured_images(key, value, dataset_name, resolution= 32):
 
 # Execute
 if __name__ ==  '__main__':
-    current_file_dir = "C:\PROJECTS\SocialLandmarks\Data\Tracking\YOLO\Tracker\Trajectories"
+    current_file_dir = "C:\PROJECTS\SocialLandmarks\Data\Tracking\YOLO\Tracker\Trajectories\PersonTrajectories"
     
     csv_directory  = current_file_dir  + "\\"
 
@@ -336,7 +336,7 @@ if __name__ ==  '__main__':
     for i in tqdm(range(n_csvs)):
         key, value = dict_list[i]
         prefix = key.split(".")[0]
-        folder_path = "C:\PROJECTS\SocialLandmarks\Data\Tracking\YOLO\Tracker\Images"
+        folder_path = "C:\PROJECTS\SocialLandmarks\Data\Tracking\YOLO\Tracker\Images\PersonTrajectories"
 
         # plt.plot(value["pos_x"], value["pos_z"], 'slategrey')
         # plt.scatter(value["pos_x"][0], value["pos_z"][0], c = 'slategrey')

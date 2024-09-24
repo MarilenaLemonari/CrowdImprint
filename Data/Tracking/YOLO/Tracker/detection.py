@@ -33,7 +33,35 @@ all_feet_trajectories = []
             #    ,"E:\WorkCYENS\DataRecording\Videos_Instructed\class_1_subject3.mp4"
             #    ,"E:\WorkCYENS\DataRecording\Videos_Instructed\class_1_subject5.mp4"]
 
+# video_files = ["E:\WorkCYENS\DataRecording_OG\Videos_Scenarios\scenario3_exhibit_subject1.mp4",
+#                "E:\WorkCYENS\DataRecording_OG\Videos_Scenarios\scenario3_exhibit_subject2.mp4",
+#                "E:\WorkCYENS\DataRecording_OG\Videos_Scenarios\scenario3_exhibit_subject3.mp4",
+#                "E:\WorkCYENS\DataRecording_OG\Videos_Scenarios\scenario3_exhibit_subject4.mp4",
+#                "E:\WorkCYENS\DataRecording_OG\Videos_Scenarios\scenario3_exhibit_subject5.mp4",
+#                 "E:\WorkCYENS\DataRecording_OG\Videos_Scenarios\scenario4_atm_subject1.mp4",
+#                 "E:\WorkCYENS\DataRecording_OG\Videos_Scenarios\scenario4_atm_subject2.mp4",
+#                 "E:\WorkCYENS\DataRecording_OG\Videos_Scenarios\scenario4_atm_subject3.mp4",
+#                 "E:\WorkCYENS\DataRecording_OG\Videos_Scenarios\scenario4_atm_subject4.mp4",
+#                 "E:\WorkCYENS\DataRecording_OG\Videos_Scenarios\scenario4_atm_subject5.mp4",
+#                 "E:\WorkCYENS\DataRecording_OG\Videos_Scenarios\scenario5_foodcourt_subject1.mp4",
+#                 "E:\WorkCYENS\DataRecording_OG\Videos_Scenarios\scenario5_foodcourt_subject2.mp4",
+#                 "E:\WorkCYENS\DataRecording_OG\Videos_Scenarios\scenario5_foodcourt_subject3.mp4",
+#                 "E:\WorkCYENS\DataRecording_OG\Videos_Scenarios\scenario5_foodcourt_subject4.mp4",
+#                 "E:\WorkCYENS\DataRecording_OG\Videos_Scenarios\scenario5_foodcourt_subject5.mp4"]
+
+video_files = ["E:\WorkCYENS\DataRecording_MAN\Videos_Scenarios\scenario1_friends_subject1.mp4",
+               "E:\WorkCYENS\DataRecording_MAN\Videos_Scenarios\scenario1_friends_subject2.mp4",
+               "E:\WorkCYENS\DataRecording_MAN\Videos_Scenarios\scenario1_friends_subject3.mp4",
+               "E:\WorkCYENS\DataRecording_MAN\Videos_Scenarios\scenario1_friends_subject4.mp4",
+               "E:\WorkCYENS\DataRecording_MAN\Videos_Scenarios\scenario1_friends_subject5.mp4",
+               "E:\WorkCYENS\DataRecording_MAN\Videos_Scenarios\scenario2_guard_subject1.mp4",
+               "E:\WorkCYENS\DataRecording_MAN\Videos_Scenarios\scenario2_guard_subject2.mp4",
+               "E:\WorkCYENS\DataRecording_MAN\Videos_Scenarios\scenario2_guard_subject3.mp4",
+               "E:\WorkCYENS\DataRecording_MAN\Videos_Scenarios\scenario2_guard_subject4.mp4",
+               "E:\WorkCYENS\DataRecording_MAN\Videos_Scenarios\scenario2_guard_subject5.mp4"]
+
 for video_file in video_files:
+
     cap = cv2.VideoCapture(video_file)
     
     # Get the total number of frames in the video for the progress bar
@@ -83,9 +111,9 @@ for video_file in video_files:
                         feet_trajectories.append(feet_world_coords)
 
             # Display the frame with bounding boxes
-            # cv2.imshow('Frame with Bounding Boxes', undistorted_frame) # TODO
-            # if cv2.waitKey(1) & 0xFF == ord('q'):
-            #     break
+            cv2.imshow('Frame with Bounding Boxes', undistorted_frame) # TODO
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
 
             # Update the progress bar
             pbar.update(1)
@@ -118,8 +146,9 @@ for traj in all_feet_trajectories:
         else:
             y_i = (y_i - source_y) * (2) + source_y
         y[i] = y_i
-    output_name = "class_" + video_files[c].split("class_")[1].split('.mp4')[0] + ".csv"
-    output_file = f'.\Trajectories\{output_name}'
+    # output_name = "class_" + video_files[c].split("class_")[1].split('.mp4')[0] + ".csv"
+    output_name = video_files[c].split(".mp4")[0].split("Videos_Scenarios\\")[1] + ".csv"
+    output_file = f'.\Trajectories\PersonTrajectories\{output_name}'
     c += 1
     # Smoothen
     window_size = 5

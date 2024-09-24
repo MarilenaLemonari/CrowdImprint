@@ -225,11 +225,13 @@ def generate_trajectories(beh_distr, n_agents, mode):
 
 if __name__ ==  '__main__':
 
-    model_name = "trial2.pth"
+    model_name = "model_final.pth"
     model_type = "pytorch"
     # dataset_name = "Flock"
     # dataset_name = "Zara"
-    dataset_name = "Students"
+    # dataset_name = "Students"
+    specific = "Scenario5_foodcourt"
+    dataset_name = f"ActedScenarios/{specific}"
 
     x_test = load_python_files(dataset_name)
     c_batch_size = x_test.shape[0]
@@ -247,7 +249,7 @@ if __name__ ==  '__main__':
     combinations, c_dict = decode_labels(predicted_labels)
     print(c_dict)
 
-    beh_distr = create_infered_beh_distr(predicted_labels, dataset_name, True)
+    beh_distr = create_infered_beh_distr(predicted_labels, specific, True)
     print(beh_distr)
     
     # Generate new trajectories based on inferred behaviours:
