@@ -91,8 +91,12 @@ def generate_trajectories(beh_distr, n_agents, mode):
     # n_agents = len(combs)
 
     os.chdir("C:\PROJECTS\DataDrivenInteractionFields\InteractionFieldsUMANS\examples")
-    behavior_list = ["0_Anticlockwise_final", "1_Unidirectional_final", "2_Attractive_final", "3_Clockwise_final", "4_AvoidV2_final",
-                "Stop", "4_AvoidOppV2_final"]
+    # behavior_list = ["0_Anticlockwise_final", "1_Unidirectional_final", "2_Attractive_final", "3_Clockwise_final", "4_AvoidV2_final",
+    #             "Stop", "4_AvoidOppV2_final"]
+    behavior_list = ["0_Anticlockwise_final", "1_Unidirectional_final", "2_Attractive_final", "CAoval", "7_AvoidRight",
+                "Stop", "6_AvoidOppp"]
+    dir_dict = {0:0, 1:3}
+    avoid_dict = {0:4, 1:6}
 
     dictionary = {}
     for i in range(len(behavior_list)-1):
@@ -115,25 +119,51 @@ def generate_trajectories(beh_distr, n_agents, mode):
         beh_combination = combs[r]
         string = beh_combination.strip("[]'")
         InF1, InF2 = map(int, string.split('_'))
-        end_time = random.randint(6,max_end_time)
+
+        flag_1_4 = ''
+        field_1 = random.randint(1,len(behavior_list)-2)
+        field_2 = random.randint(1,len(behavior_list)-2)
+        end_time = random.randint(6,15)
         max_radius = end_time/4 
-        min_radius = 0.5
+        min_radius = 2
         radius = random.uniform(min_radius, max_radius)
-        T = random.randint(3,int(end_time-3))
-        
-        # Sample Circle Around Behaviour:
-        if InF1 == 0 or InF1 == 3:
-            flag_ca = random.randint(0,1)
-            if flag_ca == 0:
-                InF1 = 0
+        T = random.randint(3,int(end_time-3)) 
+
+        if field_1 == 2 and field_2 == 2:
+            end_time = random.randint(3,6)
+            radius = end_time + 0.01
+        elif field_1 == 2 and field_2 != 2:
+            if T > 10:
+                T = 10
+            radius = T - 0.1
+            if field_2 == 4:
+                end_time = random.randint(8, 10)
+                T = random.randint(3, int(end_time)-4)
+        elif field_2 == 2:
+            end_time = random.randint(6,10)
+            radius = end_time/2
+            if field_1 == 4:
+                T = random.randint(int(end_time-4),int(end_time-2))
             else:
-                InF1 = 3
-        if InF2 == 0 or InF2 == 3:
-            flag_ca = random.randint(0,1)
-            if flag_ca == 0:
-                InF2 = 0
-            else:
-                InF2 = 3
+             T = random.randint(3,int(end_time-3))
+        if field_1 == 1 and field_2 == 4:
+            field_2 = 1
+            field_1 = 4
+            flag_1_4 = "flagged"
+        if field_1 == 1 and field_2 == 1:
+            end_time = 6
+            radius = random.uniform(1, 5)
+        if field_1 == 4:
+            radius = random.uniform(3, 5)
+        if field_2 == 4 and field_1 == 5:
+            end_time = random.randint(8,15)
+            T = random.randint(2,int(end_time-4))
+        if field_1 == 5 and field_2 == 3:
+            T = 2
+        if field_1 == 5 and field_2 == 1:
+            radius = random.uniform(1, 8)
+            end_time = random.randint(4,11-int(radius))
+            T = 2
 
         # Initialise agent and simulation duration:
         x0 = 0
@@ -149,29 +179,44 @@ def generate_trajectories(beh_distr, n_agents, mode):
         or_y = math.sin(random_angle)
         orientation = np.array([or_x, or_y])
 
-        # Handle Avoid Behaviour:
-        if InF1 == 4 or InF1 == 6:
-            # check if behind:
-            vector_to_initial_agent = init_positions[1,:] - init_positions[0,:] 
-            dot_product = np.dot(vector_to_initial_agent, orientation)
+        # Check if agent is behind source:
+        vector_to_initial_agent = init_positions[1,:] - init_positions[0,:]
+        dot_product = np.dot(vector_to_initial_agent, orientation)
+
+        if field_1 == 5 and field_2 == 4:
             if dot_product <= 0:
-                # Agent behind the source:
-                InF1 = 4
+                 # Agent behind the source:
+                field_2 = 4
             else:
                 # Agent in front of source:
-                InF1 = 6
-        if InF2 == 4 or InF2 == 6:
-            flag_av = random.randint(0,1)
-            if flag_av == 0:
-                InF2 = 4
-            else:
-                InF2 = 6
-        field_1 = InF1
-        field_2 = InF2
+                field_2 = 6
+        elif field_1 != 5 and field_2 == 4:
+            field_2 = avoid_dict[random.randint(0,1)]
+            if field_1 == 1:
+                field_2 = 6
 
-        weight = np.zeros((1,len(behavior_list)-1))
-        actionTimes = np.ones((1,len(behavior_list)-1))*(-1)
-        inactiveTimes = np.ones((1,len(behavior_list)-1))*(-1)
+        if field_1 == 4:
+            if dot_product <= 0:
+                # Agent behind the source:
+                field_1 = 4
+            else:
+                # Agent in front of source:
+                field_1 = 6
+            if field_2 == 4 or field_2 == 6:
+                field_2 = field_1
+
+
+        # If sampled field is circle around randomly choose clockwise or anticlockwise options
+        if field_1 == 3:
+            field_dir = random.randint(0,1)
+            field_1 = dir_dict[field_dir]
+        if field_2 == 3:
+            field_dir = random.randint(0,1)
+            field_2 = dir_dict[field_dir]
+
+        weight=np.zeros((1,len(behavior_list)-1))
+        actionTimes=np.ones((1,len(behavior_list)-1))*(-1)
+        inactiveTimes=np.ones((1,len(behavior_list)-1))*(-1)
 
         if field_1 != 5 and field_2 != 5:
             if field_1 == 6:
@@ -211,6 +256,102 @@ def generate_trajectories(beh_distr, n_agents, mode):
             inactiveTimes[0,first_field] = T
             actionTimes[0,first_field] = 0
 
+        # end_time = random.randint(6,max_end_time)
+        # max_radius = end_time/4 
+        # min_radius = 0.5
+        # radius = random.uniform(min_radius, max_radius)
+        # T = random.randint(3,int(end_time-3))
+        
+        # # Sample Circle Around Behaviour:
+        # if InF1 == 0 or InF1 == 3:
+        #     flag_ca = random.randint(0,1)
+        #     if flag_ca == 0:
+        #         InF1 = 0
+        #     else:
+        #         InF1 = 3
+        # if InF2 == 0 or InF2 == 3:
+        #     flag_ca = random.randint(0,1)
+        #     if flag_ca == 0:
+        #         InF2 = 0
+        #     else:
+        #         InF2 = 3
+
+        # # Initialise agent and simulation duration:
+        # x0 = 0
+        # y0 = 0
+        # angle = random.uniform(0, 2 * math.pi)
+        # x = x0 + radius * math.cos(angle)
+        # y = y0 + radius * math.sin(angle)
+        # init_positions=np.array([[x0,y0],[x,y]])
+
+        # # Initialise source orientation:
+        # random_angle = random.uniform(0, 2 * math.pi)
+        # or_x = math.cos(random_angle)
+        # or_y = math.sin(random_angle)
+        # orientation = np.array([or_x, or_y])
+
+        # # Handle Avoid Behaviour:
+        # if InF1 == 4 or InF1 == 6:
+        #     # check if behind:
+        #     vector_to_initial_agent = init_positions[1,:] - init_positions[0,:] 
+        #     dot_product = np.dot(vector_to_initial_agent, orientation)
+        #     if dot_product <= 0:
+        #         # Agent behind the source:
+        #         InF1 = 4
+        #     else:
+        #         # Agent in front of source:
+        #         InF1 = 6
+        # if InF2 == 4 or InF2 == 6:
+        #     flag_av = random.randint(0,1)
+        #     if flag_av == 0:
+        #         InF2 = 4
+        #     else:
+        #         InF2 = 6
+        # field_1 = InF1
+        # field_2 = InF2
+
+        # weight = np.zeros((1,len(behavior_list)-1))
+        # actionTimes = np.ones((1,len(behavior_list)-1))*(-1)
+        # inactiveTimes = np.ones((1,len(behavior_list)-1))*(-1)
+
+        # if field_1 != 5 and field_2 != 5:
+        #     if field_1 == 6:
+        #         first_field = 5
+        #     else:
+        #         first_field = field_1
+        #     if field_2 == 6:
+        #         sec_field = 5
+        #     else:
+        #         sec_field = field_2
+        #     weight[0,first_field] = 1
+        #     weight[0,sec_field] = 1
+
+        #     inactiveTimes[0,first_field] = T
+        #     actionTimes[0,sec_field] = T
+
+        #     inactiveTimes[0,sec_field] = end_time
+        #     actionTimes[0,first_field] = 0
+
+        # elif field_1 == 5 and field_2 != 5:
+        #     if field_2 == 6:
+        #         sec_field = 5
+        #     else:
+        #         sec_field = field_2
+
+        #     weight[0,sec_field] = 1
+        #     inactiveTimes[0,sec_field] = end_time
+        #     actionTimes[0,sec_field] = T
+
+        # elif field_1 != 5 and field_2 == 5:
+        #     if field_1 == 6:
+        #         first_field = 5
+        #     else:
+        #         first_field = field_1
+
+        #     weight[0,first_field] = 1
+        #     inactiveTimes[0,first_field] = T
+        #     actionTimes[0,first_field] = 0
+
     
         generate_instance(init_positions,weight,actionTimes,inactiveTimes,or_x, or_y,dictionary, groupID = r)
   
@@ -230,7 +371,7 @@ if __name__ ==  '__main__':
     # dataset_name = "Flock"
     # dataset_name = "Zara"
     # dataset_name = "Students"
-    specific = "Scenario5_foodcourt"
+    specific = "Scenario1_friends"
     dataset_name = f"ActedScenarios/{specific}"
 
     x_test = load_python_files(dataset_name)

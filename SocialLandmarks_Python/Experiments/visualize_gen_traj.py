@@ -82,7 +82,7 @@ def read_csv_new(current_file_dir, name):
         empty_predictions = plot_trajectories(prefix_updated, value, color_dict)
 
     plt.title(f"{name[1:]} Dataset Generated Paths")
-    plt.plot(0,0,'k',marker='o', markersize=8)
+    plt.plot(0,0,'k',marker='o', markersize=8) # TODO note that source at (0,0) by default
     legends = list(color_dict.keys())
     plt.legend(legends)
     plt.savefig(csv_directory + "traj_image.png")

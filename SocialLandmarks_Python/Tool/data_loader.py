@@ -22,8 +22,7 @@ def read_csv_files(csv_directory):
         df = pd.read_csv(os.path.join(csv_directory, filename), 
             header=None, names=column_names, 
             skiprows=None,
-            usecols=[0, 1, 2],
-            sep=';') #TODO: also subject to csv structure
+            usecols=[0, 1, 2]) #,sep=';') #TODO: also subject to csv structure
         df[column_names[0]] = df[column_names[0]].astype(float) 
         df[column_names[1]] = df[column_names[1]].astype(float)
         df[column_names[2]] = df[column_names[2]].astype(float)
@@ -117,7 +116,7 @@ def create_centrered_images(key, value, dataset_name, resolution= 32):
         else:
             # image[pixel_x,pixel_z] = cur_speed
             if f"{pixel_x}_{pixel_z}" in image_dict.keys():
-                image[pixel_x,pixel_z] = 0.85 # TODO: ML change1 cur_speed
+                image[pixel_x,pixel_z] = 0.85 
             else:
                 image[pixel_x,pixel_z] = 0.6
                 image_dict[f"{pixel_x}_{pixel_z}"] = 1
@@ -160,10 +159,14 @@ if __name__ ==  '__main__':
     npz_dir = "C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\PythonFiles\CaseStudy"
 
     """
-    For name = "\\P2C_20s_Interval\\Arxiepiskopi_0-20" the csv structure is as follows:
+    In general, the timestep limit is 15s. TODO: confirm this for every csv structure.
+    1. For name = "\\P2C_20s_Interval\\Arxiepiskopi_0-20" the csv structure is as follows:
         - timestep; x; z; orientation; goal; group; interaction; connectivity (weights)
+    2. For name = "\\SL\\Scenario1_friends":
+        - timestep, x, z, or_x, or_z
     """
-    name = "\\P2C_20s_Interval\\Arxiepiskopi_0-20"
+    # name = "\\P2C_20s_Interval\\Arxiepiskopi_0-20"
+    name = "\\SL\\Scenario1_friends"
     csv_directory = traj_dir + name + "\\"
     os.makedirs(img_dir + name, exist_ok=True)
     os.makedirs(npz_dir + name, exist_ok=True)
