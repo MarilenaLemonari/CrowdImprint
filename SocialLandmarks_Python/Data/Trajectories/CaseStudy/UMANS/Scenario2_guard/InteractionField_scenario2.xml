@@ -1,0 +1,62 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<InteractionFields>
+	<InteractionField id="0" isVelocity="true" weight="1.0" action_time="0" inactive_time="10">
+		<Matrix file="matrix/Scenario2_fieldUNI.txt" />
+	</InteractionField>
+	<!--
+	<InteractionField id="0" isVelocity="true" weight="0.0" action_time="-1.0" inactive_time="-1.0" group="0">
+		<Matrix file="matrix/0_Anticlockwise_final.txt" />
+	</InteractionField>
+	<InteractionField id="1" isVelocity="true" weight="1.0" action_time="2.0" inactive_time="5.0" group="0">
+		<Matrix file="matrix/1_Unidirectional_final.txt" />
+	</InteractionField>
+	<InteractionField id="2" isVelocity="true" weight="0.0" action_time="-1.0" inactive_time="-1.0" group="0">
+		<Matrix file="matrix/2_Attractive_final.txt" />
+	</InteractionField>
+	<InteractionField id="3" isVelocity="true" weight="0.0" action_time="-1.0" inactive_time="-1.0" group="0">
+		<Matrix file="matrix/CAoval.txt" />
+	</InteractionField>
+	<InteractionField id="4" isVelocity="true" weight="0.0" action_time="-1.0" inactive_time="-1.0" group="0">
+		<Matrix file="matrix/7_AvoidRight.txt" />
+	</InteractionField>
+	<InteractionField id="5" isVelocity="true" weight="0.0" action_time="-1.0" inactive_time="-1.0" group="0">
+		<Matrix file="matrix/6_AvoidOppp.txt" />
+	</InteractionField>
+	<InteractionField id="10" isVelocity="true" weight="0.0" action_time="-1.0" inactive_time="-1.0" group="1">
+		<Matrix file="matrix/0_Anticlockwise_final.txt" />
+	</InteractionField>
+	<InteractionField id="11" isVelocity="true" weight="0.0" action_time="-1.0" inactive_time="-1.0" group="1">
+		<Matrix file="matrix/1_Unidirectional_final.txt" />
+	</InteractionField>
+	<InteractionField id="12" isVelocity="true" weight="1.0" action_time="0.0" inactive_time="4.0" group="1">
+		<Matrix file="matrix/2_Attractive_final.txt" />
+	</InteractionField>
+	<InteractionField id="13" isVelocity="true" weight="0.0" action_time="-1.0" inactive_time="-1.0" group="1">
+		<Matrix file="matrix/CAoval.txt" />
+	</InteractionField>
+	<InteractionField id="14" isVelocity="true" weight="1.0" action_time="4.0" inactive_time="8.0" group="1">
+		<Matrix file="matrix/7_AvoidRight.txt" />
+	</InteractionField>
+	<InteractionField id="15" isVelocity="true" weight="0.0" action_time="-1.0" inactive_time="-1.0" group="1">
+		<Matrix file="matrix/6_AvoidOppp.txt" />
+	</InteractionField>
+	<InteractionField id="20" isVelocity="true" weight="0.0" action_time="-1.0" inactive_time="-1.0" group="2">
+		<Matrix file="matrix/0_Anticlockwise_final.txt" />
+	</InteractionField>
+	<InteractionField id="21" isVelocity="true" weight="0.0" action_time="-1.0" inactive_time="-1.0" group="2">
+		<Matrix file="matrix/1_Unidirectional_final.txt" />
+	</InteractionField>
+	<InteractionField id="22" isVelocity="true" weight="1.0" action_time="0.0" inactive_time="5.0" group="2">
+		<Matrix file="matrix/2_Attractive_final.txt" />
+	</InteractionField>
+	<InteractionField id="23" isVelocity="true" weight="1.0" action_time="5.0" inactive_time="8.0" group="2">
+		<Matrix file="matrix/CAoval.txt" />
+	</InteractionField>
+	<InteractionField id="24" isVelocity="true" weight="0.0" action_time="-1.0" inactive_time="-1.0" group="2">
+		<Matrix file="matrix/7_AvoidRight.txt" />
+	</InteractionField>
+	<InteractionField id="25" isVelocity="true" weight="0.0" action_time="-1.0" inactive_time="-1.0" group="2">
+		<Matrix file="matrix/6_AvoidOppp.txt" />
+	</InteractionField>
+	-->
+</InteractionFields>

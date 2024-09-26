@@ -1,0 +1,9 @@
+<?xml version="1.0" ?>
+<Simulation delta_time="0.1" end_time="15">
+	<World type="Infinite">
+		<Obstacles file="obstacles/UserStudy1_obstacle.xml"/>
+	</World>
+	<Agents file="agents/Agent_scenario2.xml"/>
+	<Policies file="policies/InteractionFieldsWithCollisionAvoidance.xml"/>
+	<InteractionFields file="interactionFields/InteractionField_scenario2.xml"/>
+</Simulation>
