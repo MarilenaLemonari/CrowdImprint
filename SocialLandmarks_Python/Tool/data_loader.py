@@ -40,9 +40,13 @@ def read_csv_files(csv_directory):
     
     for filename, df in data_dict.items():
         # Normalize to [0, 1]
-        bound_min = min(np.min(df["pos_x"]), np.min(df["pos_z"]), 0)
-        bound_max = max(np.max(df["pos_x"]), np.max(df["pos_z"]), 0)
-        
+        # bound_min = min(np.min(df["pos_x"]), np.min(df["pos_z"]), 0)
+        # bound_max = max(np.max(df["pos_x"]), np.max(df["pos_z"]), 0)
+        x_source = 0 # 14.18639
+        z_source = 0 # -15.73068
+        bound_min = min(np.min(df["pos_x"]), np.min(df["pos_z"]), x_source, z_source)
+        bound_max = max(np.max(df["pos_x"]), np.max(df["pos_z"]), x_source, z_source)
+
         tol = 0.5
         
         bound_max += tol
@@ -52,9 +56,13 @@ def read_csv_files(csv_directory):
         df["pos_z"] = (df['pos_z'] - bound_min) / (bound_max - bound_min) * (1 - 0) 
 
         # TODO: dependent on environment 
+        #source for CCP: x_source = 14.18639 z_source = -15.73068
         s = len(df["pos_x"])
         source_norm = np.zeros((s))
-        source_norm[0] = (0 - bound_min) / (bound_max - bound_min) * (1 - 0)
+        # source_norm[0] = (0 - bound_min) / (bound_max - bound_min) * (1 - 0)
+        source_norm[0] = (x_source - bound_min) / (bound_max - bound_min) * (1 - 0)
+        source_norm[1] = (z_source - bound_min) / (bound_max - bound_min) * (1 - 0)
+
         df["norm_source"] = list(source_norm)
 
         data_dict[filename] = df
@@ -62,11 +70,11 @@ def read_csv_files(csv_directory):
     return data_dict
 
 def create_centrered_images(key, value, dataset_name, resolution= 32):
-    # # default_int = 0.5
+    # default_int = 0.5
     # plt.clf()
     # plt.plot(value["pos_x"], value["pos_z"], c = 'slategrey')
     # plt.scatter(value["pos_x"][0], value["pos_z"][0], c = 'slategrey')
-    # plt.scatter(value["norm_source"][0], value["norm_source"][0], c = 'firebrick', marker = '*', s = 200)
+    # plt.scatter(value["norm_source"][0], value["norm_source"][1], c = 'firebrick', marker = '*', s = 200)
     # plt.legend(['Path', 'Spawn', 'Source'])
     # plt.xlabel("Position X")
     # plt.ylabel("Position Z")
@@ -166,7 +174,10 @@ if __name__ ==  '__main__':
         - timestep, x, z, or_x, or_z
     """
     # name = "\\P2C_20s_Interval\\Arxiepiskopi_0-20"
-    name = "\\SL\\Scenario1_friends"
+    name = "\\SL\\Scenario2_guard"
+    # name = "\\CCP\\Scenario2_guard"
+    # name = "\\UMANS\\Scenario2_guard"
+
     csv_directory = traj_dir + name + "\\"
     os.makedirs(img_dir + name, exist_ok=True)
     os.makedirs(npz_dir + name, exist_ok=True)

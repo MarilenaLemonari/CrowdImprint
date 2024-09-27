@@ -17,8 +17,11 @@ def load_data_keras(folder_path):
     return image
 
 if __name__ ==  '__main__':
-    npz_real = "C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\PythonFiles\ActedScenarios\Scenario1_friends\scenario1_friends_subject1.npz"
-    npz_sim = "C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\PythonFiles\ActedScenarios\Scenario1_friends\scenario1_friends_subject1.npz"
+    # TODO: specify directories
+    npz_real = "C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\PythonFiles\ActedScenarios\Scenario2_guard\scenario2_guard_subject1.npz"
+    # npz_sim = "C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\PythonFiles\CaseStudy\CCP\Scenario2_guard\Agent_441433527_855392969.npz"
+    # npz_sim = "C:\\PROJECTS\\SocialLandmarks\\SocialLandmarks_Python\\Data\\PythonFiles\\CaseStudy\\UMANS\\Scenario2_guard\\output_1.npz"
+    npz_sim = "C:\\PROJECTS\\SocialLandmarks\\SocialLandmarks_Python\\Data\\PythonFiles\\CaseStudy\\SL\\Scenario2_guard\\agent_1.npz"
 
     # Load Model
     image_encoder = tf.keras.models.load_model("C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Models\CrowdLIP\image_encoder_model.h5")
