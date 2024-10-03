@@ -6,10 +6,11 @@ import os
 import matplotlib.pyplot as plt
 from tslearn.clustering import TimeSeriesKMeans
 from scipy.interpolate import interp1d
+import argparse
 
 # INSTRUCTIONS:
 #   cd C:\PROJECTS\SocialLandmarks
-#   .venv/Scripts/activate
+#   .venv\Scripts\activate
 #   cd .\Data\
 #   python3 .\data_analysis.py
 
@@ -424,12 +425,23 @@ def perform_dtw(data, max_list, n_clusters, degree):
   plt.savefig('Representative Curves using DTW')
   plt.show()
 
+def main(source_name, traj_index, index_name):
+  pass
+
 if __name__ ==  '__main__':
+
+  parser = argparse.ArgumentParser(description="Process command-line inputs.")
+  parser.add_argument('--source_name', type=str, default="Flock", help='Name of the source')
+  parser.add_argument('--traj_index', type=int, default=0, help='Index of the trajectory')
+  parser.add_argument('--index_name', type=str, default="Flock Trajectories", help='Name of the index')
+  args = parser.parse_args()
+
   print("Main")
   # agents_traj = preprocess_data(source = "ETH")
   # agents_traj = preprocess_data(source = "Flock")
   # agents_traj = preprocess_data(source = "Zara")
-  agents_traj = preprocess_data(source = "Students")
+  # agents_traj = preprocess_data(source = "Students")
+  agents_traj = preprocess_data(source = args.source_name)
 
   # data, [max_value, max_value_h, max_value_w] = visualize_agent_traj(agents_traj = agents_traj[0], title = "ETH_Hotel Trajectories")
   # data, [max_value, max_value_h, max_value_w] = visualize_agent_traj(agents_traj = agents_traj[1], title = "ETH_Road Trajectories")
@@ -438,6 +450,7 @@ if __name__ ==  '__main__':
   # data, [max_value, max_value_h, max_value_w] = visualize_agent_traj(agents_traj = agents_traj[1], title = "Zara_2 Trajectories")
   # data, [max_value, max_value_h, max_value_w] = visualize_agent_traj(agents_traj = agents_traj[2], title = "Zara_3 Trajectories")
   # data, [max_value, max_value_h, max_value_w] = visualize_agent_traj(agents_traj = agents_traj[0], title = "Students_1 Trajectories")
-  data, [max_value, max_value_h, max_value_w] = visualize_agent_traj(agents_traj = agents_traj[1], title = "Students_3 Trajectories")
+  # data, [max_value, max_value_h, max_value_w] = visualize_agent_traj(agents_traj = agents_traj[1], title = "Students_3 Trajectories")
+  data, [max_value, max_value_h, max_value_w] = visualize_agent_traj(agents_traj = agents_traj[args.traj_index], title = args.index_name)
 
   perform_dtw(data, [max_value, max_value_h, max_value_w], n_clusters = 5, degree = 3)
