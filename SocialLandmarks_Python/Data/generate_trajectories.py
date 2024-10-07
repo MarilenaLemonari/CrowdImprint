@@ -12,6 +12,7 @@ import random
 from tqdm import tqdm
 import math
 import pandas as pd
+import argparse
 
 #TODO: go to \examples with cd
 # cd C:\PROJECTS\SocialLandmarks
@@ -212,7 +213,15 @@ def generate_instance(n,init_positions,weight,actionTimes,inactiveTimes,or_x, or
   update_Agentxml(f"{pathA}Agent_social.xml",or_x,or_y)
   S_true=make_trajectory(n,n_agents,mode,category)
 
+def main(category = "Testing"):
+  pass
+
+
 if __name__ ==  '__main__':
+  parser = argparse.ArgumentParser(description="Process command-line inputs.")
+  parser.add_argument('--category', type=str, default="Testing", help='Purpose of Data e.g., training, validation, testing.')
+  # parser.add_argument('--mode', type=str, default="SingleSwitch", help='Level of complexity of data, i.e., number of temporal switches.')
+  args = parser.parse_args()
 
   """
   Generated trajectories are of the form (n_rows, 5), 
@@ -238,9 +247,9 @@ if __name__ ==  '__main__':
     else:
       dictionary[i] = behavior_list[i]
 
-  category = "Testing" 
+  category = args.category 
   if category == "Training":
-    repeat = 10000 * (len(behavior_list)-2) # TODO:change 10000
+    repeat = 10000 * (len(behavior_list)-2) 
     prefix = 'IF_'
   elif category == "Testing":
     repeat = 500

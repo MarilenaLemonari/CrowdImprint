@@ -26,6 +26,7 @@ from scipy import stats
 from skimage import io
 import cv2
 import random
+import argparse
 
 #TODO: remove source csv.
 # cd C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data
@@ -400,13 +401,25 @@ def create_structured_images(key, value, dataset_name, resolution= 32):
     image = fill_pixel(1, int(source_posX), int(source_posZ), 1, image, resolution)
     tifffile.imwrite(dataset_name + "\\" + key + '.tif', image)
 
+def main(name):
+  pass
+
 # Execute
 if __name__ ==  '__main__':
+    parser = argparse.ArgumentParser(description="Process command-line inputs.")
+    parser.add_argument('--name', type=str, default="\SingleSwitch\TestData", help='Folder of trajectories')
+    args = parser.parse_args()
+
     current_file_dir = "C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\Trajectories"
-    name = "\SingleSwitch" #TODO
+    name = args.name # "\SingleSwitch" #TODO
     # name = "\\NoSwitch"
     
     csv_directory  = current_file_dir + name + "\\"
+
+    #remove source
+    if os.path.exists(csv_directory + "output_0.csv"):
+        os.remove(csv_directory + "output_0.csv")
+    print("Source csv Successfully Removed.")
 
     csv_data = read_csv_files(csv_directory)
     n_csvs = len(csv_data)
@@ -420,6 +433,9 @@ if __name__ ==  '__main__':
         key, value = dict_list[i]
         prefix = key.split(".")[0]
         folder_path = "C:\\PROJECTS\\SocialLandmarks\\SocialLandmarks_Python\\Data\\Images" + name
+
+        if os.path.exists(folder_path):
+            os.mkdir(folder_path)
 
         # plt.plot(value["pos_x"], value["pos_z"], 'slategrey')
         # plt.scatter(value["pos_x"][0], value["pos_z"][0], c = 'slategrey')
