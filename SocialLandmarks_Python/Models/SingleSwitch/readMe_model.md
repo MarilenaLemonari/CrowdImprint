@@ -12,7 +12,7 @@ The scripts in this directory to train and test the main model.
 # Execution
 - Requirements of venv are found in `".../SocialLandmarks/requirements.txt"`
 - For utilisation of this framework, re-training is not necessary.
-- To test the model (and obtain Confusion Mtrices for train/val/test), run testModel.bat. You will be prompted to choose if you need to preprocess the images, or not i.e., they are already in npz files.
+- To test the model (and obtain Confusion Matrices for train/val/test), run testModel.bat. You will be prompted to choose if you need to preprocess the images, or not i.e., they are already in npz files.
 
 # Note
 - The remaining scripts are complementary to the three executible scripts mentioned above. 
