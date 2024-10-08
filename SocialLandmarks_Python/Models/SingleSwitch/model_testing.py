@@ -47,10 +47,16 @@ def test_keras():
         json.dump(data, json_file, indent=4)
     print(f"Data successfully written to {filename}")
 
+def main(model_name):
+    pass
 
 if __name__ ==  '__main__':
+    parser = argparse.ArgumentParser(description="Process command-line inputs.")
+    parser.add_argument('--model_name', type=str, default="model_final.pth", help='Specify Model.')
+    args = parser.parse_args()
+
     trained_model, criterion, optimizer, device = instantiate_model()
-    trained_model.load_state_dict(torch.load("C:\\PROJECTS\\SocialLandmarks\\SocialLandmarks_Python\\Models\\SingleSwitch\\model_final.pth"))
+    trained_model.load_state_dict(torch.load(f"C:\\PROJECTS\\SocialLandmarks\\SocialLandmarks_Python\\Models\\SingleSwitch\\{args.model_name}"))
     print("SUCCESS! Trained Model is Loaded.")
 
     # Train & Validation data aka "SEEN" data during training.

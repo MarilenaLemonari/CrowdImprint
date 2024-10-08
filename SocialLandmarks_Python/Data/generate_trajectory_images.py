@@ -451,6 +451,6 @@ if __name__ ==  '__main__':
         files = os.listdir(folder_path)
         file_exists = any(file.startswith(prefix) for file in files)
         if file_exists == False:
-            empty_predictions = create_images(prefix, value, folder_path, resolution=64) 
+            empty_predictions = create_centrered_images(prefix, value, folder_path, resolution=64) 
 
     print("DONE! Preprocessing Successful.")
