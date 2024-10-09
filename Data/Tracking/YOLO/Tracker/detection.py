@@ -7,175 +7,209 @@ import glob
 import os
 import csv
 from scipy.signal import savgol_filter
+import argparse
 
 # python3
 # cd C:\PROJECTS\SocialLandmarks\Data\Tracking\YOLO\Tracker
 # myenv\Scripts\activate
 # python detection.py
 
-
-model = YOLO("yolov10n.pt")  # TODO
-
-# Load the camera matrix and distortion coefficients (replace with your actual values)
-camera_matrix = np.array([
-    [4.73908241e+03, 0.00000000e+00, 2.89321683e+03],
-    [0.00000000e+00, 4.73819501e+03, 2.02846582e+03],
-    [0.00000000e+00, 0.00000000e+00, 1.00000000e+00]
-])
-dist_coeffs = np.array([1.10624914e-02, -2.59719368e+00, -5.70461677e-03, -1.22012466e-02, 6.42489045e+00])
-video_dir = 'E:\WorkCYENS\DataRecording\Videos_Instructed' #'./Videos/'  
-video_files = glob.glob(os.path.join(video_dir, '*.mp4'))
-
-all_feet_trajectories = []
-
-# video_files = ["E:\WorkCYENS\DataRecording\Videos_Instructed\class_12_subject1.mp4"]
-            #    ,"E:\WorkCYENS\DataRecording\Videos_Instructed\class_1_subject2.mp4"
-            #    ,"E:\WorkCYENS\DataRecording\Videos_Instructed\class_1_subject3.mp4"
-            #    ,"E:\WorkCYENS\DataRecording\Videos_Instructed\class_1_subject5.mp4"]
-
-# video_files = ["E:\WorkCYENS\DataRecording_OG\Videos_Scenarios\scenario3_exhibit_subject1.mp4",
-#                "E:\WorkCYENS\DataRecording_OG\Videos_Scenarios\scenario3_exhibit_subject2.mp4",
-#                "E:\WorkCYENS\DataRecording_OG\Videos_Scenarios\scenario3_exhibit_subject3.mp4",
-#                "E:\WorkCYENS\DataRecording_OG\Videos_Scenarios\scenario3_exhibit_subject4.mp4",
-#                "E:\WorkCYENS\DataRecording_OG\Videos_Scenarios\scenario3_exhibit_subject5.mp4",
-#                 "E:\WorkCYENS\DataRecording_OG\Videos_Scenarios\scenario4_atm_subject1.mp4",
-#                 "E:\WorkCYENS\DataRecording_OG\Videos_Scenarios\scenario4_atm_subject2.mp4",
-#                 "E:\WorkCYENS\DataRecording_OG\Videos_Scenarios\scenario4_atm_subject3.mp4",
-#                 "E:\WorkCYENS\DataRecording_OG\Videos_Scenarios\scenario4_atm_subject4.mp4",
-#                 "E:\WorkCYENS\DataRecording_OG\Videos_Scenarios\scenario4_atm_subject5.mp4",
-#                 "E:\WorkCYENS\DataRecording_OG\Videos_Scenarios\scenario5_foodcourt_subject1.mp4",
-#                 "E:\WorkCYENS\DataRecording_OG\Videos_Scenarios\scenario5_foodcourt_subject2.mp4",
-#                 "E:\WorkCYENS\DataRecording_OG\Videos_Scenarios\scenario5_foodcourt_subject3.mp4",
-#                 "E:\WorkCYENS\DataRecording_OG\Videos_Scenarios\scenario5_foodcourt_subject4.mp4",
-#                 "E:\WorkCYENS\DataRecording_OG\Videos_Scenarios\scenario5_foodcourt_subject5.mp4"]
-
-video_files = ["E:\WorkCYENS\DataRecording_MAN\Videos_Scenarios\scenario1_friends_subject1.mp4",
-               "E:\WorkCYENS\DataRecording_MAN\Videos_Scenarios\scenario1_friends_subject2.mp4",
-               "E:\WorkCYENS\DataRecording_MAN\Videos_Scenarios\scenario1_friends_subject3.mp4",
-               "E:\WorkCYENS\DataRecording_MAN\Videos_Scenarios\scenario1_friends_subject4.mp4",
-               "E:\WorkCYENS\DataRecording_MAN\Videos_Scenarios\scenario1_friends_subject5.mp4",
-               "E:\WorkCYENS\DataRecording_MAN\Videos_Scenarios\scenario2_guard_subject1.mp4",
-               "E:\WorkCYENS\DataRecording_MAN\Videos_Scenarios\scenario2_guard_subject2.mp4",
-               "E:\WorkCYENS\DataRecording_MAN\Videos_Scenarios\scenario2_guard_subject3.mp4",
-               "E:\WorkCYENS\DataRecording_MAN\Videos_Scenarios\scenario2_guard_subject4.mp4",
-               "E:\WorkCYENS\DataRecording_MAN\Videos_Scenarios\scenario2_guard_subject5.mp4"]
-
-for video_file in video_files:
-
-    cap = cv2.VideoCapture(video_file)
+def parse_camera_matrix(matrix_str):
+    # Split the string into a list of floats
+    elements = list(map(float, matrix_str.split(',')))
     
-    # Get the total number of frames in the video for the progress bar
-    total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+    # Ensure the input is a proper length (e.g., 9 for a 3x3 matrix)
+    if len(elements) != 9:
+        raise argparse.ArgumentTypeError("Camera matrix must have exactly 9 elements.")
+    
+    # Reshape the list into a 3x3 matrix using NumPy
+    matrix = np.array(elements).reshape(3, 3)
+    return matrix
 
-    # List to store the world coordinates of the feet for the current video
-    feet_trajectories = []
+def parse_dist_coeffs(dist_coeff):
+    elements = list(map(float, dist_coeff.split(',')))
+    
+    if len(elements) != 5:
+        raise argparse.ArgumentTypeError("Distortion coefficients must have exactly 5 elements.")
+    
+    matrix = np.array(elements).reshape(5,)
+    return matrix
 
-    # Process the video frames with a progress bar
-    with tqdm(total=total_frames, desc=f"Processing {os.path.basename(video_file)}", unit="frame") as pbar:
-        while cap.isOpened():
-            ret, frame = cap.read()
-            if not ret:
-                break
+if __name__ == "__main__":
 
-            # Undistort the frame
-            h, w = frame.shape[:2]
-            new_camera_mtx, roi = cv2.getOptimalNewCameraMatrix(camera_matrix, dist_coeffs, (w, h), 1, (w, h))
-            undistorted_frame = cv2.undistort(frame, camera_matrix, dist_coeffs, None, new_camera_mtx)
+    d_camera_matrix = '4.73908241e+03, 0.00000000e+00, 2.89321683e+03, 0.00000000e+00, 4.73819501e+03, 2.02846582e+03,0.00000000e+00, 0.00000000e+00, 1.00000000e+00'
+    d_dist_coeff = '1.10624914e-02, -2.59719368e+00, -5.70461677e-03, -1.22012466e-02, 6.42489045e+00'
 
-            # Perform YOLO object detection
-            results = model(undistorted_frame)
-            
+    parser = argparse.ArgumentParser(description="Process command-line inputs.")
+    parser.add_argument('--camera_matrix', type=str, default=d_camera_matrix, help='Calibrated Camera Info.')
+    parser.add_argument('--dist_coeffs', type=str, default=d_dist_coeff, help='Distortion Coeficients.')
+    args = parser.parse_args()
 
-            for result in results:
-                boxes = result.boxes
-                for box in boxes:
-                    x1, y1, x2, y2 = box.xyxy[0].numpy()  # Bounding box coordinates
-                    confidence = box.conf[0].item()  # Confidence score
-                    class_id = box.cls[0].item()  # Class ID
+    camera_matrix = parse_camera_matrix(args.camera_matrix)
+    dist_coeffs = parse_dist_coeffs(args.dist_coeffs)
 
-                    if confidence > 0.5 and int(class_id) == 0:  # Class 0 is 'person' in COCO dataset
-                        x, y, w, h = int(x1), int(y1), int(x2 - x1), int(y2 - y1)
-                        
-                        # Draw the bounding box
-                        cv2.rectangle(undistorted_frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
-                        cv2.putText(undistorted_frame, f"Person: {confidence:.2f}", (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+    model = YOLO("yolov10n.pt") 
 
-                        # Get the bottom center of the bounding box
-                        feet_pixel = np.array([x + w / 2, y + h])
-                        
-                        # Convert the bottom center of the bounding box to world coordinates
-                        feet_world_coords = cv2.undistortPoints(np.expand_dims(feet_pixel, axis=0), camera_matrix, dist_coeffs, P=new_camera_mtx)
-                        feet_world_coords = feet_world_coords[0][0] / 100 
-                        
-                        # Store the world coordinates of the feet
-                        feet_trajectories.append(feet_world_coords)
+    # # Load the camera matrix and distortion coefficients
+    # camera_matrix = np.array([
+    #     [4.73908241e+03, 0.00000000e+00, 2.89321683e+03],
+    #     [0.00000000e+00, 4.73819501e+03, 2.02846582e+03],
+    #     [0.00000000e+00, 0.00000000e+00, 1.00000000e+00]
+    # ])
+    # dist_coeffs = np.array([1.10624914e-02, -2.59719368e+00, -5.70461677e-03, -1.22012466e-02, 6.42489045e+00])
+    video_dir = 'E:\WorkCYENS\DataRecording\Videos_Instructed' #'./Videos/'  
+    video_files = glob.glob(os.path.join(video_dir, '*.mp4'))
 
-            # Display the frame with bounding boxes
-            cv2.imshow('Frame with Bounding Boxes', undistorted_frame) # TODO
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                break
+    all_feet_trajectories = []
 
-            # Update the progress bar
-            pbar.update(1)
+    # video_files = ["E:\WorkCYENS\DataRecording\Videos_Instructed\class_12_subject1.mp4"]
+                #    ,"E:\WorkCYENS\DataRecording\Videos_Instructed\class_1_subject2.mp4"
+                #    ,"E:\WorkCYENS\DataRecording\Videos_Instructed\class_1_subject3.mp4"
+                #    ,"E:\WorkCYENS\DataRecording\Videos_Instructed\class_1_subject5.mp4"]
 
-    cap.release()
-    cv2.destroyAllWindows()
+    # video_files = ["E:\WorkCYENS\DataRecording_OG\Videos_Scenarios\scenario3_exhibit_subject1.mp4",
+    #                "E:\WorkCYENS\DataRecording_OG\Videos_Scenarios\scenario3_exhibit_subject2.mp4",
+    #                "E:\WorkCYENS\DataRecording_OG\Videos_Scenarios\scenario3_exhibit_subject3.mp4",
+    #                "E:\WorkCYENS\DataRecording_OG\Videos_Scenarios\scenario3_exhibit_subject4.mp4",
+    #                "E:\WorkCYENS\DataRecording_OG\Videos_Scenarios\scenario3_exhibit_subject5.mp4",
+    #                 "E:\WorkCYENS\DataRecording_OG\Videos_Scenarios\scenario4_atm_subject1.mp4",
+    #                 "E:\WorkCYENS\DataRecording_OG\Videos_Scenarios\scenario4_atm_subject2.mp4",
+    #                 "E:\WorkCYENS\DataRecording_OG\Videos_Scenarios\scenario4_atm_subject3.mp4",
+    #                 "E:\WorkCYENS\DataRecording_OG\Videos_Scenarios\scenario4_atm_subject4.mp4",
+    #                 "E:\WorkCYENS\DataRecording_OG\Videos_Scenarios\scenario4_atm_subject5.mp4",
+    #                 "E:\WorkCYENS\DataRecording_OG\Videos_Scenarios\scenario5_foodcourt_subject1.mp4",
+    #                 "E:\WorkCYENS\DataRecording_OG\Videos_Scenarios\scenario5_foodcourt_subject2.mp4",
+    #                 "E:\WorkCYENS\DataRecording_OG\Videos_Scenarios\scenario5_foodcourt_subject3.mp4",
+    #                 "E:\WorkCYENS\DataRecording_OG\Videos_Scenarios\scenario5_foodcourt_subject4.mp4",
+    #                 "E:\WorkCYENS\DataRecording_OG\Videos_Scenarios\scenario5_foodcourt_subject5.mp4"]
 
-    # Convert the list of trajectories to a NumPy array for easier handling
-    feet_trajectories = np.array(feet_trajectories)
+    video_files = ["E:\WorkCYENS\DataRecording_MAN\Videos_Scenarios\scenario1_friends_subject1.mp4",
+                "E:\WorkCYENS\DataRecording_MAN\Videos_Scenarios\scenario1_friends_subject2.mp4",
+                "E:\WorkCYENS\DataRecording_MAN\Videos_Scenarios\scenario1_friends_subject3.mp4",
+                "E:\WorkCYENS\DataRecording_MAN\Videos_Scenarios\scenario1_friends_subject4.mp4",
+                "E:\WorkCYENS\DataRecording_MAN\Videos_Scenarios\scenario1_friends_subject5.mp4",
+                "E:\WorkCYENS\DataRecording_MAN\Videos_Scenarios\scenario2_guard_subject1.mp4",
+                "E:\WorkCYENS\DataRecording_MAN\Videos_Scenarios\scenario2_guard_subject2.mp4",
+                "E:\WorkCYENS\DataRecording_MAN\Videos_Scenarios\scenario2_guard_subject3.mp4",
+                "E:\WorkCYENS\DataRecording_MAN\Videos_Scenarios\scenario2_guard_subject4.mp4",
+                "E:\WorkCYENS\DataRecording_MAN\Videos_Scenarios\scenario2_guard_subject5.mp4"]
 
-    # Add to the list of all trajectories
-    all_feet_trajectories.append(feet_trajectories)
+    for video_file in video_files:
 
-timestep = 1/30
-source_x = 7.25
-source_y = 5.14
-c = 0
-for traj in all_feet_trajectories:
-    time =  [i * timestep for i in range(len(traj))]
-    x = traj[:,0]
-    y = traj[:,1]
-    source = [0] * len(traj)
-    source[0] = source_x
-    source[1] = source_y
-    # Stretch
-    for i in range(len(y)):
-        y_i = y[i]
-        if y_i >= source_y:
-            y_i = (y_i - source_y) * (1+abs(y_i-source_y)) + source_y
-        else:
-            y_i = (y_i - source_y) * (2) + source_y
-        y[i] = y_i
-    # output_name = "class_" + video_files[c].split("class_")[1].split('.mp4')[0] + ".csv"
-    output_name = video_files[c].split(".mp4")[0].split("Videos_Scenarios\\")[1] + ".csv"
-    output_file = f'.\Trajectories\PersonTrajectories\{output_name}'
-    c += 1
-    # Smoothen
-    window_size = 5
-    poly_order = 2
-    smoothed_y = savgol_filter(y, window_size, poly_order)
-    # Iterate
-    window_s = 3
-    smoothed_y = smoothed_y[::window_s]
-    smoothed_x = x[::window_s]
-    time = time[::window_s]
-    source = source[:len(time)]
+        cap = cv2.VideoCapture(video_file)
+        
+        # Get the total number of frames in the video for the progress bar
+        total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
 
-    with open(output_file, mode='w', newline='') as file:
-        writer = csv.writer(file)
-        # writer.writerow(['Time', 'Pos_x', 'Pos_y', 'Source'])
-        for i in range(len(smoothed_x)):
-            writer.writerow([time[i], smoothed_x[i], smoothed_y[i], source[i]])
+        # List to store the world coordinates of the feet for the current video
+        feet_trajectories = []
 
-# # Plot the trajectories using matplotlib
-# plt.figure(figsize=(10, 6))
-# plt.plot(source_x, source_y, '*', markersize = 5)
-# for traj in all_feet_trajectories:
-#     plt.plot(traj[:, 0], traj[:, 1], 'o-', markersize=3)
-# plt.xlabel('X (m)')
-# plt.ylabel('Y (m)')
-# plt.title('Feet Trajectories in World Space')
-# plt.grid(True)
-# # plt.xlim([0, 20])
-# # plt.ylim([0, 20])
-# plt.show()
+        # Process the video frames with a progress bar
+        with tqdm(total=total_frames, desc=f"Processing {os.path.basename(video_file)}", unit="frame") as pbar:
+            while cap.isOpened():
+                ret, frame = cap.read()
+                if not ret:
+                    break
+
+                # Undistort the frame
+                h, w = frame.shape[:2]
+                new_camera_mtx, roi = cv2.getOptimalNewCameraMatrix(camera_matrix, dist_coeffs, (w, h), 1, (w, h))
+                undistorted_frame = cv2.undistort(frame, camera_matrix, dist_coeffs, None, new_camera_mtx)
+
+                # Perform YOLO object detection
+                results = model(undistorted_frame)
+                
+
+                for result in results:
+                    boxes = result.boxes
+                    for box in boxes:
+                        x1, y1, x2, y2 = box.xyxy[0].numpy()  # Bounding box coordinates
+                        confidence = box.conf[0].item()  # Confidence score
+                        class_id = box.cls[0].item()  # Class ID
+
+                        if confidence > 0.5 and int(class_id) == 0:  # Class 0 is 'person' in COCO dataset
+                            x, y, w, h = int(x1), int(y1), int(x2 - x1), int(y2 - y1)
+                            
+                            # Draw the bounding box
+                            cv2.rectangle(undistorted_frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
+                            cv2.putText(undistorted_frame, f"Person: {confidence:.2f}", (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+
+                            # Get the bottom center of the bounding box
+                            feet_pixel = np.array([x + w / 2, y + h])
+                            
+                            # Convert the bottom center of the bounding box to world coordinates
+                            feet_world_coords = cv2.undistortPoints(np.expand_dims(feet_pixel, axis=0), camera_matrix, dist_coeffs, P=new_camera_mtx)
+                            feet_world_coords = feet_world_coords[0][0] / 100 
+                            
+                            # Store the world coordinates of the feet
+                            feet_trajectories.append(feet_world_coords)
+
+                # Display the frame with bounding boxes
+                cv2.imshow('Frame with Bounding Boxes', undistorted_frame) # TODO
+                if cv2.waitKey(1) & 0xFF == ord('q'):
+                    break
+
+                # Update the progress bar
+                pbar.update(1)
+
+        cap.release()
+        cv2.destroyAllWindows()
+
+        # Convert the list of trajectories to a NumPy array for easier handling
+        feet_trajectories = np.array(feet_trajectories)
+
+        # Add to the list of all trajectories
+        all_feet_trajectories.append(feet_trajectories)
+
+    timestep = 1/30
+    source_x = 7.25
+    source_y = 5.14
+    c = 0
+    for traj in all_feet_trajectories:
+        time =  [i * timestep for i in range(len(traj))]
+        x = traj[:,0]
+        y = traj[:,1]
+        source = [0] * len(traj)
+        source[0] = source_x
+        source[1] = source_y
+        # Stretch
+        for i in range(len(y)):
+            y_i = y[i]
+            if y_i >= source_y:
+                y_i = (y_i - source_y) * (1+abs(y_i-source_y)) + source_y
+            else:
+                y_i = (y_i - source_y) * (2) + source_y
+            y[i] = y_i
+        # output_name = "class_" + video_files[c].split("class_")[1].split('.mp4')[0] + ".csv"
+        output_name = video_files[c].split(".mp4")[0].split("Videos_Scenarios\\")[1] + ".csv"
+        output_file = f'.\Trajectories\PersonTrajectories\{output_name}'
+        c += 1
+        # Smoothen
+        window_size = 5
+        poly_order = 2
+        smoothed_y = savgol_filter(y, window_size, poly_order)
+        # Iterate
+        window_s = 3
+        smoothed_y = smoothed_y[::window_s]
+        smoothed_x = x[::window_s]
+        time = time[::window_s]
+        source = source[:len(time)]
+
+        with open(output_file, mode='w', newline='') as file:
+            writer = csv.writer(file)
+            # writer.writerow(['Time', 'Pos_x', 'Pos_y', 'Source'])
+            for i in range(len(smoothed_x)):
+                writer.writerow([time[i], smoothed_x[i], smoothed_y[i], source[i]])
+
+    # # Plot the trajectories using matplotlib
+    # plt.figure(figsize=(10, 6))
+    # plt.plot(source_x, source_y, '*', markersize = 5)
+    # for traj in all_feet_trajectories:
+    #     plt.plot(traj[:, 0], traj[:, 1], 'o-', markersize=3)
+    # plt.xlabel('X (m)')
+    # plt.ylabel('Y (m)')
+    # plt.title('Feet Trajectories in World Space')
+    # plt.grid(True)
+    # # plt.xlim([0, 20])
+    # # plt.ylim([0, 20])
+    # plt.show()
