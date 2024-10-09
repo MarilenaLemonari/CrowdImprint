@@ -13,15 +13,12 @@ The scripts in this directory generate the ground truth data, used for training,
 - Also, here the [InFs](https://onlinelibrary.wiley.com/doi/full/10.1111/cgf.14491)+[UMANS](https://project.inria.fr/crowdscience/project/ocsr/umans/) framework is necessary to have in another repository, called `"InteractionFieldsUMANS"`.
 - Double click on `generateTrainingData.bat` or run `cdir/generateTrainingData.bat`
 ```
-@echo off
 cd C:\PROJECTS\SocialLandmarks
-call .venv\Scripts\activate
+.venv\Scripts\activate
 cd C:\PROJECTS\DataDrivenInteractionFields\InteractionFieldsUMANS\examples
-echo Virtual Environment activated!
-python3 -u C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\generate_trajectories.py
+python3 C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\generate_trajectories.py
 cd C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data
 python3 .\generate_trajectory_images.py
-pause
 ```
 
 # Note

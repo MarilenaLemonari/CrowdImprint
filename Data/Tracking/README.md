@@ -17,11 +17,9 @@
 - You can edit the `.bat` to input the new camera matrix `(3,3)` and distortion coefficients `(5,)` using `--camera_matrix` and `--dist_coeffs` in the python line. 
 - Otherwise, the dafault (ours) values will be used.
 ```
-@echo off
 cd C:\PROJECTS\SocialLandmarks\Data\Tracking\YOLO\Tracker
-call myenv\Scripts\activate
-python -u .\detection.py --camera_matrix e.g., '1,0,0,0,1,0,0,0,1'
-pause
+myenv\Scripts\activate
+python .\detection.py --camera_matrix e.g., '1,0,0,0,1,0,0,0,1'
 ```
 
 # Note
