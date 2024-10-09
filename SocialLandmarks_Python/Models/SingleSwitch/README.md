@@ -13,6 +13,26 @@ The scripts in this directory to train and test the main model.
 - Requirements of venv are found in `".../SocialLandmarks/requirements.txt"`
 - For utilisation of this framework, re-training is not necessary.
 - To test the model (and obtain Confusion Matrices for train/val/test), run testModel.bat. You will be prompted to choose if you need to preprocess the images, or not i.e., they are already in npz files.
+```
+@echo off
+cd C:\PROJECTS\SocialLandmarks
+call .venv\Scripts\activate
+cd C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data
+
+:: Prompt user for input
+set /p userInput="Do you need to preprocess your input data? (yes/no): "
+
+:: Check if the user input is "yes"
+if /i "%userInput%"=="yes" (
+    echo Running the additional script...
+    python3 C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Models\SingleSwitch\preprocess_model_data.py
+)
+
+:: Now run the model testing script
+python3 -u C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Models\SingleSwitch\model_testing.py
+pause
+
+```
 
 # Note
 - The remaining scripts are complementary to the three executible scripts mentioned above. 

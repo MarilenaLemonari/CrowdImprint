@@ -10,6 +10,15 @@
 # Execution
 - Requirements of venv are found in `".../SocialLandmarks/requirements.txt"`
 - Double click on `coreBehaviours.bat` or run `cdir/coreBehaviours.bat`
+```
+@echo off
+cd C:\PROJECTS\SocialLandmarks
+call .venv\Scripts\activate
+cd .\Data\
+echo Virtual Environment activated!
+python3 -u .\data_analysis.py
+pause
+```
 
 # Note
 At this stage, the `cdir/Tracking` folder is not used.
