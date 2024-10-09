@@ -3,12 +3,14 @@
 The experiments are split into INFERENCE and EVALUATION.
 
 ## Evaluation
-<pre>
-1. preprocess_existing.py
-2. evaluation_existing.py
-</pre>
+```
+preprocess_existing.py
+evaluation_existing.py
+```
 
 ## Inference
-1. preprocess_existing.py 
-2. inference_existing.py 
-3. visualize_gen_traj.py
+```
+preprocess_existing.py 
+inference_existing.py 
+visualize_gen_traj.py
+```
