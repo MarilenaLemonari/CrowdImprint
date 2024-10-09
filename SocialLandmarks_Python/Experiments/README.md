@@ -1,5 +1,5 @@
 
-# Folder Structure
+# Structure
 The experiments are split into INFERENCE and EVALUATION.
 
 ## Evaluation
