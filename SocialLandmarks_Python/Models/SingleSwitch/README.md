@@ -20,7 +20,7 @@ cd C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data
 
 # if preprocessing needed:
 python3 C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Models\SingleSwitch\preprocess_model_data.py
-#else:
+# else:
 python3 -u C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Models\SingleSwitch\model_testing.py
 ```
 
