@@ -1,0 +1,78 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<Agents>
+	<Agent max_speed="0" pref_speed="0" rad="0.0">
+		<pos x="1" y="1" />
+		<goal x="0" y="0" />
+		<Policy id="0" />
+	</Agent>
+	<Agent group="0" max_speed="0.0" pref_speed="0.0" rad="0.3">
+		<pos x="0.0" y="0.0" />
+		<goal x="0" y="0" />
+		<orientation x="0.06196124306103203" y="-0.9980785562060391" />
+		<Policy id="0" />
+		<InteractionField id="0" />
+		<InteractionField id="1" />
+		<InteractionField id="2" />
+		<InteractionField id="3" />
+		<InteractionField id="4" />
+		<InteractionField id="5" />
+	</Agent>
+	<Agent group="0" max_speed="1.0" pref_speed="1.0" rad="0.3">
+		<pos x="0.33592275628154217" y="-3.9858695289500146" />
+		<goal x="0" y="0" />
+		<Policy id="0" />
+	</Agent>
+
+	<Agent group="1" max_speed="0.0" pref_speed="0.0" rad="0.3">
+		<pos x="0.0" y="0.0" />
+		<goal x="0" y="0" />
+		<orientation x="0.06196124306103203" y="-0.9980785562060391" />
+		<Policy id="0" />
+		<InteractionField id="10" />
+		<InteractionField id="11" />
+		<InteractionField id="12" />
+		<InteractionField id="13" />
+		<InteractionField id="14" />
+		<InteractionField id="15" />
+	</Agent>
+	<Agent group="1" max_speed="1.0" pref_speed="1.0" rad="0.3">
+		<pos x="2" y="-1" />
+		<goal x="0" y="0" />
+		<Policy id="9999" />
+	</Agent>
+	
+	<Agent group="8" max_speed="0.0" pref_speed="0.0" rad="0.3">
+		<pos x="0.0" y="0.0" />
+		<goal x="0" y="0" />
+		<orientation x="0.5440890593325802" y="0.8390274700595851" />
+		<Policy id="0" />
+		<InteractionField id="80" />
+		<InteractionField id="81" />
+		<InteractionField id="82" />
+		<InteractionField id="83" />
+		<InteractionField id="84" />
+		<InteractionField id="85" />
+	</Agent>
+	<Agent group="8" max_speed="1.0" pref_speed="1.0" rad="0.3">
+		<pos x="-0.32804629962828785" y="3.986525507920423" />
+		<goal x="0" y="0" />
+		<Policy id="0" />
+	</Agent>
+	<Agent group="9" max_speed="0.0" pref_speed="0.0" rad="0.3">
+		<pos x="0.0" y="0.0" />
+		<goal x="0" y="0" />
+		<orientation x="-0.9971388994100185" y="0.07559110584835267" />
+		<Policy id="0" />
+		<InteractionField id="90" />
+		<InteractionField id="91" />
+		<InteractionField id="92" />
+		<InteractionField id="93" />
+		<InteractionField id="94" />
+		<InteractionField id="95" />
+	</Agent>
+	<Agent group="9" max_speed="1.0" pref_speed="1.0" rad="0.3">
+		<pos x="-1.9748196553926658" y="7.649188671269314" />
+		<goal x="0" y="0" />
+		<Policy id="0" />
+	</Agent>
+</Agents>

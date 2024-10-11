@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<Agents>
+	<Agent group="0" max_speed="2.0" pref_speed="1.0" rad="0.3">
+		<pos x="0.0" y="0.0" />
+		<goal x="-10" y="0" />
+		<orientation x="-1" y="0" />
+		<Policy id="9999" />
+		<InteractionField id="0" />
+		<InteractionField id="1" />
+		<InteractionField id="2" />
+		<InteractionField id="3" />
+		<InteractionField id="4" />
+		<InteractionField id="5" />
+	</Agent>
+	<Agent group="0" max_speed="1.0" pref_speed="1.0" rad="0.3">
+		<pos x="1.2668514068475603" y="-4.733401262619551" />
+		<goal x="0" y="0" />
+		<Policy id="0" />
+	</Agent>
+</Agents>

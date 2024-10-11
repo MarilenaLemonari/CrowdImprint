@@ -1,0 +1,183 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<Agents>
+	<Agent max_speed="0" pref_speed="0" rad="0.0">
+		<pos x="1" y="1" />
+		<goal x="0" y="0" />
+		<Policy id="0" />
+	</Agent>
+	<!--
+	<Agent group="0" max_speed="0.0" pref_speed="0.0" rad="0.3">
+		<pos x="0.0" y="0.0" />
+		<goal x="0" y="0" />
+		<orientation x="-0.6233367454377662" y="0.7819535163851196" />
+		<Policy id="0" />
+		<InteractionField id="0" />
+		<InteractionField id="1" />
+		<InteractionField id="2" />
+		<InteractionField id="3" />
+		<InteractionField id="4" />
+		<InteractionField id="5" />
+	</Agent>
+	<Agent group="0" max_speed="1.0" pref_speed="1.0" rad="0.3">
+		<pos x="-0.6036632865255295" y="4.459326253651015" />
+		<goal x="0" y="0" />
+		<Policy id="0" />
+	</Agent>
+	<Agent group="1" max_speed="0.0" pref_speed="0.0" rad="0.3">
+		<pos x="0.0" y="0.0" />
+		<goal x="0" y="0" />
+		<orientation x="-0.4135346418915507" y="-0.9104883854040242" />
+		<Policy id="0" />
+		<InteractionField id="10" />
+		<InteractionField id="11" />
+		<InteractionField id="12" />
+		<InteractionField id="13" />
+		<InteractionField id="14" />
+		<InteractionField id="15" />
+	</Agent>
+	<Agent group="1" max_speed="1.0" pref_speed="1.0" rad="0.3">
+		<pos x="5.919101424101998" y="-6.646370312523498" />
+		<goal x="0" y="0" />
+		<Policy id="0" />
+	</Agent>
+	<Agent group="2" max_speed="0.0" pref_speed="0.0" rad="0.3">
+		<pos x="0.0" y="0.0" />
+		<goal x="0" y="0" />
+		<orientation x="0.26746136266529424" y="0.9635685857691833" />
+		<Policy id="0" />
+		<InteractionField id="20" />
+		<InteractionField id="21" />
+		<InteractionField id="22" />
+		<InteractionField id="23" />
+		<InteractionField id="24" />
+		<InteractionField id="25" />
+	</Agent>
+	<Agent group="2" max_speed="1.0" pref_speed="1.0" rad="0.3">
+		<pos x="3.1360823391565065" y="1.2098245508134866" />
+		<goal x="0" y="0" />
+		<Policy id="0" />
+	</Agent>
+	<Agent group="3" max_speed="0.0" pref_speed="0.0" rad="0.3">
+		<pos x="0.0" y="0.0" />
+		<goal x="0" y="0" />
+		<orientation x="-0.3769488347909206" y="-0.9262340826971156" />
+		<Policy id="0" />
+		<InteractionField id="30" />
+		<InteractionField id="31" />
+		<InteractionField id="32" />
+		<InteractionField id="33" />
+		<InteractionField id="34" />
+		<InteractionField id="35" />
+	</Agent>
+	<Agent group="3" max_speed="1.0" pref_speed="1.0" rad="0.3">
+		<pos x="2.5471712191622227" y="1.3863328533478665" />
+		<goal x="0" y="0" />
+		<Policy id="0" />
+	</Agent>
+	-->
+	<Agent group="4" max_speed="0.0" pref_speed="0.0" rad="0.3">
+		<pos x="0.0" y="0.0" />
+		<goal x="0" y="0" />
+		<orientation x="-0.9993677860086381" y="-0.03555317550083293" />
+		<Policy id="0" />
+		<InteractionField id="40" />
+		<InteractionField id="41" />
+		<InteractionField id="42" />
+		<InteractionField id="43" />
+		<InteractionField id="44" />
+		<InteractionField id="45" />
+	</Agent>
+	<Agent group="4" max_speed="1.0" pref_speed="1.0" rad="0.3">
+		<pos x="4.493446888430226" y="-0.24276544411575085" />
+		<goal x="0" y="0" />
+		<Policy id="0" />
+	</Agent>
+	<Agent group="5" max_speed="0.0" pref_speed="0.0" rad="0.3">
+		<pos x="0.0" y="0.0" />
+		<goal x="0" y="0" />
+		<orientation x="-0.4456945091827395" y="-0.8951851230244819" />
+		<Policy id="0" />
+		<InteractionField id="50" />
+		<InteractionField id="51" />
+		<InteractionField id="52" />
+		<InteractionField id="53" />
+		<InteractionField id="54" />
+		<InteractionField id="55" />
+	</Agent>
+	<Agent group="5" max_speed="1.0" pref_speed="1.0" rad="0.3">
+		<pos x="-0.6212891299192762" y="-4.961249824091118" />
+		<goal x="0" y="0" />
+		<Policy id="0" />
+	</Agent>
+
+	<Agent group="6" max_speed="0.0" pref_speed="0.0" rad="0.3">
+		<pos x="0.0" y="0.0" />
+		<goal x="0" y="0" />
+		<orientation x="-0.9409243116599241" y="-0.3386169513289287" />
+		<Policy id="0" />
+		<InteractionField id="60" />
+		<InteractionField id="61" />
+		<InteractionField id="62" />
+		<InteractionField id="63" />
+		<InteractionField id="64" />
+		<InteractionField id="65" />
+	</Agent>
+	<Agent group="6" max_speed="1.0" pref_speed="1.0" rad="0.3">
+		<pos x="4.428760824804951" y="0.7975447051250276" />
+		<goal x="0" y="0" />
+		<Policy id="0" />
+	</Agent>
+	<!--
+	<Agent group="7" max_speed="0.0" pref_speed="0.0" rad="0.3">
+		<pos x="0.0" y="0.0" />
+		<goal x="0" y="0" />
+		<orientation x="0.8248848491870283" y="-0.5653007921290165" />
+		<Policy id="0" />
+		<InteractionField id="70" />
+		<InteractionField id="71" />
+		<InteractionField id="72" />
+		<InteractionField id="73" />
+		<InteractionField id="74" />
+		<InteractionField id="75" />
+	</Agent>
+	<Agent group="7" max_speed="1.0" pref_speed="1.0" rad="0.3">
+		<pos x="-0.33659301691798504" y="2.8804001702822557" />
+		<goal x="0" y="0" />
+		<Policy id="0" />
+	</Agent>
+	<Agent group="8" max_speed="0.0" pref_speed="0.0" rad="0.3">
+		<pos x="0.0" y="0.0" />
+		<goal x="0" y="0" />
+		<orientation x="0.04484758891299262" y="0.9989938407060832" />
+		<Policy id="0" />
+		<InteractionField id="80" />
+		<InteractionField id="81" />
+		<InteractionField id="82" />
+		<InteractionField id="83" />
+		<InteractionField id="84" />
+		<InteractionField id="85" />
+	</Agent>
+	<Agent group="8" max_speed="1.0" pref_speed="1.0" rad="0.3">
+		<pos x="-4.151916329759196" y="2.78596317109163" />
+		<goal x="0" y="0" />
+		<Policy id="0" />
+	</Agent>
+	<Agent group="9" max_speed="0.0" pref_speed="0.0" rad="0.3">
+		<pos x="0.0" y="0.0" />
+		<goal x="0" y="0" />
+		<orientation x="0.9859402720017304" y="0.16709811502573538" />
+		<Policy id="0" />
+		<InteractionField id="90" />
+		<InteractionField id="91" />
+		<InteractionField id="92" />
+		<InteractionField id="93" />
+		<InteractionField id="94" />
+		<InteractionField id="95" />
+	</Agent>
+	<Agent group="9" max_speed="1.0" pref_speed="1.0" rad="0.3">
+		<pos x="9.887568237913744" y="0.49597816544613454" />
+		<goal x="0" y="0" />
+		<Policy id="0" />
+	</Agent>
+	-->
+</Agents>

@@ -394,6 +394,6 @@ if __name__ ==  '__main__':
     print(beh_distr)
     
     # Generate new trajectories based on inferred behaviours:
-    n_agents = 3
+    n_agents = 10
     mode =  f"Inference\{dataset_name}"
     generate_trajectories(beh_distr, n_agents, mode)
