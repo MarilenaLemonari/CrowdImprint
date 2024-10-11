@@ -121,8 +121,8 @@ def generate_trajectories(beh_distr, n_agents, mode):
         InF1, InF2 = map(int, string.split('_'))
 
         flag_1_4 = ''
-        field_1 = random.randint(1,len(behavior_list)-2)
-        field_2 = random.randint(1,len(behavior_list)-2)
+        field_1 = InF1 # random.randint(1,len(behavior_list)-2)
+        field_2 = InF2 # random.randint(1,len(behavior_list)-2)
         end_time = random.randint(6,15)
         max_radius = end_time/4 
         min_radius = 2
@@ -371,7 +371,7 @@ if __name__ ==  '__main__':
     # dataset_name = "Flock"
     # dataset_name = "Zara"
     # dataset_name = "Students"
-    specific = "Scenario1_friends"
+    specific = "Scenario4_atm"
     dataset_name = f"ActedScenarios/{specific}"
 
     x_test = load_python_files(dataset_name)

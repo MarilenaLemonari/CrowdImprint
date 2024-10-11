@@ -39,7 +39,7 @@ def read_csvs_generated(csv_directory):
 
     return data_dict
 
-def plot_trajectories(key, value, color_dict):
+def plot_trajectories(key, value, color_dict, line_dict, index):
     # gt_dict = {"1_1": 0, "1_2": 1, "1_3": 2, "1_4": 3, "1_5": 4,
     #     "2_1": 5, "2_2": 6, "2_3": 7, "2_4": 8, "2_5": 9,
     #     "3_1": 10, "3_2": 11,"3_3": 12, "3_4": 13, "3_5": 14,
@@ -49,10 +49,18 @@ def plot_trajectories(key, value, color_dict):
     #     "1_0": 2, "2_0": 7, "3_0": 12, "4_0": 17, "5_0": 22, "6_0":17,
     #     "1_6":3, "2_6":8, "3_6":13, "4_6":18, "5_6":23, "6_6":18,
     #     "6_1":15, "6_2":16, "6_3":17, "6_4":18, "6_5":19}
-    plt.plot(value["pos_x"].to_numpy(), value["pos_z"].to_numpy(), c = color_dict[key])
-    plt.plot(value["pos_x"][0], value["pos_z"][0], 'o', c = color_dict[key],  label='_nolegend_')
+    index += 1
+    # line_dict = {"2_3": "solid", "3_1": "dashed", "4_1": "dashdot", "3_4": "dotted"}
 
-def read_csv_new(current_file_dir, name):
+    if index in [1,2,3,4]:
+        plt.plot(value["pos_x"].to_numpy(), value["pos_z"].to_numpy(), c =color_dict[key], ls = line_dict[key])
+    else: 
+        plt.plot(value["pos_x"].to_numpy(), value["pos_z"].to_numpy(), c =color_dict[key], ls = line_dict[key],  label='_nolegend_')
+    plt.plot(value["pos_x"][0], value["pos_z"][0], 'o', c =color_dict[key],  label='_nolegend_') # color_dict[key]
+
+    return index
+
+def read_csv_new(current_file_dir, name, legends):
     csv_directory  = current_file_dir + name + "\\"
 
     csv_data = read_csvs_generated(csv_directory)
@@ -69,24 +77,82 @@ def read_csv_new(current_file_dir, name):
     # print(key, value)
     # exit()
 
+    
     color_dict ={}
-    color_list = ["slategrey", "firebrick", "firebrick"]
-    index = 0
+    color_list = ["firebrick"] * 15 #, "firebrick", "firebrick"]
+    line_dict = {}
+    line_list = ["solid", "dashed", "dashdot"]
+    # line_list = ["solid", "solid", "dashed", "dashdot", "dashed", "solid", "dashed", "solid", "dotted", "solid", "solid", "dotted",
+    #              "dashdot", "dotted", "dashdot" ]
+    line_list = ["solid", "dashed", "dashdot", "dotted" ]
+    idx = 0
     for i in tqdm(range(n_csvs)):
         key, value = dict_list[i]
         prefix = key.split(".")[0]
         prefix_updated = combo_dict[prefix][2:-2]
+        index = 0
         if prefix_updated not in color_dict:
             index = len(color_dict)
             color_dict[prefix_updated] = color_list[index]
-        empty_predictions = plot_trajectories(prefix_updated, value, color_dict)
+            line_dict[prefix_updated] = line_list[index]
+        idx = plot_trajectories(prefix_updated, value, color_dict, line_dict, idx)
 
     plt.title(f"{name[1:]} Dataset Generated Paths")
-    plt.plot(0,0,'k',marker='o', markersize=8) # TODO note that source at (0,0) by default
-    legends = list(color_dict.keys())
+    legends += ["Source"]
+    legends += list(color_dict.keys())
+    # legends = list(color_dict.keys())
     plt.legend(legends)
-    plt.savefig(csv_directory + "traj_image.png")
-    plt.show()
+    # plt.savefig(csv_directory + "traj_image.png")
+    # plt.show()
+
+def read_csv_source(source_name):
+    csv_directory  = source_name + "\\"
+
+    csv_data = read_csvs_generated(csv_directory)
+    n_csvs = len(csv_data)
+    dict_list = list(csv_data.items())
+
+    # Read combinations for each agent:
+    # file_name = [f for f in os.listdir(csv_directory) if f.endswith('.json')]
+    # file_location = csv_directory + f"{file_name[0]}"
+    # with open(file_location, 'r') as file:
+    #         combo_dict = json.load(file)
+
+    # key, value = dict_list[20]
+    # print(key, value)
+    # exit()
+
+    color_list = ["slategrey", "slategrey", "slategrey", "slategrey", "slategrey"]
+    line_list = ["dotted", "dotted", "dotted", "dotted", "dotted"]
+    index = 0
+    for i in tqdm(range(n_csvs)):
+        key, value = dict_list[i]
+        value["pos_x"] -= 7.25
+        value["pos_z"] -= 5.14
+        value["pos_x"] *= (5/10)
+        value["pos_z"] *= (5/30)
+        plt.plot(value["pos_x"][0], value["pos_z"][0], 'o', c =color_list[i],  label='_nolegend_')
+        if i == 0:
+            plt.plot(value["pos_x"].to_numpy(), value["pos_z"].to_numpy(), c =color_list[i], ls = line_list[i])
+        else:
+            plt.plot(value["pos_x"].to_numpy(), value["pos_z"].to_numpy(), c =color_list[i], ls = line_list[i], label='_nolegend_')
+        # prefix = key.split(".")[0]
+        # prefix_updated = "1" #combo_dict[prefix][2:-2]
+        # color_dict[prefix_updated] = color_list[0]
+        # line_dict[prefix_updated] = line_list[0]
+        # # if prefix_updated not in color_dict:
+        # #     index = len(color_dict)
+        # #     color_dict[prefix_updated] = color_list[index]
+        # #     line_dict[prefix_updated] = line_list[index]
+        # empty_predictions = plot_trajectories(prefix_updated, value, color_dict, line_dict)
+
+    # plt.title(f"{name[1:]} Dataset Generated Paths")
+    # plt.plot(0,0,'k',marker='o', markersize=8) # TODO note that source at (0,0) by default
+    # legends.append("OG")
+    # plt.legend(legends)
+    # plt.savefig(csv_directory + "traj_image.png")
+    # plt.show()
+
 
 if __name__ ==  '__main__':
 
@@ -94,6 +160,12 @@ if __name__ ==  '__main__':
     # name = "\Flock"
     # name = "\Zara"
     # name = "\Students"
-    name = "\ActedScenarios\Scenario1_friends"
+    name = "\ActedScenarios\Scenario4_atm"
+    source_name = "C:\PROJECTS\SocialLandmarks\Data\Tracking\YOLO\Tracker\Trajectories\ObjectScenarios\\atm"
 
-    read_csv_new(current_file_dir, name)
+    legends = [] #["OG"] 
+    #read_csv_source(source_name)
+    plt.plot(0,0,'k',marker='o', markersize=8) # note that source at (0,0) by default
+    read_csv_new(current_file_dir, name, legends)
+    # plt.savefig(current_file_dir + name + "\\" + "traj_image_all2.png")
+    # plt.show()

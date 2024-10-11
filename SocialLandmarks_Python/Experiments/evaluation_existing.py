@@ -143,6 +143,7 @@ def prepare_search_database(values_dict):
     max_value = max_dist[np.argmax(np.abs(max_dist))]
     max_height = []
     data = []
+
     for i, points in enumerate(processed_points):   
         y_stretched = stretch_points(points, max_value)
         max_height.append(max(np.abs(y_stretched)))
@@ -162,11 +163,22 @@ def evaluate_trajectories():
     # query_traj_directory  = query_file_dir + query_name + "\\"
     query_traj_directory  =  "C:\PROJECTS\SocialLandmarks\Data\Tracking\YOLO\Tracker\Trajectories"
     values_traj_directory  = "C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\Trajectories\SingleSwitch"
-    queries_dict = read_value_csv_files(query_traj_directory) #TODO: was read_csv_files(query_traj_directory)
+    queries_dict = read_value_csv_files(query_traj_directory) #TODO
     values_dict = read_value_csv_files(values_traj_directory)    # print(values_dict['0IF_0_1_T5_d8_a1.csv'])
 
     # Prepare search database:
-    data_v, values_dict, max_value = prepare_search_database(values_dict)   
+    data_v, values_dict, max_value = prepare_search_database(values_dict) 
+    # print(max_value)  # -1.2050501629209263
+    # max_value = -1.2050501629209263 #-0.2197874307608558 #-1.2050501629209263
+    # arr = values_dict['31351IF_1_2_T4_d7_a1.csv']
+    # x = arr[:,0]
+    # y = arr[:,1]
+    # plt.plot(x[0], y[0], marker = '.', color = "firebrick")
+    # plt.plot(x,y, 'slategrey')
+    # # plt.ylim([max_value, 0.1])
+    # plt.xlim([max_value/2, -max_value/2])
+    # plt.show()
+    # exit()
     
     # Search database with query:
     search_dict = {}
@@ -176,6 +188,13 @@ def evaluate_trajectories():
         # Prepare query for searching:
         rotated_points, max_dist_value, max_width_value = centre_and_rotate(query_traj)
         y_stretched = stretch_points(rotated_points, max_value)
+
+        # if query == 'class_5_subject2.csv':
+        #     plt.plot(rotated_points[0,0], y_stretched[0], marker = '.', color = 'firebrick')
+        #     plt.plot(rotated_points[:,0], y_stretched, 'slategrey')
+        #     plt.xlim([max_value/2, -max_value/2])
+        #     plt.show()
+        #     exit()
 
         dist_dict = {}
         for search_key, search_value in tqdm(values_dict.items()):
@@ -338,6 +357,9 @@ if __name__ ==  '__main__':
         WE assume appropriate source placement.
     """
 
+    evaluate_trajectories()
+    exit()
+
     model_name = "model_final.pth"
     model_type = "pytorch"
     # dataset_name = "Flock"
@@ -368,10 +390,10 @@ if __name__ ==  '__main__':
         "1_6":3, "2_6":8, "3_6":13, "4_6":18, "5_6":23, "6_6":18,
         "6_1":15, "6_2":16, "6_3":17, "6_4":18, "6_5":19}
 
-    # search_dict, json_path = evaluate_trajectories()
+    search_dict, json_path = evaluate_trajectories()
     # search_dict, json_path = evaluate_images(query_path = "C:\PROJECTS\SocialLandmarks\Data\Tracking\YOLO\Tracker\Images\Instructed")
     # (search_dict)
-    # exit()
+    exit()
 
     final_dict = evaluate_dedicated_metric(traj_directory="C:\PROJECTS\SocialLandmarks\Data\Tracking\YOLO\Tracker\Trajectories\\")
     # final_dict, eval_pred, eval_gt, metric = get_gt_instructed(c_dict, gt_dict)

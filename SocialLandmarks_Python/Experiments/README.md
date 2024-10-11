@@ -14,8 +14,19 @@ The outputs in `"cdir\Evaluation\GroundTruths"` are:
 3. `"confusion_matrix.png"`
 
 ## Inference
+- To use the framework, you have to have preprocessed trajectories (`.npz`) of agents interacting to a certain type of source e.g., ATM machine.
+- Run `"inference.py"` specifying the number of agents you want the new simulation to have (`default  = 3`).
+- Then, you can visualize the generated trajectories `"visualize_gen_traj.py"`.
+So, overall:
 ```
 preprocess_existing.py 
 inference_existing.py 
 visualize_gen_traj.py
 ```
+The outputs are:
+1. In `"...\SocialLandmarks\SocialLandmarks_Python\Experiments\Inference"`, where the distribution of the predicted behaviour combinations can be found.
+2. In `"...\SocialLandmarks\SocialLandmarks_Python\Data\Trajectories\Inference\{input_name}"`, where the new `.csv` trajectories can be found, along with their plot and corresponding predicted combinations. 
+
+### Note
+- Given you have preprocessed data, you can perform inference via `"inference.bat"`.
+- If you only want to obtain the inferred distribution of behaviour without novel generations, run `"run_sl.py"`.
