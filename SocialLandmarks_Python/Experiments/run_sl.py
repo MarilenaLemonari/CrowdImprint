@@ -11,7 +11,10 @@ if __name__ ==  '__main__':
     # python3 run_sl.py
 
     folder_dir = "C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\PythonFiles\CaseStudy"
-    name = name = "\\SL\\Scenario1_friends"
+    # name = "\\RecordedData\\Scenario5_foodcourt"
+    # name = "\\SL\\Scenario2_guard"
+    # name = "\\CCP\\Scenario3_exhibit"
+    name = "\\UMANS\\Scenario3_exhibit"
     folder_path = folder_dir + name
 
     x_tool = load_inference_data(folder_path)

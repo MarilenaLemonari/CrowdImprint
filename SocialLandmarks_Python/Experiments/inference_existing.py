@@ -371,7 +371,7 @@ if __name__ ==  '__main__':
     # dataset_name = "Flock"
     # dataset_name = "Zara"
     # dataset_name = "Students"
-    specific = "Scenario4_atm"
+    specific = "Scenario2_guard"
     dataset_name = f"ActedScenarios/{specific}"
 
     x_test = load_python_files(dataset_name)

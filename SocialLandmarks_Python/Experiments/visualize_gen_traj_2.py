@@ -67,16 +67,57 @@ def read_csv_new(current_file_dir, name, legends):
     n_csvs = len(csv_data)
     dict_list = list(csv_data.items())
 
-    # Read combinations for each agent:
-    file_name = [f for f in os.listdir(csv_directory) if f.endswith('.json')]
-    file_location = csv_directory + f"{file_name[0]}"
-    with open(file_location, 'r') as file:
-            combo_dict = json.load(file)
+    # # Read combinations for each agent:
+    # file_name = [f for f in os.listdir(csv_directory) if f.endswith('.json')]
+    # file_location = csv_directory + f"{file_name[0]}"
+    # with open(file_location, 'r') as file:
+    #         combo_dict = json.load(file)
 
-    # key, value = dict_list[20]
+    # key, value = dict_list[0]
     # print(key, value)
     # exit()
+    key1, value0 = dict_list[0]
+    key1, value1 = dict_list[1]
+    key1, value2 = dict_list[2]
+    key1, value3 = dict_list[3]
+    key1, value4 = dict_list[4]
+    key1, value5 = dict_list[5]
+    key1, value6 = dict_list[6]
+    key1, value7 = dict_list[7]
+    key1, value8 = dict_list[8]
+    plt.plot(0,0,'k',marker='o', markersize=8)
+    # value = value0
+    # plt.plot(value["pos_x"].to_numpy(), value["pos_z"].to_numpy(), c = 'firebrick')
+    # plt.plot(value["pos_x"][0], value["pos_z"][0], 'o', c = 'firebrick',  label='_nolegend_') 
+    # value = value1
+    # plt.plot(value["pos_x"].to_numpy(), value["pos_z"].to_numpy(), c = 'firebrick')
+    # plt.plot(value["pos_x"][0], value["pos_z"][0], 'o', c = 'firebrick',  label='_nolegend_') 
+    value = value2
+    plt.plot(value["pos_x"].to_numpy(), value["pos_z"].to_numpy(), c = 'firebrick')
+    plt.plot(value["pos_x"][0], value["pos_z"][0], 'o', c = 'firebrick',  label='_nolegend_') 
+    # value = value3
+    # plt.plot(value["pos_x"].to_numpy(), value["pos_z"].to_numpy(), c = 'firebrick')
+    # plt.plot(value["pos_x"][0], value["pos_z"][0], 'o', c = 'firebrick',  label='_nolegend_') 
+    # value = value5
+    # plt.plot(value["pos_x"].to_numpy(), value["pos_z"].to_numpy(), c = 'firebrick')
+    # plt.plot(value["pos_x"][0], value["pos_z"][0], 'o', c = 'firebrick',  label='_nolegend_') 
+    value = value6
+    plt.plot(value["pos_x"].to_numpy(), value["pos_z"].to_numpy(), c = 'firebrick')
+    plt.plot(value["pos_x"][0], value["pos_z"][0], 'o', c = 'firebrick',  label='_nolegend_') 
+    # value = value7
+    # plt.plot(value["pos_x"].to_numpy(), value["pos_z"].to_numpy(), c = 'firebrick')
+    # plt.plot(value["pos_x"][0], value["pos_z"][0], 'o', c = 'firebrick',  label='_nolegend_') 
 
+    value = value4
+    plt.plot(value["pos_x"].to_numpy(), value["pos_z"].to_numpy(), c = 'slategrey')
+    plt.plot(value["pos_x"][0], value["pos_z"][0], 'o', c = 'slategrey',  label='_nolegend_') 
+
+    plt.title(f"{name[1:]} Dataset Generated Paths")
+    legends = ['Source', '1_2', '1_2', '1_1 OOD']
+    plt.legend(legends)
+    plt.savefig(csv_directory + "traj_image.png")
+    plt.show()
+    exit()
     
     color_dict ={}
     color_list = ["firebrick"] * 15 #, "firebrick", "firebrick"]
@@ -129,7 +170,7 @@ def read_csv_source(source_name):
         key, value = dict_list[i]
         value["pos_x"] -= 7.25
         value["pos_z"] -= 5.14
-        #value["pos_x"] *= (5/10)
+        value["pos_x"] *= (5/10)
         value["pos_z"] *= (5/30)
         plt.plot(value["pos_x"][0], value["pos_z"][0], 'o', c =color_list[i],  label='_nolegend_')
         if i == 0:
@@ -160,12 +201,12 @@ if __name__ ==  '__main__':
     # name = "\Flock"
     # name = "\Zara"
     # name = "\Students"
-    name = "\ActedScenarios\Scenario3_exhibit"
-    source_name = "C:\PROJECTS\SocialLandmarks\Data\Tracking\YOLO\Tracker\Trajectories\ObjectScenarios\\exhibit"
+    name = "\ActedScenarios\Scenario4_atm"
+    source_name = "C:\PROJECTS\SocialLandmarks\Data\Tracking\YOLO\Tracker\Trajectories\ObjectScenarios\\atm"
 
-    legends = ["OG"] 
-    read_csv_source(source_name)
-    plt.plot(0,0,'k',marker='o', markersize=8) # note that source at (0,0) by default
-    read_csv_new(current_file_dir, name, legends)
-    plt.savefig(current_file_dir + name + "\\" + "traj_image_all2.png")
-    plt.show()
+    # legends = [] #["OG"] 
+    # read_csv_source(source_name)
+    # plt.plot(0,0,'k',marker='o', markersize=8) # note that source at (0,0) by default
+    read_csv_new(current_file_dir, name, [])
+    # plt.savefig(current_file_dir + name + "\\" + "traj_image_all2.png")
+    # plt.show()
