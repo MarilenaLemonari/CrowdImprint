@@ -365,13 +365,17 @@ def generate_trajectories(beh_distr, n_agents, mode):
 
 
 if __name__ ==  '__main__':
+    parser = argparse.ArgumentParser(description="Process command-line inputs.")
+    parser.add_argument('--scenario', type=str, default="Scenario3_exhibit", help='Specific Scenario to perform Inference.')
+    parser.add_argument('--n_agents', type=int, default=3, help='How many agents to generate')
+    args = parser.parse_args()
 
     model_name = "model_final.pth"
     model_type = "pytorch"
     # dataset_name = "Flock"
     # dataset_name = "Zara"
     # dataset_name = "Students"
-    specific = "Scenario2_guard"
+    specific = args.scenario
     dataset_name = f"ActedScenarios/{specific}"
 
     x_test = load_python_files(dataset_name)
@@ -394,6 +398,6 @@ if __name__ ==  '__main__':
     print(beh_distr)
     
     # Generate new trajectories based on inferred behaviours:
-    n_agents = 10
+    n_agents = args.n_agents
     mode =  f"Inference\{dataset_name}"
     generate_trajectories(beh_distr, n_agents, mode)

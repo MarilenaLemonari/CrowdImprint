@@ -25,6 +25,7 @@ from sklearn.cluster import KMeans
 from scipy import stats
 from skimage import io
 import cv2
+import argparse
 import random
 
 def fill_pixel(tol, pixel_x, pixel_z, intensity, image, resolution):
@@ -76,24 +77,34 @@ def read_ccp_csvs(csv_directory):
         # bound_max = max(np.max(df["pos_x"]), np.max(df["pos_z"]), 0)
         x_source =  14.18639
         z_source = -15.73068
+        # bound_min = min(np.min(df["pos_x"]), np.min(df["pos_z"]), x_source, z_source)
+        # bound_max = max(np.max(df["pos_x"]), np.max(df["pos_z"]), x_source, z_source)
         bound_min = min(np.min(df["pos_x"]), np.min(df["pos_z"]), x_source, z_source)
         bound_max = max(np.max(df["pos_x"]), np.max(df["pos_z"]), x_source, z_source)
 
-        tol = -25
+        tol = 10
         
         bound_max += tol
         bound_min -= tol 
+        bound_min_x = np.min(df["pos_x"]) - tol
+        bound_max_x = np.max(df["pos_x"]) + tol
+        bound_min_z = np.min(df["pos_z"]) - tol
+        bound_max_z = np.min(df["pos_z"]) + tol
 
-        df["pos_x"] = (df['pos_x'] - bound_min) / (bound_max - bound_min) * (1 - 0) 
-        df["pos_z"] = (df['pos_z'] - bound_min) / (bound_max - bound_min) * (1 - 0) 
+        # df["pos_x"] = (df['pos_x'] - bound_min) / (bound_max - bound_min) * (1 - 0) 
+        # df["pos_z"] = (df['pos_z'] - bound_min) / (bound_max - bound_min) * (1 - 0) 
+        df["pos_x"] = (df['pos_x'] - bound_min_x) / (bound_max_x - bound_min_x) * (1 - 0) 
+        df["pos_z"] = (df['pos_z'] - bound_min_z) / (bound_max_z - bound_min_z) * (1 - 0) 
 
         # TODO: dependent on environment 
         #source for CCP: x_source = 14.18639 z_source = -15.73068
         s = len(df["pos_x"])
         source_norm = np.zeros((s))
         # source_norm[0] = (0 - bound_min) / (bound_max - bound_min) * (1 - 0)
-        source_norm[0] = (x_source - bound_min) / (bound_max - bound_min) * (1 - 0)
-        source_norm[1] = (z_source - bound_min) / (bound_max - bound_min) * (1 - 0)
+        # source_norm[0] = (x_source - bound_min) / (bound_max - bound_min) * (1 - 0)
+        # source_norm[1] = (z_source - bound_min) / (bound_max - bound_min) * (1 - 0)
+        source_norm[0] = (x_source - bound_min_x) / (bound_max_x - bound_min_x) * (1 - 0)
+        source_norm[1] = (z_source - bound_min_z) / (bound_max_z - bound_min_z) * (1 - 0)
 
         df["norm_source"] = list(source_norm)
 
@@ -148,8 +159,8 @@ def read_csv_files(csv_directory):
         bound_min = min(np.min(df["pos_x"]), np.min(df["pos_z"]), source_x, source_y)
         bound_max = max(np.max(df["pos_x"]), np.max(df["pos_z"]), source_x, source_y)
 
-        bound_max += 0.5
-        bound_min -= 0.5
+        bound_max += 1.5
+        bound_min -= 1.5
 
         df["pos_x"] = (df['pos_x'] - bound_min) / (bound_max - bound_min) * (1 - 0) 
         df["pos_z"] = (df['pos_z'] - bound_min) / (bound_max - bound_min) * (1 - 0) 
@@ -258,12 +269,20 @@ def generate_python_files(folder_path, python_path):
 
 # Execute
 if __name__ ==  '__main__':
-    current_file_dir = "C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\Trajectories\CaseStudy\\UMANS\\Scenario3_exhibit"
+    parser = argparse.ArgumentParser(description="Process command-line inputs.")
+    parser.add_argument('--scenario', type=str, default="Scenario3_exhibit", help='Specific Scenario to perform Inference.')
+    parser.add_argument('--source', type=str, default="SL", help='Synthetic Trajectory Source.')
+    args = parser.parse_args()
+
+    current_file_dir = f"C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\Trajectories\CaseStudy\\{args.source}\\{args.scenario}"
     # current_file_dir = "C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\Trajectories\CaseStudy\\CCP\\Scenario3_exhibit"
     
     csv_directory  = current_file_dir  + "\\"
 
-    csv_data =  read_csv_files(csv_directory) # read_ccp_csvs(csv_directory)#TODO
+    if args.source == "CCP":
+        csv_data =  read_ccp_csvs(csv_directory)#TODO
+    else:
+        csv_data =  read_csv_files(csv_directory) 
     n_csvs = len(csv_data)
     dict_list = list(csv_data.items())
     first_name, second_name = current_file_dir.split("Trajectories")

@@ -3,6 +3,10 @@ from inference import *
 from inference_existing import *
 
 if __name__ ==  '__main__':
+    parser = argparse.ArgumentParser(description="Process command-line inputs.")
+    parser.add_argument('--scenario', type=str, default="Scenario3_exhibit", help='Specific Scenario to perform Inference.')
+    parser.add_argument('--source', type=str, default="SL", help='Synthetic Trajectory Source.')
+    args = parser.parse_args()
 
     # Instructions:
     # cd C:\PROJECTS\SocialLandmarks
@@ -14,7 +18,7 @@ if __name__ ==  '__main__':
     # name = "\\RecordedData\\Scenario5_foodcourt"
     # name = "\\SL\\Scenario2_guard"
     # name = "\\CCP\\Scenario3_exhibit"
-    name = "\\UMANS\\Scenario3_exhibit"
+    name = f"\\{args.source}\\{args.scenario}"
     folder_path = folder_dir + name
 
     x_tool = load_inference_data(folder_path)

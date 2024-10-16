@@ -26,7 +26,12 @@
 		<InteractionField id="1" />
 	</Agent>
 	<Agent group="1" max_speed="1.0" pref_speed="1.0" rad="0.3">
-		<pos x="1" y="-2" />
+		<pos x="1" y="-5" />
+		<goal x="0" y="0" />
+		<Policy id="0" />
+	</Agent>
+		<Agent group="1" max_speed="1.0" pref_speed="1.0" rad="0.3">
+		<pos x="-3" y="2" />
 		<goal x="0" y="0" />
 		<Policy id="0" />
 	</Agent>
@@ -39,7 +44,12 @@
 		<InteractionField id="2" />
 	</Agent>
 	<Agent group="2" max_speed="1.0" pref_speed="1.0" rad="0.3">
-		<pos x="-2.465301481836761" y="4.234653303831788" />
+		<pos x="0" y="-3" />
+		<goal x="0" y="0" />
+		<Policy id="0" />
+	</Agent>
+		<Agent group="2" max_speed="1.0" pref_speed="1.0" rad="0.3">
+		<pos x="1" y="0" />
 		<goal x="0" y="0" />
 		<Policy id="0" />
 	</Agent>

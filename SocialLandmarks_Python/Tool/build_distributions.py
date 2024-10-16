@@ -27,7 +27,7 @@ def make_hist(hist_values, decode_dict, dataset_name):
             tick_names.append(decode_dict[index])
     
 
-    plt.bar(range(len(decode_dict)), hist_adj, tick_label=tick_names, color = 'slategrey', edgecolor = 'firebrick', linewidth=2.5)
+    plt.bar(range(len(decode_dict)), hist_adj, tick_label=tick_names, color = 'slategrey') #, edgecolor = 'firebrick', linewidth=2.5)
     plt.xlabel('Predicted Behaviour Combination')
     plt.ylabel('Predicted Behaviour Frequency (%)')
     plt.title(f'Behaviour Histogram of {dataset_name}')
@@ -45,7 +45,7 @@ if __name__ ==  '__main__':
     # Load predictions:
     pred_loc = "C:\\PROJECTS\\SocialLandmarks\\SocialLandmarks_Python\\Data\\PythonFiles\\CaseStudy\\UMANS\\Scenario3_exhibit"
     json_files = [f for f in os.listdir(pred_loc) if f.endswith('.json')]
-    name = "UMANS_sc3"
+    name = "UMANS_sc3_1"
     counter = 1 
     for json_file in json_files:
         path = os.path.join(pred_loc, json_file)
