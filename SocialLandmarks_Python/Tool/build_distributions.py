@@ -35,6 +35,10 @@ def make_hist(hist_values, decode_dict, dataset_name):
     plt.show()
 
 if __name__ ==  '__main__':
+    parser = argparse.ArgumentParser(description="Process command-line inputs.")
+    parser.add_argument('--scenario', type=str, default="Scenario3_exhibit", help='Specific Scenario to perform Inference.')
+    parser.add_argument('--source', type=str, default="SL", help='Synthetic Trajectory Source.')
+    args = parser.parse_args()
 
     # Instructions:
     # cd C:\PROJECTS\SocialLandmarks
@@ -43,9 +47,10 @@ if __name__ ==  '__main__':
     # python3 build_distributions.py
 
     # Load predictions:
-    pred_loc = "C:\\PROJECTS\\SocialLandmarks\\SocialLandmarks_Python\\Data\\PythonFiles\\CaseStudy\\UMANS\\Scenario3_exhibit"
+    # pred_loc = "C:\\PROJECTS\\SocialLandmarks\\SocialLandmarks_Python\\Data\\PythonFiles\\CaseStudy\\UMANS\\Scenario3_exhibit"
+    pred_loc = f"C:\\PROJECTS\\SocialLandmarks\\SocialLandmarks_Python\\Data\\PythonFiles\\CaseStudy\\{args.source}\\{args.scenario}"
     json_files = [f for f in os.listdir(pred_loc) if f.endswith('.json')]
-    name = "UMANS_sc3_1"
+    name = f"{args.source}_{args.scenario}_1"
     counter = 1 
     for json_file in json_files:
         path = os.path.join(pred_loc, json_file)
