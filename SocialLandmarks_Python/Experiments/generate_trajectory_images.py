@@ -183,7 +183,7 @@ def create_images(key, value, dataset_name, resolution= 32):
     choices = [0, 1]
     probabilities = [0.2, 0.8]
     chosen_number = random.choices(choices, probabilities)[0]
-    indication = key.split('IF_')[1].split('_T')[0]
+    # indication = key.split('IF_')[1].split('_T')[0]
 
     image[pixel_x_init,pixel_z_init] = 1
     image = fill_pixel(2, pixel_x_init, pixel_z_init, 1, image, resolution)
@@ -297,7 +297,7 @@ def create_centrered_images(key, value, dataset_name, resolution= 32):
     choices = [0, 1]
     probabilities = [0.2, 0.8]
     chosen_number = random.choices(choices, probabilities)[0]
-    indication = key.split('IF_')[1].split('_T')[0]
+    # indication = key.split('IF_')[1].split('_T')[0]
 
     image[pixel_x_init,pixel_z_init] = 1
     image = fill_pixel(2, pixel_x_init, pixel_z_init, 1, image, resolution)
@@ -405,21 +405,10 @@ def main(name):
   pass
 
 # Execute
-if __name__ ==  '__main__':
-    parser = argparse.ArgumentParser(description="Process command-line inputs.")
-    parser.add_argument('--name', type=str, default="\SingleSwitch\TestData", help='Folder of trajectories')
-    args = parser.parse_args()
+def generate_images(name):
 
-    current_file_dir = "C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\Trajectories"
-    name = args.name # "\SingleSwitch" #TODO
-    # name = "\\NoSwitch"
-    
+    current_file_dir = "C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\Trajectories"    
     csv_directory  = current_file_dir + name + "\\"
-
-    #remove source
-    if os.path.exists(csv_directory + "output_0.csv"):
-        os.remove(csv_directory + "output_0.csv")
-    print("Source csv Successfully Removed.")
 
     csv_data = read_csv_files(csv_directory)
     n_csvs = len(csv_data)
