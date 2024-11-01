@@ -412,7 +412,8 @@ if __name__ ==  '__main__':
 
     current_file_dir = "C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\Trajectories"
     name = args.name # "\SingleSwitch" #TODO
-    # name = "\\NoSwitch"
+    # # name = "\\NoSwitch"
+    # name = "\\Evaluation\\Sanity"
     
     csv_directory  = current_file_dir + name + "\\"
 

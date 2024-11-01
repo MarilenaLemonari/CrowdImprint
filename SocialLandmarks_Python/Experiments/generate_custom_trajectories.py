@@ -50,7 +50,7 @@ def build_IFxml(desired_name,Ns,dictionary):
   with open(save_path_file, "w") as f:
       f.write(xml_str)
 #AGENT.XML
-def build_AGENTxml(desired_name,positions,s_positions,mode,dictionary):
+def build_AGENTxml(desired_name,positions,s_positions,mode,dictionary,placeholder = True):
   from xml.dom import minidom
   import os 
   if mode == "t":
@@ -62,25 +62,26 @@ def build_AGENTxml(desired_name,positions,s_positions,mode,dictionary):
   root.appendChild(xml)
   N=positions.shape[0]
   Ns=len(s_positions)
-  # Placeholder:
-  i=0
-  sourceIF=f'source{i+1}'
-  sourceIF=root.createElement('Agent')   
-  sourceIF.setAttribute('max_speed', '0')
-  sourceIF.setAttribute('pref_speed', '0')
-  sourceIF.setAttribute('rad', '0.0')
-  xml.appendChild(sourceIF)
-  sourcePos = root.createElement('pos')
-  sourcePos.setAttribute('x', '1')
-  sourcePos.setAttribute('y', '1')
-  sourceIF.appendChild(sourcePos)
-  sourceGoal = root.createElement('goal')
-  sourceGoal.setAttribute('x', '0')
-  sourceGoal.setAttribute('y', '0')
-  sourceIF.appendChild(sourceGoal)
-  sourcePolicy = root.createElement('Policy')
-  sourcePolicy.setAttribute('id', '0')
-  sourceIF.appendChild(sourcePolicy)
+  if placeholder == True:
+    # Placeholder:
+    i=0
+    sourceIF=f'source{i+1}'
+    sourceIF=root.createElement('Agent')   
+    sourceIF.setAttribute('max_speed', '0')
+    sourceIF.setAttribute('pref_speed', '0')
+    sourceIF.setAttribute('rad', '0.0')
+    xml.appendChild(sourceIF)
+    sourcePos = root.createElement('pos')
+    sourcePos.setAttribute('x', '1')
+    sourcePos.setAttribute('y', '1')
+    sourceIF.appendChild(sourcePos)
+    sourceGoal = root.createElement('goal')
+    sourceGoal.setAttribute('x', '0')
+    sourceGoal.setAttribute('y', '0')
+    sourceIF.appendChild(sourceGoal)
+    sourcePolicy = root.createElement('Policy')
+    sourcePolicy.setAttribute('id', '0')
+    sourceIF.appendChild(sourcePolicy)
   # Rest:
   for i in range(N):
     sourceIF=f'source{i+2}'
@@ -151,9 +152,9 @@ def build_SCENARIOxml(desired_name,desired_files, end_time, delta_time = 0.1):
   save_path_file = desired_name 
   with open(save_path_file, "w") as f:
       f.write(xml_str)
-def build_xml(init_positions,source_list, dictionary, end_time, delta_time = 0.1):
+def build_xml(init_positions,source_list, dictionary, end_time, delta_time = 0.1, placeholder = True):
   build_IFxml(f"{pathIF}InteractionField_social.xml",len(source_list), dictionary)
-  Ns=build_AGENTxml(f"{pathA}Agent_social.xml",init_positions,source_list,mode,dictionary)
+  Ns=build_AGENTxml(f"{pathA}Agent_social.xml",init_positions,source_list,mode,dictionary, placeholder)
   build_SCENARIOxml(f"{path}Scenario_social.xml","social",end_time, delta_time)
 
 def update_gtIFxml(IFxml_file,W,actionTimes,inactiveTimes,unique_size, groupID):
@@ -209,7 +210,6 @@ def make_trajectory(n_agents,mode, name = None):
   #   folder=f"{mode}/TestData"
 
   folder  = mode
-
 
   for i in range(1,n_agents+1):
     file=f"C:\\PROJECTS\\SocialLandmarks\\SocialLandmarks_Python\\Data\\Trajectories\\{folder}\\agent_{i}.csv"

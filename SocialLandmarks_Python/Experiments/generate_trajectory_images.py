@@ -405,10 +405,16 @@ def main(name):
   pass
 
 # Execute
-def generate_images(name):
+def generate_images(name, placeholder = True):
 
     current_file_dir = "C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\Trajectories"    
     csv_directory  = current_file_dir + name + "\\"
+
+    if os.path.exists(csv_directory + "output_0.csv"):
+        os.remove(csv_directory + "output_0.csv")
+    if placeholder == False:
+        if os.path.exists(csv_directory + "output_1.csv"):
+            os.remove(csv_directory + "output_1.csv")
 
     csv_data = read_csv_files(csv_directory)
     n_csvs = len(csv_data)

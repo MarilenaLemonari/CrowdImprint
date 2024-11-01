@@ -308,4 +308,6 @@ if __name__ ==  '__main__':
     # if captured:
     folder_path = 'C:\PROJECTS\SocialLandmarks\Data\Tracking\YOLO\Tracker\Images\PersonTrajectories'
     name = "ActedScenarios"
+    folder_path = 'C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\Images\Evaluation\Sanity'
+    name = "Evaluation\Sanity"
     generate_python_files(folder_path, name)

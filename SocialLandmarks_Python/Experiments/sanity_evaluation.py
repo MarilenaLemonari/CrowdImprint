@@ -9,7 +9,26 @@ import json
 from preprocess_existing import generate_python_files
 from generate_trajectory_images import *
 
-def generate_trajectories(n_gens, mode):
+def make_trajectory_sanity(n_agents,mode,n):
+
+  folder = mode
+
+  for i in range(2,n_agents+2):
+    file=f"C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\Trajectories\{folder}\\agent_{n}.csv"
+    file2=f"C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\Trajectories\{folder}\output_{i}.csv"
+    if os.path.exists(file)==True:
+      os.remove(file)
+    if os.path.exists(file2)==True:
+      os.remove(file2)
+  os.getcwd()
+  os.system(f"C:\\PROJECTS\\DataDrivenInteractionFields\\InteractionFieldsUMANS\\buildConsole\\Release\\UMANS-ConsoleApplication-Windows.exe -i Scenario_social.xml -o C:\\PROJECTS\\SocialLandmarks\\SocialLandmarks_Python\\Data\\Trajectories\\{folder}")
+  S_true=[]
+  for i in range(2,n_agents+2):
+    os.rename(f"C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\Trajectories\{folder}\output_{i}.csv",f"C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\Trajectories\{folder}\\agent_{n}.csv")
+    S_true.append(load_trajectories(f"C:/PROJECTS/SocialLandmarks/SocialLandmarks_Python/Data/Trajectories/{folder}/agent_{n}.csv", 0))
+  return S_true
+
+def generate_trajectories_sanity(n_gens, mode):
     n_agents = n_gens
     os.chdir("C:\PROJECTS\DataDrivenInteractionFields\InteractionFieldsUMANS\examples")
 
@@ -27,11 +46,10 @@ def generate_trajectories(n_gens, mode):
         else:
             dictionary[i] = behavior_list[i]
 
-    max_end_time = 15
+    # max_end_time = 15
     # init_positions = np.array([[0,0],[1,2],[0,0]])
-    init_positions = np.zeros((n_agents*2,2))
-    source_list = list(np.arange(0,n_agents) * 2) 
-    build_xml(init_positions, source_list, dictionary, max_end_time)
+    init_positions = np.zeros((2,2))# np.zeros((n_agents*2,2))
+    source_list = [0] # list(np.arange(0,n_agents) * 2) 
 
     # combs = ["['0_5']", "['1_2']"]
     combs_dict = {}
@@ -51,6 +69,7 @@ def generate_trajectories(n_gens, mode):
         min_radius = 2
         radius = random.uniform(min_radius, max_radius)
         T = random.randint(3,int(end_time-3)) 
+        build_xml(init_positions, source_list, dictionary, end_time)
 
         if field_1 == 2 and field_2 == 2:
             end_time = random.randint(3,6)
@@ -179,10 +198,10 @@ def generate_trajectories(n_gens, mode):
             inactiveTimes[0,first_field] = T
             actionTimes[0,first_field] = 0
     
-        generate_instance(init_positions,weight,actionTimes,inactiveTimes,or_x, or_y,dictionary, groupID = r)
-  
-    # Save trajectories
-    S_true=make_trajectory(n_agents,mode)
+        generate_instance(init_positions,weight,actionTimes,inactiveTimes,or_x, or_y,dictionary, groupID = 0)#was r
+      
+        # Save trajectories
+        S_true=make_trajectory_sanity(1,mode,r+1)
 
     # Save combinations:
     file_path = "C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\Trajectories" + "\\" + mode + "\comb_dict.json"
@@ -261,13 +280,29 @@ if __name__ == "__main__":
     # python3 sanity_evaluation.py
     """
 
+    # combs_dict = {}
+    # folder_path = "C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\PythonFiles\Evaluation\Sanity"
+    # all_files = os.listdir(folder_path)
+    # tif_files = [file for file in all_files if file.lower().endswith('.npz')]
+    # for file in tif_files:
+    #     combination = file.split("IF_")[1].split("_T")[0]
+    #     key = file.split(".npz")[0]
+    #     combs_dict[key] = combination
+    # file_path = "C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\Trajectories\Evaluation\Sanity\comb_dict.json"
+    # with open(file_path, "w") as json_file:
+    #     json.dump(combs_dict, json_file)
+    # exit()
+
     mode =  "Evaluation\\Sanity"
-    combs_dict = generate_trajectories(n_gens=10000, mode=mode)
+    # combs_dict = generate_trajectories_sanity(n_gens=10000, mode=mode)
+
+    with open("C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\Trajectories\Evaluation\Sanity\comb_dict.json", 'r') as file:
+        combs_dict = json.load(file)
     class_dict = get_class(combs_dict)
     
-    generate_images(name = "\\" + mode)
-    folder_path = 'C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\Images\Evaluation\Sanity'
-    generate_python_files(folder_path=folder_path, name = mode)
+    # generate_images(name = "\\" + mode, placeholder=False)
+    # folder_path = 'C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\Images\Evaluation\Sanity'
+    # generate_python_files(folder_path=folder_path, name = mode)
     predictions_dict = run_model(dataset_name =  mode, combs_dict =  combs_dict)
 
     print(class_dict)
