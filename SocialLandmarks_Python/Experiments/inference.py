@@ -16,21 +16,22 @@ def load_inference_data(folder_path, return_dict = False):
 
     pred_dict = {}
 
-    counter += 1
-    # print(counter, npz_file)
-    file_path = os.path.join(folder_path, npz_file)
-    loaded_data = np.load(file_path)
-    array_keys = loaded_data.files
-    array_key = array_keys[0]
-    array = loaded_data[array_key]
-    if (array.dtype != 'float32'):
-        print("ERROR! Check file path: ",file_path)
-        exit()
-    loaded_images.append(array)        
-    pred_dict[npz_file] = array
+    for npz_file in npz_files:
+        counter += 1
+        # print(counter, npz_file)
+        file_path = os.path.join(folder_path, npz_file)
+        loaded_data = np.load(file_path)
+        array_keys = loaded_data.files
+        array_key = array_keys[0]
+        array = loaded_data[array_key]
+        if (array.dtype != 'float32'):
+            print("ERROR! Check file path: ",file_path)
+            exit()
+        loaded_images.append(array)        
+        pred_dict[npz_file] = array
 
-    images = np.array(loaded_images)
-    images = images[:, np.newaxis, :, :]
+        images = np.array(loaded_images)
+        images = images[:, np.newaxis, :, :]
 
     if return_dict == False:
         return images
