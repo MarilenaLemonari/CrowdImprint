@@ -1,6 +1,6 @@
 
 # Description
-1. Go to directory `cdir = ".../SocialLandmarks/Data"`
+1. Go to directory `cdir = ".../CrowdImprint/Data"`
 2. `cdir/Trajectories` has the csv files of the existing datasets we used for trajectory analysis.
 3. `cdir/Results` contains .png images of the set of the 5 (max) most commonly calculated curves for each dataset, along with the plot of all formatted trajectories and the DTW curves.
 4.  `cdir/Results`  also contains the chosen core behaviours (presented as sketched Interaction Fields).
@@ -8,10 +8,10 @@
 6. `cdir/data_analysis.py` contains the python script used to generate the aforementioned png images.
 
 # Execution
-- Requirements of venv are found in `".../SocialLandmarks/requirements.txt"`
+- Requirements of venv are found in `".../CrowdImprint/requirements.txt"`
 - Double click on `coreBehaviours.bat` or run `cdir/coreBehaviours.bat`
 ```
-cd C:\PROJECTS\SocialLandmarks
+cd C:\PROJECTS\CrowdImprint
 .venv\Scripts\activate
 cd .\Data\
 python3 .\data_analysis.py

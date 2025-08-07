@@ -1,7 +1,7 @@
 
 # Description
 1. The two subfolders in this directory are the two ways that have been attempted to track videos, i.e., YOLO and TRex. We end up only using YOLO.
-2. Go to directory `cdir = ".../SocialLandmarks/Data/Tracking/YOLO/Tracker"`
+2. Go to directory `cdir = ".../CrowdImprint/Data/Tracking/YOLO/Tracker"`
 3. `"cdir/calibration.py"` performs the camera calibration according to our custom data capturing, based on checkboard images.
 4. `"cdir/detection.py` generates the tracked trajectories from input videos. 
 5. `"cdir/generate_images_from_recordings.py"` generates the trajectory images from the tracked data.
@@ -12,12 +12,12 @@
 
 # Execution
 - To avoid conficts, we make a new venv `"cdir/myenv"` with requirements `"cdir/req.txt"`.
-- Navigate to directory `".../SocialLandmarks/Data/Tracking"`.
+- Navigate to directory `".../CrowdImprint/Data/Tracking"`.
 - Double click  or run `trackingVideos.bat`, provided you have already calibrated the camera.
 - You can edit the `.bat` to input the new camera matrix `(3,3)` and distortion coefficients `(5,)` using `--camera_matrix` and `--dist_coeffs` in the python line. 
 - Otherwise, the dafault (ours) values will be used.
 ```
-cd C:\PROJECTS\SocialLandmarks\Data\Tracking\YOLO\Tracker
+cd C:\PROJECTS\CrowdImprint\Data\Tracking\YOLO\Tracker
 myenv\Scripts\activate
 python .\detection.py --camera_matrix e.g., '1,0,0,0,1,0,0,0,1'
 ```

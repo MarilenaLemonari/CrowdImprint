@@ -1,9 +1,9 @@
 
 # Structure
-The experiments are split into INFERENCE and EVALUATION, in `"cdir =C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Experiments"`
+The experiments are split into INFERENCE and EVALUATION, in `"cdir =C:\PROJECTS\CrowdImprint\CrowdImprint_Python\Experiments"`
 
 ## Evaluation
-Evaluation is performed on the recorded instructed data (`"C:\PROJECTS\SocialLandmarks\Data\Tracking\YOLO\Tracker\Images\Instructed"`).
+Evaluation is performed on the recorded instructed data (`"C:\PROJECTS\CrowdImprint\Data\Tracking\YOLO\Tracker\Images\Instructed"`).
 ```
 preprocess_existing.py
 evaluation_existing.py
@@ -24,8 +24,8 @@ inference_existing.py
 visualize_gen_traj.py
 ```
 The outputs are:
-1. In `"...\SocialLandmarks\SocialLandmarks_Python\Experiments\Inference"`, where the distribution of the predicted behaviour combinations can be found.
-2. In `"...\SocialLandmarks\SocialLandmarks_Python\Data\Trajectories\Inference\{input_name}"`, where the new `.csv` trajectories can be found, along with their plot and corresponding predicted combinations. 
+1. In `"...\CrowdImprint\CrowdImprint_Python\Experiments\Inference"`, where the distribution of the predicted behaviour combinations can be found.
+2. In `"...\CrowdImprint\CrowdImprint_Python\Data\Trajectories\Inference\{input_name}"`, where the new `.csv` trajectories can be found, along with their plot and corresponding predicted combinations. 
 
 ### Note
 - Given you have preprocessed data, you can perform inference via `"inference.bat"`.
