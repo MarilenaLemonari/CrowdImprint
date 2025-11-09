@@ -1,0 +1,7 @@
+{
+    "traj_load": {"noswitch": 151, "cim": 207, "doubleswitch":218},
+    "img_load":  {"noswitch": 8, "cim":14 , "doubleswitch": 21},
+    "train_time": {"noswitch": 61, "cim": 145 , "doubleswitch": 0},
+    "inf_time": {"noswitch": 0, "cim": 0, "doubleswitch": 0},
+    "class_no": {"noswitch": 5, "cim": 25, "doubleswitch": 125}
+}

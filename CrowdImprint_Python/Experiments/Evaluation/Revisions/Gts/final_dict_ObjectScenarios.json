@@ -1,0 +1,107 @@
+{
+    "scenario3_exhibit_subject1.csv": {
+        "stop_metric": 0.005025125628140704,
+        "circling_metric": 0.1507537688442211,
+        "attract_metric": 0.010050251256281407,
+        "uni_metric": 0.0400521102292421,
+        "avoid_metric": 0.01577205075099942
+    },
+    "scenario3_exhibit_subject2.csv": {
+        "stop_metric": 0.028985507246376812,
+        "circling_metric": 0.2753623188405797,
+        "attract_metric": 0.07729468599033816,
+        "uni_metric": 0.018751661122732043,
+        "avoid_metric": 0.00901723235921694
+    },
+    "scenario3_exhibit_subject3.csv": {
+        "stop_metric": 0.034482758620689655,
+        "circling_metric": 0.17624521072796934,
+        "attract_metric": 0.07279693486590039,
+        "uni_metric": 0.08610037387012759,
+        "avoid_metric": 0.022484655539107022
+    },
+    "scenario3_exhibit_subject4.csv": {
+        "stop_metric": 0.010714285714285714,
+        "circling_metric": 0.1392857142857143,
+        "attract_metric": 0.025,
+        "uni_metric": 0.07531470214341027,
+        "avoid_metric": 0.016117918407090034
+    },
+    "scenario3_exhibit_subject5.csv": {
+        "stop_metric": 0.004739336492890996,
+        "circling_metric": 0.2985781990521327,
+        "attract_metric": 0.02843601895734597,
+        "uni_metric": 0.09063794762779825,
+        "avoid_metric": 0.010593492797110709
+    },
+    "scenario4_atm_subject1.csv": {
+        "stop_metric": 0.009615384615384616,
+        "circling_metric": 0.2692307692307692,
+        "attract_metric": 0.009615384615384616,
+        "uni_metric": 0.04722560167897912,
+        "avoid_metric": 0.021948235592080197
+    },
+    "scenario4_atm_subject2.csv": {
+        "stop_metric": 0.00558659217877095,
+        "circling_metric": 0.18435754189944134,
+        "attract_metric": 0.01675977653631285,
+        "uni_metric": 0.0556754104610259,
+        "avoid_metric": 0.020990030295587075
+    },
+    "scenario4_atm_subject3.csv": {
+        "stop_metric": 0.0055248618784530384,
+        "circling_metric": 0.18232044198895028,
+        "attract_metric": 0.011049723756906077,
+        "uni_metric": 0.0397078287552453,
+        "avoid_metric": 0.012205883816604228
+    },
+    "scenario4_atm_subject4.csv": {
+        "stop_metric": 0.014545454545454545,
+        "circling_metric": 0.48363636363636364,
+        "attract_metric": 0.05454545454545454,
+        "uni_metric": 0.028488216492369885,
+        "avoid_metric": 0.011732947798722306
+    },
+    "scenario4_atm_subject5.csv": {
+        "stop_metric": 0.01818181818181818,
+        "circling_metric": 0.23636363636363636,
+        "attract_metric": 0.01818181818181818,
+        "uni_metric": 0.055307520582676586,
+        "avoid_metric": 0.029248176543492748
+    },
+    "scenario5_foodcourt_subject1.csv": {
+        "stop_metric": 0.012269938650306749,
+        "circling_metric": 0.34355828220858897,
+        "attract_metric": 0.05521472392638037,
+        "uni_metric": 0.042662134940283154,
+        "avoid_metric": 0.017466729610533464
+    },
+    "scenario5_foodcourt_subject2.csv": {
+        "stop_metric": 0.010309278350515464,
+        "circling_metric": 0.20103092783505155,
+        "attract_metric": 0.05154639175257732,
+        "uni_metric": 0.07164362232860133,
+        "avoid_metric": 0.013961361754744512
+    },
+    "scenario5_foodcourt_subject3.csv": {
+        "stop_metric": 0.005813953488372093,
+        "circling_metric": 0.14534883720930233,
+        "attract_metric": 0.01744186046511628,
+        "uni_metric": 0.05640656408064409,
+        "avoid_metric": 0.01839573397543117
+    },
+    "scenario5_foodcourt_subject4.csv": {
+        "stop_metric": 0.015463917525773196,
+        "circling_metric": 0.2268041237113402,
+        "attract_metric": 0.061855670103092786,
+        "uni_metric": 0.11475457991099303,
+        "avoid_metric": 0.011457500412721602
+    },
+    "scenario5_foodcourt_subject5.csv": {
+        "stop_metric": 0.007575757575757576,
+        "circling_metric": 0.3560606060606061,
+        "attract_metric": 0.05303030303030303,
+        "uni_metric": 0.03413306068129322,
+        "avoid_metric": 0.016211473038957303
+    }
+}

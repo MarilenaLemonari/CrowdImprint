@@ -4,6 +4,7 @@
 #
 
 /.venv/
+/cim/
 /Data/Tracking/YOLO/Tracker/myenv/**/
 /Data/Tracking/YOLO/Tracker/*.pt
 /Data/Tracking/YOLO/Tracker/Images/*.tif

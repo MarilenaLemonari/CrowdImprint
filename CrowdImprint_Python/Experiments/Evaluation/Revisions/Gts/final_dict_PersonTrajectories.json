@@ -1,0 +1,72 @@
+{
+    "scenario1_friends_subject1.csv": {
+        "stop_metric": 0.0072992700729927005,
+        "circling_metric": 0.32116788321167883,
+        "attract_metric": 0.029197080291970802,
+        "uni_metric": 0.056301333928200914,
+        "avoid_metric": 0.016791034764826893
+    },
+    "scenario1_friends_subject2.csv": {
+        "stop_metric": 0.024390243902439025,
+        "circling_metric": 0.2764227642276423,
+        "attract_metric": 0.07317073170731707,
+        "uni_metric": 0.06391955504407429,
+        "avoid_metric": 0.013864561254257642
+    },
+    "scenario1_friends_subject3.csv": {
+        "stop_metric": 0.005050505050505051,
+        "circling_metric": 0.08585858585858586,
+        "attract_metric": 0.04040404040404041,
+        "uni_metric": 0.06295424139069973,
+        "avoid_metric": 0.015617916722239717
+    },
+    "scenario1_friends_subject4.csv": {
+        "stop_metric": 0.0056179775280898875,
+        "circling_metric": 0.398876404494382,
+        "attract_metric": 0.028089887640449437,
+        "uni_metric": 0.024592252084804807,
+        "avoid_metric": 0.010885470448741118
+    },
+    "scenario1_friends_subject5.csv": {
+        "stop_metric": 0.017341040462427744,
+        "circling_metric": 0.3468208092485549,
+        "attract_metric": 0.057803468208092484,
+        "uni_metric": 0.046249450248731755,
+        "avoid_metric": 0.013709952596049638
+    },
+    "scenario2_guard_subject1.csv": {
+        "stop_metric": 0.012903225806451613,
+        "circling_metric": 0.16129032258064516,
+        "attract_metric": 0.04516129032258064,
+        "uni_metric": 0.0627282951572001,
+        "avoid_metric": 0.02176618708579606
+    },
+    "scenario2_guard_subject2.csv": {
+        "stop_metric": 0.011049723756906077,
+        "circling_metric": 0.47513812154696133,
+        "attract_metric": 0.0718232044198895,
+        "uni_metric": 0.07286337248391327,
+        "avoid_metric": 0.025524677819864023
+    },
+    "scenario2_guard_subject3.csv": {
+        "stop_metric": 0.00980392156862745,
+        "circling_metric": 0.29411764705882354,
+        "attract_metric": 0.058823529411764705,
+        "uni_metric": 0.19660932358136296,
+        "avoid_metric": 0.058543993581593665
+    },
+    "scenario2_guard_subject4.csv": {
+        "stop_metric": 0.018867924528301886,
+        "circling_metric": 0.330188679245283,
+        "attract_metric": 0.03773584905660377,
+        "uni_metric": 0.06959315308267006,
+        "avoid_metric": 0.019647277007328635
+    },
+    "scenario2_guard_subject5.csv": {
+        "stop_metric": 0.008333333333333333,
+        "circling_metric": 0.225,
+        "attract_metric": 0.041666666666666664,
+        "uni_metric": 0.05662208859283105,
+        "avoid_metric": 0.023074131947470843
+    }
+}
