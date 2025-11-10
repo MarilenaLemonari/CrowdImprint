@@ -244,7 +244,7 @@ def evaluate_images(query_path):
 
     return search_dict, json_path
 
-def evaluate_dedicated_metric(traj_directory):
+def evaluate_dedicated_metric(traj_directory, tol_stop=0.001, tol_circle=0.0005,tol_attract=0.01):
     # METHOD 3:
     print("evaluate_dedicated_metrics()")
 
@@ -257,7 +257,7 @@ def evaluate_dedicated_metric(traj_directory):
     final_dict = {}
     for agent_id, agent_traj in traj_dict.items():
         metrics_dict = {}
-        timestep = 0.0333333 # For flock. TODO
+        timestep = 0.1 #0.0333333 # For flock. TODO
         tol = 1/timestep
         frames = len(agent_traj)
         source_x = agent_traj["norm_source"].iloc[0]
@@ -276,14 +276,14 @@ def evaluate_dedicated_metric(traj_directory):
             pos_x = agent_traj["pos_x"].iloc[i]
             pos_z = agent_traj["pos_z"].iloc[i]
             speed = agent_traj["speed"].iloc[i]
-            if speed <= 0.001:
+            if speed <= tol_stop:
                 stop_metric += 1 
             dfs_new = math.dist((pos_x, pos_z),(source_x, source_z)) 
-            if abs(dfs - dfs_new) <= 0.0005:
+            if abs(dfs - dfs_new) <= tol_circle:
                 circling_metric += 1
             dfs = dfs_new
             afs_new = math.degrees(math.atan2(source_z - pos_z, source_x - pos_x)) 
-            if abs(afs-afs_new) <= 0.01:
+            if abs(afs-afs_new) <= tol_attract:
                 attract_metric += 1
             afs = afs_new
             if (i % int(tol)) == 0:
@@ -311,10 +311,10 @@ def evaluate_dedicated_metric(traj_directory):
                 path_x.append(pos_x)
                 path_z.append(pos_z)
             # exit()
-        stop_metric /= frames
-        circling_metric /= frames
-        attract_metric /= frames
-        uni_metric /= steps
+        stop_metric /= frames #norm
+        circling_metric /= frames #norm
+        attract_metric /= frames #norm
+        uni_metric /= steps 
         avoid_metric /= steps
         metrics_dict["stop_metric"] = stop_metric
         metrics_dict["circling_metric"] = circling_metric

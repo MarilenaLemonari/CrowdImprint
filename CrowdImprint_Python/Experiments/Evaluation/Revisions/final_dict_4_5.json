@@ -1,0 +1,72 @@
+{
+    "agent_1.csv": {
+        "stop_metric": 0.5266666666666666,
+        "circling_metric": 0.5533333333333333,
+        "attract_metric": 0.52,
+        "uni_metric": 0.003436708268234666,
+        "avoid_metric": 9.408076735679418e-05
+    },
+    "agent_10.csv": {
+        "stop_metric": 0.5933333333333334,
+        "circling_metric": 0.5866666666666667,
+        "attract_metric": 0.5866666666666667,
+        "uni_metric": 0.00850767678216323,
+        "avoid_metric": 0.0006377908600482045
+    },
+    "agent_2.csv": {
+        "stop_metric": 0.8,
+        "circling_metric": 0.7933333333333333,
+        "attract_metric": 0.7933333333333333,
+        "uni_metric": 0.002769089089704802,
+        "avoid_metric": 0.00025361191718445685
+    },
+    "agent_3.csv": {
+        "stop_metric": 0.7733333333333333,
+        "circling_metric": 0.7733333333333333,
+        "attract_metric": 0.78,
+        "uni_metric": 0.0017116130882624879,
+        "avoid_metric": 0.0002038505155076405
+    },
+    "agent_4.csv": {
+        "stop_metric": 0.66,
+        "circling_metric": 0.66,
+        "attract_metric": 0.66,
+        "uni_metric": 0.0018682389198072847,
+        "avoid_metric": 0.0004541015128955076
+    },
+    "agent_5.csv": {
+        "stop_metric": 0.6066666666666667,
+        "circling_metric": 0.7133333333333334,
+        "attract_metric": 0.6,
+        "uni_metric": 0.002600693875479622,
+        "avoid_metric": 0.00013126468738525635
+    },
+    "agent_6.csv": {
+        "stop_metric": 0.78,
+        "circling_metric": 0.78,
+        "attract_metric": 0.7733333333333333,
+        "uni_metric": 0.020255147855266387,
+        "avoid_metric": 0.0007009409187600546
+    },
+    "agent_7.csv": {
+        "stop_metric": 0.5933333333333334,
+        "circling_metric": 0.6066666666666667,
+        "attract_metric": 0.5866666666666667,
+        "uni_metric": 0.004041233933467197,
+        "avoid_metric": 0.00048412122717565433
+    },
+    "agent_8.csv": {
+        "stop_metric": 0.8066666666666666,
+        "circling_metric": 0.8,
+        "attract_metric": 0.8,
+        "uni_metric": 0.021883124184184734,
+        "avoid_metric": 0.001313326133792158
+    },
+    "agent_9.csv": {
+        "stop_metric": 0.47333333333333333,
+        "circling_metric": 0.48,
+        "attract_metric": 0.4666666666666667,
+        "uni_metric": 0.0037995751046039947,
+        "avoid_metric": 0.00017585761187972088
+    }
+}

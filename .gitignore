@@ -5,6 +5,9 @@
 
 /.venv/
 /cim/
+/**/*.xlsx
+/CrowdImprint_Python/Experiments/Evaluation/Revisions/Boxplots/**/*.png
+/CrowdImprint_Python/Experiments/Evaluation/Revisions/Boxplots/*.json
 /Data/Tracking/YOLO/Tracker/myenv/**/
 /Data/Tracking/YOLO/Tracker/*.pt
 /Data/Tracking/YOLO/Tracker/Images/*.tif
