@@ -8,6 +8,8 @@
 /**/*.xlsx
 /CrowdImprint_Python/Experiments/Evaluation/Revisions/Boxplots/**/*.png
 /CrowdImprint_Python/Experiments/Evaluation/Revisions/Boxplots/*.json
+/CrowdImprint_Python/Experiments/Evaluation/Revisions/Histograms/**/*.png
+/CrowdImprint_Python/Experiments/Evaluation/Revisions/*.json
 /Data/Tracking/YOLO/Tracker/myenv/**/
 /Data/Tracking/YOLO/Tracker/*.pt
 /Data/Tracking/YOLO/Tracker/Images/*.tif

@@ -236,6 +236,72 @@ def create_boxplot_pairs(gt, gen, title,subplot_names=["stop_metric", "circle_me
     plt.close()
     # plt.show()
 
+def create_histogram(gt, gen, title,
+                     subplot_names=["stop_metric", "circle_metric", "attract_metric","uni_metric","avoid_metric"],
+                     bins=20, density=True):
+    """
+    Draw 5 subplots; each subplot overlays GT and GEN histograms for the i-th metric.
+    Saves to .\\Evaluation\\Revisions\\Boxplots\\{title}.png (same path you used).
+    """
+    # Ensure iterable-of-iterables
+    if len(gt) != len(gen):
+        raise ValueError("GT and GEN must have the same number of groups.")
+    n = len(subplot_names)
+
+    # Figure: 1 x n subplots, share y for easy visual comparison
+    fig, axes = plt.subplots(1, n, figsize=(4*n, 4), sharey=True)
+
+    # If n == 1, axes is a single Axes
+    if n == 1:
+        axes = [axes]
+
+    for i in range(n):
+        gti  = np.asarray(gt[i])
+        geni = np.asarray(gen[i])
+
+        # Common bin edges per pair → fair comparison
+        all_vals = np.concatenate([gti, geni])
+        # handle edge case if all values identical
+        if np.all(all_vals == all_vals[0]):
+            # make a tiny bin span around the constant value
+            epsilon = 1e-9 if all_vals.size == 0 else max(1e-9, 0.01 * (abs(all_vals[0]) + 1))
+            bins_i = np.linspace(all_vals[0] - epsilon, all_vals[0] + epsilon, 5)
+        else:
+            bins_i = np.histogram_bin_edges(all_vals, bins=bins)
+
+        ax = axes[i]
+        ax.hist(gti,  bins=bins_i, alpha=0.55, color='firebrick',  edgecolor='black',
+                label='COLL.' if i == 0 else None, density=density)
+        ax.hist(geni, bins=bins_i, alpha=0.55, color='slategrey', edgecolor='black',
+                label='GEN.'  if i == 0 else None, density=density)
+
+        # # Optional: draw medians as black lines
+        # if gti.size:
+        #     ax.axvline(np.median(gti),  color='black', linewidth=1, linestyle='-')
+        # if geni.size:
+        #     ax.axvline(np.median(geni), color='black', linewidth=1, linestyle='-')
+
+        ax.set_title(subplot_names[i])
+        if i == 0:
+            ax.set_ylabel("Density" if density else "Count")
+        ax.set_xlabel("Value")
+
+    # Common title + legend
+    fig.suptitle("Collected vs Generated", y=0.98)
+    handles, labels = axes[0].get_legend_handles_labels()
+    if handles:
+        fig.legend(handles, labels, loc="upper right")
+
+    plt.tight_layout(rect=[0, 0, 1, 0.95])
+
+    out_dir = ".\\Evaluation\\Revisions\\Histograms"
+    os.makedirs(out_dir, exist_ok=True)
+    out_path = os.path.join(out_dir, f"{title}.png")
+    plt.savefig(out_path, dpi=200)
+    plt.clf()
+    plt.close()
+    # print(out_path)  # optional feedback
+
 def get_metrics_dict():
     name_dict = {"stop": 0, "circle":1, "attract":2, "continue":3, "uni":3, "avoid":4}
     return name_dict
@@ -246,46 +312,67 @@ def get_metric_class():
 
 if __name__ == "__main__":
     
-    name = "instructed" #instructed, scenarios
-    direction = "avoid"
+    name = "scenarios" #instructed, scenarios
+    direction = "all"
 
     if name == "scenarios":
         pairs_dict = get_scenario_pairs()
     else:
         pairs_dict = get_pairs_dict()
     
+    #TODO: differences statistics for table.
 
+    exit()
     if direction == "all":
+        gt_avg = []
+        gen_avg = []
         for key, metrics_value in pairs_dict.items():
 
             gt = metrics_value["gt"]
             gen = metrics_value["gen"] # col is metrics
-
+            # gt_avg.append(gt)
+            # gen_avg.append(gen)
             create_boxplot_pairs(gt, gen, title=name+"_"+key)
+        
+        if name == "scenarios":
+            gt_list = [] # 5, N_classes with direction
+            gen_list = []
+            subplot_names = []
+            for key, metrics_value in pairs_dict.items():
+                gt = metrics_value["gt"]
+                gen = metrics_value["gen"]
+                subplot_names.append(key)
+                gt_list.append(gt)
+                gen_list.append(gen)
+
+                create_histogram(gt.T,gen.T,title=name+"_"+key)
+
+            # gt=np.transpose(np.array(gt_list), (2, 1, 0))
+            # gen =np.transpose(np.array(gen_list), (2, 1, 0)) #(metr,num, sc)
 
     else:
         if name == "scenarios":
             print("ERROR: Cannot do metric-specific boxplot for scenario.")
             exit()
+        else:
+            gt_list = [] # 5, N_classes with direction
+            gen_list = []
+            subplot_names = []
+            for key, metrics_value in pairs_dict.items():
+                gt = metrics_value["gt"]
+                gen = metrics_value["gen"]
+                name_dict = get_metrics_dict()
+                column = name_dict[direction]
+                metric_class = get_metric_class()
+                if str(metric_class[direction]) in key:
+                    gt_list.append(gt[:,column])
+                    gen_list.append(gen[:,column])
+                    subplot_names.append(key)
 
-        gt_list = [] # 5, N_classes with direction
-        gen_list = []
-        subplot_names = []
-        for key, metrics_value in pairs_dict.items():
-            gt = metrics_value["gt"]
-            gen = metrics_value["gen"]
-            name_dict = get_metrics_dict()
-            column = name_dict[direction]
-            metric_class = get_metric_class()
-            if str(metric_class[direction]) in key:
-                gt_list.append(gt[:,column])
-                gen_list.append(gen[:,column])
-                subplot_names.append(key)
-
-        gt=np.array(gt_list)
-        gen = np.array(gen_list)
- 
-        create_spec_boxplots(gt,gen,name+"_"+direction, direction,subplot_names)
+            gt=np.array(gt_list)
+            gen = np.array(gen_list)
+    
+            create_spec_boxplots(gt,gen,name+"_"+direction, direction,subplot_names)
     
 
 
