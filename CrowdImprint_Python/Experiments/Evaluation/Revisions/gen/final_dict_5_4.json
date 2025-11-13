@@ -1,0 +1,72 @@
+{
+    "49808IF_5_4_T4_d8_a1.csv": {
+        "stop_metric": 0.5,
+        "circling_metric": 0.9875,
+        "attract_metric": 0.9875,
+        "uni_metric": 1.0,
+        "avoid_metric": 1.0
+    },
+    "49817IF_5_4_T6_d14_a1.csv": {
+        "stop_metric": 0.42857142857142855,
+        "circling_metric": 0.9928571428571429,
+        "attract_metric": 0.65,
+        "uni_metric": 0.8461538461538461,
+        "avoid_metric": 1.0
+    },
+    "49844IF_5_4_T9_d13_a1.csv": {
+        "stop_metric": 0.6923076923076923,
+        "circling_metric": 0.9538461538461539,
+        "attract_metric": 0.7615384615384615,
+        "uni_metric": 1.0,
+        "avoid_metric": 1.0
+    },
+    "49856IF_5_4_T2_d8_a1.csv": {
+        "stop_metric": 0.25,
+        "circling_metric": 0.9875,
+        "attract_metric": 0.5125,
+        "uni_metric": 1.0,
+        "avoid_metric": 1.0
+    },
+    "49901IF_5_4_T3_d8_a1.csv": {
+        "stop_metric": 0.375,
+        "circling_metric": 0.9375,
+        "attract_metric": 0.4375,
+        "uni_metric": 1.0,
+        "avoid_metric": 1.0
+    },
+    "49931IF_5_4_T5_d12_a1.csv": {
+        "stop_metric": 0.4166666666666667,
+        "circling_metric": 0.9916666666666667,
+        "attract_metric": 0.5166666666666667,
+        "uni_metric": 1.0,
+        "avoid_metric": 1.0
+    },
+    "49979IF_5_4_T2_d11_a1.csv": {
+        "stop_metric": 0.18181818181818182,
+        "circling_metric": 0.990909090909091,
+        "attract_metric": 0.990909090909091,
+        "uni_metric": 1.0,
+        "avoid_metric": 1.0
+    },
+    "49985IF_5_4_T3_d14_a1.csv": {
+        "stop_metric": 0.21428571428571427,
+        "circling_metric": 0.9928571428571429,
+        "attract_metric": 0.8071428571428572,
+        "uni_metric": 1.0,
+        "avoid_metric": 1.0
+    },
+    "49988IF_5_4_T4_d15_a1.csv": {
+        "stop_metric": 0.41333333333333333,
+        "circling_metric": 0.9933333333333333,
+        "attract_metric": 0.8733333333333333,
+        "uni_metric": 1.0,
+        "avoid_metric": 1.0
+    },
+    "49996IF_5_4_T4_d14_a1.csv": {
+        "stop_metric": 0.36428571428571427,
+        "circling_metric": 0.9928571428571429,
+        "attract_metric": 0.9928571428571429,
+        "uni_metric": 1.0,
+        "avoid_metric": 1.0
+    }
+}

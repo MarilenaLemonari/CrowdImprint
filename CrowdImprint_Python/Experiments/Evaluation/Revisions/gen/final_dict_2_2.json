@@ -1,0 +1,72 @@
+{
+    "49697IF_2_2_T7_d4_a1.csv": {
+        "stop_metric": 0.025,
+        "circling_metric": 0.325,
+        "attract_metric": 0.35,
+        "uni_metric": 1.0,
+        "avoid_metric": 1.0
+    },
+    "49729IF_2_2_T3_d4_a1.csv": {
+        "stop_metric": 0.025,
+        "circling_metric": 0.3,
+        "attract_metric": 0.375,
+        "uni_metric": 1.0,
+        "avoid_metric": 1.0
+    },
+    "49842IF_2_2_T10_d4_a1.csv": {
+        "stop_metric": 0.025,
+        "circling_metric": 0.525,
+        "attract_metric": 0.375,
+        "uni_metric": 1.0,
+        "avoid_metric": 1.0
+    },
+    "49850IF_2_2_T5_d3_a1.csv": {
+        "stop_metric": 0.03333333333333333,
+        "circling_metric": 0.3333333333333333,
+        "attract_metric": 0.9666666666666667,
+        "uni_metric": 0.5,
+        "avoid_metric": 0.5
+    },
+    "49860IF_2_2_T3_d4_a1.csv": {
+        "stop_metric": 0.025,
+        "circling_metric": 0.975,
+        "attract_metric": 0.175,
+        "uni_metric": 1.0,
+        "avoid_metric": 1.0
+    },
+    "49917IF_2_2_T10_d5_a1.csv": {
+        "stop_metric": 0.02,
+        "circling_metric": 0.36,
+        "attract_metric": 0.48,
+        "uni_metric": 1.0,
+        "avoid_metric": 1.0
+    },
+    "49936IF_2_2_T7_d5_a1.csv": {
+        "stop_metric": 0.02,
+        "circling_metric": 0.3,
+        "attract_metric": 0.48,
+        "uni_metric": 1.0,
+        "avoid_metric": 1.0
+    },
+    "49946IF_2_2_T3_d3_a1.csv": {
+        "stop_metric": 0.03333333333333333,
+        "circling_metric": 0.4,
+        "attract_metric": 0.9666666666666667,
+        "uni_metric": 1.0,
+        "avoid_metric": 1.0
+    },
+    "49947IF_2_2_T7_d3_a1.csv": {
+        "stop_metric": 0.03333333333333333,
+        "circling_metric": 0.3333333333333333,
+        "attract_metric": 0.9666666666666667,
+        "uni_metric": 1.0,
+        "avoid_metric": 1.0
+    },
+    "49950IF_2_2_T4_d5_a1.csv": {
+        "stop_metric": 0.02,
+        "circling_metric": 0.28,
+        "attract_metric": 0.92,
+        "uni_metric": 0.75,
+        "avoid_metric": 1.0
+    }
+}
