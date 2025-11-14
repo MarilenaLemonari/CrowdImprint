@@ -6,6 +6,8 @@
 /.venv/
 /cim/
 /**/*.xlsx
+/**/*.jpg
+/Data/Tracking/MuseumVisitors/frames/
 /CrowdImprint_Python/Experiments/Evaluation/Revisions/Boxplots/**/*.png
 /CrowdImprint_Python/Experiments/Evaluation/Revisions/Boxplots/*.json
 /CrowdImprint_Python/Experiments/Evaluation/Revisions/Histograms/**/*.png
@@ -107,3 +109,5 @@ ExportedObj/
 # /Video-to-Crowds-Unity/[Aa]ssets/[Ss]treamingAssets/aa.meta
 # /Video-to-Crowds-Unity/[Aa]ssets/[Ss]treamingAssets/aa/*
 SocialLandmarks_Python/Data/confusion_matrix.png
+/Data/Tracking/MuseumVisitors
+*.jpg

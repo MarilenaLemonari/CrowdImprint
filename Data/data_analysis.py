@@ -9,7 +9,7 @@ from scipy.interpolate import interp1d
 import argparse
 
 # INSTRUCTIONS:
-#   cd C:\PROJECTS\SocialLandmarks
+#   cd C:\PROJECTS\CrowdImprint
 #   .venv\Scripts\activate
 #   cd .\Data\
 #   python3 .\data_analysis.py
@@ -43,14 +43,14 @@ def preprocess_data(source):
             within which a list of #agents,
             of positional arrays of shape (#frames, 3) with columns: [frame_no, pos_x, pos_y].
     """
-    # traj_path =  "C:/PROJECTS/SocialLandmarks/Data/Trajectories/eth_hotel.txt"
-    traj_dir = "C:/PROJECTS/SocialLandmarks/Data/Trajectories"
+    # traj_path =  "C:/PROJECTS/CrowdImprint/Data/Trajectories/eth_hotel.txt"
+    traj_dir = "./Trajectories"
     all_files = os.listdir(traj_dir)
     eth_files = [file for file in all_files if file.endswith(".txt") and "eth" in file]
     agents_traj = []
     
     for i, eth_file in enumerate(eth_files):
-      traj_path =  f"C:/PROJECTS/SocialLandmarks/Data/Trajectories/{eth_file}"
+      traj_path =  f"./Trajectories/{eth_file}"
 
       traj_array = np.loadtxt(traj_path)
 
@@ -99,7 +99,7 @@ def preprocess_data(source):
             of positional arrays of shape (#timesteps, 3) with columns: [timestep, pos_x, pos_y]
     """
 
-    traj_dir = "C:/PROJECTS/SocialLandmarks/Data/Trajectories/Flock/"
+    traj_dir = "./Trajectories/Flock/"
     all_agent_files = os.listdir(traj_dir)
     column_names = ["Timestep", "pos_x", "pos_y" ]
 
@@ -148,7 +148,7 @@ def preprocess_data(source):
           2.5fps
     """
   
-    traj_dir = "C:/PROJECTS/SocialLandmarks/Data/Trajectories/Zara/"
+    traj_dir = "./Trajectories/Zara/"
     zara_folders = [folder for folder in os.listdir(traj_dir) if os.path.isdir(os.path.join(traj_dir, folder))]
     agents_traj = []
     timestep = 0.4
@@ -205,7 +205,7 @@ def preprocess_data(source):
           2.5fps
     """
   
-    traj_dir = "C:/PROJECTS/SocialLandmarks/Data/Trajectories/Students/"
+    traj_dir = "./Trajectories/Students/"
     student_folders = [folder for folder in os.listdir(traj_dir) if os.path.isdir(os.path.join(traj_dir, folder))]
     agents_traj = []
     timestep = 0.4
@@ -442,6 +442,8 @@ if __name__ ==  '__main__':
   # agents_traj = preprocess_data(source = "Zara")
   # agents_traj = preprocess_data(source = "Students")
   agents_traj = preprocess_data(source = args.source_name)
+  # print(agents_traj[0]) # (num_agents, arr(timestep,x,z))
+  
 
   # data, [max_value, max_value_h, max_value_w] = visualize_agent_traj(agents_traj = agents_traj[0], title = "ETH_Hotel Trajectories")
   # data, [max_value, max_value_h, max_value_w] = visualize_agent_traj(agents_traj = agents_traj[1], title = "ETH_Road Trajectories")
