@@ -1,5 +1,5 @@
 from imports import *
-
+from generate_images_from_data import create_centrered_images
 
 def visualize_agent_traj(agents_traj, title, plot = True,source=np.array([0.09,0.6])):
     print("visualize_agent_traj()")
@@ -323,8 +323,8 @@ def plot_paths(arr, name ,source=np.array([0.09,0.6])):
     plt.ylim(-0.1,1.1)
     plt.xlabel("x")
     plt.ylabel("z")
-    plt.savefig(f".\\Trajectories\\{name}.png")
-    plt.close()
+    #plt.savefig(f".\\Trajectories\\{name}.png")
+    #plt.close()
     #plt.show()
 
 def preprocess_traj(traj, plot_bool=False, stretch_vertical = 10/8):
@@ -371,6 +371,74 @@ def format_data(group_traj):
 
     return [agent_traj]
 
+def generate_python_files(folder_path, name):
+
+    all_files = os.listdir(folder_path)
+    tif_files = [file for file in all_files if file.lower().endswith('.tif')]
+
+    for tif_file in tqdm(tif_files):
+        old_name = tif_file.split('.')[0]
+        try:
+            image_path = os.path.join(folder_path, tif_file)
+            image = cv2.imread(image_path, cv2.IMREAD_UNCHANGED)
+            # tifffile.imwrite(f'C:\PROJECTS\SocialLandmarks\SocialLandmarks_Python\Data\PythonFiles\{name}\{old_name}.tif', image)
+            np.savez(f'C:\\PROJECTSisha\\CrowdImprint\\CrowdImprint_Python\\Data\\PythonFiles\\{name}\\{old_name}.npz', image)
+        except Exception as e:
+            print(f"Error loading image '{tif_file}': {e}")
+
+def create_images(group_traj):
+    source=np.array([0.09,0.6])
+    source_x = source[0]
+    source_y = source[1]
+    folder_path = ".\\Images"
+    for key, value in group_traj.items():
+
+        prefix = key.split("_")
+        new_key = prefix[0] + "_" + prefix[1] + "_group_" + prefix[2] 
+
+        df = pd.DataFrame()
+        df[["frames", "pos_x", "pos_z"]] = value
+        dims = value[:,0].shape
+        source_norm = np.zeros((dims))
+        source_norm[0] = source_x
+        source_norm[1] = source_y
+        
+        # normalize:
+        bound_min = min(np.min(df["pos_x"]), np.min(df["pos_z"]), source_x, source_y)
+        bound_max = max(np.max(df["pos_x"]), np.max(df["pos_z"]), source_x, source_y)
+        bound_max += 0.5
+        bound_min -= 0.5
+        df["pos_x"] = (df['pos_x'] - bound_min) / (bound_max - bound_min) * (1 - 0) 
+        df["pos_z"] = (df['pos_z'] - bound_min) / (bound_max - bound_min) * (1 - 0) 
+        source_norm[0] = (source_x - bound_min) / (bound_max - bound_min) * (1 - 0)
+        source_norm[1] = (source_y - bound_min) / (bound_max - bound_min) * (1 - 0)
+        df["norm_source"] = source_norm
+
+        # find speed:
+        dx = value[1:,1] - value[:-1,1]
+        dz = value[1:,2] - value[:-1,2]
+        dt = value[1:, 0] - value[:-1,0]
+        speed_x = abs(dx)/dt
+        speed_z = abs(dz)/dt
+        speed = np.sqrt((speed_x)**2+(speed_z)**2)
+        speed_min = np.min(speed)
+        speed_max = np.max(speed)
+        if (speed_max - speed_min) != 0 :
+            speed = (speed - speed_min) / (speed_max - speed_min) * (1-0)
+        df["speed"] = np.hstack((np.array([0]),speed))
+        df = df.drop(columns=["frames"])
+
+        if prefix[2] == "3":
+            plt.plot(value[:,1], value[:,2],c="slategrey")
+
+        #create_centrered_images(new_key, df, folder_path, resolution=64)        
+
+    # plt.xlim([-1,1])
+    # plt.ylim([-1,1])
+    plt.plot(source_x, source_y,"o", c="black")
+    plt.show()
+    # create_centrered_images(prefix, value, folder_path, resolution=64) 
+
 def main():
 
     df = load_data()
@@ -379,11 +447,15 @@ def main():
 
     # Process data:
     # preprocess_traj(traj, plot_bool=False)
-    group_traj = split_groups(traj, group_info)
-    agents_traj = format_data(group_traj)
+    group_traj = split_groups(traj, group_info) # keys {visitor_id}_{camera_id}_{groupid}
+    # create_images(group_traj)
+    generate_python_files(".\\Images\\group_6", "group_6")
 
-    data, datasource,[max_value, max_value_h, max_value_w] = visualize_agent_traj(agents_traj = agents_traj[0], title = "museum_visitors")
-    perform_dtw(data, datasource, [max_value, max_value_h, max_value_w], n_clusters = 5, degree = 3)
+    exit()
+    agents_traj = format_data(group_traj)
+    # Formatting for finding core behaviours:
+    # data, datasource,[max_value, max_value_h, max_value_w] = visualize_agent_traj(agents_traj = agents_traj[0], title = "museum_visitors")
+    # perform_dtw(data, datasource, [max_value, max_value_h, max_value_w], n_clusters = 5, degree = 3)
     
 
 if __name__ == "__main__":
