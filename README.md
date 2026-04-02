@@ -32,7 +32,7 @@ measuring behaviour similarity.
 
 <p align="center" dir="auto">
 	<a href="https://youtu.be/SEhdstN5mgM" rel="nofollow">
-		<img align="center" width="400px" src="https://github.com/MarilenaLemonari/CrowdImprint/blob/main/Msic/Images/ci_youtube.png"/>
+		<img align="center" width="400px" src="https://github.com/MarilenaLemonari/CrowdImprint/blob/main/Misc/Images/ci_youtube.png"/>
 	</a>
 </p>
 
