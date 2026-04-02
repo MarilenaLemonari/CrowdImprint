@@ -1,5 +1,6 @@
 from imports import *
 from generate_images_from_data import create_centrered_images
+from make_video import *
 
 def visualize_agent_traj(agents_traj, title, plot = True,source=np.array([0.09,0.6])):
     print("visualize_agent_traj()")
@@ -264,6 +265,7 @@ def extract_pseudo_ground_trajectories(df, img_w=1280, img_h=800, invert_z=True)
 
     trajectories = {}
     group_info = {}
+    group_list = []
 
     for (vid, cam), group in df_sorted.groupby(["visitorid", "cameraid"]):
 
@@ -276,6 +278,10 @@ def extract_pseudo_ground_trajectories(df, img_w=1280, img_h=800, invert_z=True)
         visitor_group = []
         for _, row in group.iterrows():
             visitor_group.append(row["groupid"])
+
+            if row["groupid"] == 3:
+                if row["cameraid"] == 1:
+                    group_list.append(row["frameid"])
             
             frame = int(row["frameid"])
             x = float(row["x_norm"])
@@ -285,6 +291,7 @@ def extract_pseudo_ground_trajectories(df, img_w=1280, img_h=800, invert_z=True)
         trajectories[vid][cam] = traj_list
         group_info[f"{vid}_{cam}"] = visitor_group
 
+    print(group_list)
     return trajectories, group_info
 
 def load_data():
@@ -343,7 +350,6 @@ def preprocess_traj(traj, plot_bool=False, stretch_vertical = 10/8):
 def split_groups(traj, group_info):
 
     group_traj = {}
-
     for visitor_id, traj_dict in traj.items():
         for camera_id, path_cam in traj[visitor_id].items():
             path_array = np.array(path_cam)
@@ -444,12 +450,13 @@ def main():
     df = load_data()
 
     traj, group_info = extract_pseudo_ground_trajectories(df)
+    exit()
 
     # Process data:
     # preprocess_traj(traj, plot_bool=False)
     group_traj = split_groups(traj, group_info) # keys {visitor_id}_{camera_id}_{groupid}
     # create_images(group_traj)
-    generate_python_files(".\\Images\\group_6", "group_6")
+    # generate_python_files(".\\Images\\group_6", "group_6")     
 
     exit()
     agents_traj = format_data(group_traj)
