@@ -24,7 +24,7 @@ measuring behaviour similarity.
 <br>
 
 <p align="center"><strong>
-	- <a href="https://doi.org/10.1007/s00371-025-04329-2" target="_blank">Publication</a> | <a href="https://github.com/MarilenaLemonari/CrowdImprint/blob/main/Misc/PDF%20Files/CI_suppemetrary.pdf" target="_blank">Supplementary Material (PDF)</a> | <a href="https://youtu.be/SEhdstN5mgM" target="_blank">Video</a> -
+	- <a href="https://doi.org/10.1007/s00371-025-04329-2" target="_blank">Publication</a> | <a href="https://github.com/MarilenaLemonari/CrowdImprint/blob/main/Misc/PDF_files/CI_suppemetrary.pdf" target="_blank">Supplementary Material (PDF)</a> | <a href="https://youtu.be/SEhdstN5mgM" target="_blank">Video</a> -
 </strong>
 </p>
 
