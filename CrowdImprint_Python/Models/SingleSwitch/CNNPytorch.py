@@ -60,7 +60,8 @@ class CNN(nn.Module):
         x = self.dropout5(x)
         
         x = self.fc4(x)
-        x = F.log_softmax(x, dim=1)
+        #x = F.log_softmax(x, dim=1)\
+        x = F.softmax(x, dim=1)
         
         return x
     
@@ -113,7 +114,8 @@ class CNN10class(nn.Module):
         x = self.dropout5(x)
         
         x = self.fc4(x)
-        x = F.log_softmax(x, dim=1)
+        # x = F.log_softmax(x, dim=1)
+        x = F.softmax(x, dim=1)
         
         return x
     
@@ -124,6 +126,7 @@ def instantiate_model():
     print("SUCCESS! Model Instantiated.")
 
     criterion = nn.CrossEntropyLoss()
+    # criterion = nn.NLLLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001, weight_decay=0.003)
 
     return model, criterion, optimizer, device

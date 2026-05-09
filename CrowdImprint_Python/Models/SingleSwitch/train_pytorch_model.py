@@ -3,7 +3,7 @@ from data_loader import *
 from CNNPytorch import *
 from config import *
 
-os.environ['WANDB_API_KEY']="29162836c3095b286c169bf889de71652ed3201b"
+# os.environ['WANDB_API_KEY']=...
 
 # TODO:
 # cd C:\PROJECTS\SocialLandmarks
@@ -58,11 +58,11 @@ def validate(model, val_loader, criterion, device, CM = False, name = "Validatio
     return val_loss_avg, val_acc_overall_avg
 
 def train(model, train_loader, val_loader, criterion, optimizer, device, epochs):
-    model.train()
     epoch_losses = []
     acc_overall = []
 
     for epoch in range(epochs):
+        model.train()
         epoch_loss = 0.0
         epoch_total = 0
         correct = 0
